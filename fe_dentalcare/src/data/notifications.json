@@ -1,0 +1,68 @@
+[
+  {
+    "id": "NOTIF-H1-001",
+    "facilityId": "FAC-001",
+    "title": "Jadwal Kontrol Gigi Besok (H-1): Siti Rahmawati",
+    "message": "Pasien Siti Rahmawati (RM-2026-000002) dijadwalkan Kontrol Rutin Behel & Kawat Gigi besok pukul 09:00 bersama drg. Jihan, S.Kep. Harap konfirmasi kehadiran pasien.",
+    "category": "appointment",
+    "timestamp": "2026-10-05T08:00:00Z",
+    "isRead": false,
+    "severity": "warning",
+    "actionUrl": "/appointments"
+  },
+  {
+    "id": "NOTIF-H1-002",
+    "facilityId": "FAC-001",
+    "title": "Jadwal Kontrol Gigi Besok (H-1): Budi Santoso",
+    "message": "Pasien Budi Santoso (RM-2026-000001) dijadwalkan Kontrol Evaluasi Tambalan Gigi & Saluran Akar besok pukul 10:30 bersama drg. Jihan, S.Kep.",
+    "category": "appointment",
+    "timestamp": "2026-10-05T08:30:00Z",
+    "isRead": false,
+    "severity": "info",
+    "actionUrl": "/appointments"
+  },
+  {
+    "id": "NOTIF-001",
+    "facilityId": "FAC-001",
+    "title": "Hasil Foto Panoramik Gigi Tersedia",
+    "message": "Hasil foto Rontgen Panoramik digital gigi pasien Ahmad Fauzi (RM-2026-000004) telah selesai diunggah dan siap diverifikasi oleh dokter gigi.",
+    "category": "radiology",
+    "timestamp": "2026-09-16T08:35:00Z",
+    "isRead": false,
+    "severity": "info",
+    "actionUrl": "/radiology"
+  },
+  {
+    "id": "NOTIF-002",
+    "facilityId": "FAC-001",
+    "title": "Stok Bahan Dental Menipis",
+    "message": "Stok Composite Resin Solare A2 tersisa 3 syringe (batas minimum: 5 syringe). Harap segera ajukan restock bahan tambal gigi.",
+    "category": "inventory",
+    "timestamp": "2026-09-16T08:00:00Z",
+    "isRead": false,
+    "severity": "warning",
+    "actionUrl": "/inventory"
+  },
+  {
+    "id": "NOTIF-003",
+    "facilityId": "FAC-001",
+    "title": "Resep Obat Dental Siap Diproses",
+    "message": "Resep obat gigi pasca tindakan tambal gigi oleh drg. Jihan, S.Kep untuk pasien Siti Rahmawati telah masuk antrean farmasi klinik.",
+    "category": "pharmacy",
+    "timestamp": "2026-09-16T09:30:00Z",
+    "isRead": true,
+    "severity": "info",
+    "actionUrl": "/pharmacy"
+  },
+  {
+    "id": "NOTIF-004",
+    "facilityId": "FAC-001",
+    "title": "Pembayaran Kasir Gigi Diterima",
+    "message": "Invoice INV-2026-0001 pasien Siti Rahmawati sebesar Rp 350.000 (Scaling Gigi Rahang Atas & Bawah) telah lunas via QRIS.",
+    "category": "billing",
+    "timestamp": "2026-09-16T10:15:00Z",
+    "isRead": true,
+    "severity": "success",
+    "actionUrl": "/billing"
+  }
+]

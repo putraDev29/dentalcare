@@ -1,0 +1,154 @@
+[
+  {
+    "id": "INV-001",
+    "facilityId": "FAC-001",
+    "invoiceNumber": "INV-202609-0001",
+    "encounterId": "ENC-001",
+    "patientId": "PAT-001",
+    "patientName": "Budi Santoso",
+    "patientMrn": "RM-2026-000001",
+    "patientPhone": "081298765432",
+    "insuranceType": "umum",
+    "items": [
+      {
+        "id": "ITEM-001",
+        "description": "Jasa Konsultasi & Pemeriksaan Gigi drg. Jihan, S.Kep",
+        "category": "consultation",
+        "quantity": 1,
+        "unitPrice": 150000,
+        "totalPrice": 150000
+      },
+      {
+        "id": "ITEM-002",
+        "description": "Tindakan: Penambalan Komposit Sinar Gigi #46",
+        "category": "procedure",
+        "quantity": 1,
+        "unitPrice": 450000,
+        "totalPrice": 450000
+      },
+      {
+        "id": "ITEM-003",
+        "description": "Tindakan: Pembersihan Karang Gigi (Scaling) Rahang Atas & Bawah",
+        "category": "procedure",
+        "quantity": 1,
+        "unitPrice": 350000,
+        "totalPrice": 350000
+      },
+      {
+        "id": "ITEM-004",
+        "description": "Obat: Asam Mefenamat 500mg (10 tablet)",
+        "category": "medicine",
+        "quantity": 10,
+        "unitPrice": 6000,
+        "totalPrice": 60000
+      },
+      {
+        "id": "ITEM-005",
+        "description": "Obat: Minosep Obat Kumur Chlorhexidine 0.2% 150ml",
+        "category": "medicine",
+        "quantity": 1,
+        "unitPrice": 42000,
+        "totalPrice": 42000
+      }
+    ],
+    "subtotal": 1052000,
+    "discount": 0,
+    "tax": 0,
+    "totalAmount": 1052000,
+    "coveredByInsurance": 0,
+    "patientPaidAmount": 1052000,
+    "paidAmount": 1052000,
+    "balanceAmount": 0,
+    "outstandingAmount": 0,
+    "status": "paid",
+    "paymentStatus": "paid",
+    "paymentMethod": "qris",
+    "paidAt": "2026-09-16T09:10:00Z",
+    "cashierId": "USR-005",
+    "cashierName": "Maya Indah, S.E.",
+    "transactions": [
+      {
+        "id": "TRX-001",
+        "amount": 1052000,
+        "paymentMethod": "qris",
+        "referenceNumber": "QRIS-BCA-9812401",
+        "paidAt": "2026-09-16T09:10:00Z",
+        "cashierName": "Maya Indah, S.E.",
+        "notes": "Pembayaran lunas via QRIS BCA"
+      }
+    ],
+    "notes": "Pembersihan karang gigi & tambal gigi 46. Pasien Umum."
+  },
+  {
+    "id": "INV-004",
+    "facilityId": "FAC-001",
+    "invoiceNumber": "INV-202609-0004",
+    "encounterId": "ENC-004",
+    "patientId": "PAT-004",
+    "patientName": "Ahmad Fauzi",
+    "patientMrn": "RM-2026-000004",
+    "patientPhone": "081122334455",
+    "insuranceType": "umum",
+    "items": [
+      {
+        "id": "ITEM-006",
+        "description": "Jasa Konsultasi & Pemeriksaan Gigi drg. Jihan, S.Kep",
+        "category": "consultation",
+        "quantity": 1,
+        "unitPrice": 150000,
+        "totalPrice": 150000
+      },
+      {
+        "id": "ITEM-007",
+        "description": "Tindakan: Kuretase Gingiva & Root Planing Per Regio Gigi 36",
+        "category": "procedure",
+        "quantity": 1,
+        "unitPrice": 400000,
+        "totalPrice": 400000
+      },
+      {
+        "id": "ITEM-008",
+        "description": "Obat: Amoxicillin 500mg (15 kaplet)",
+        "category": "medicine",
+        "quantity": 15,
+        "unitPrice": 4000,
+        "totalPrice": 60000
+      },
+      {
+        "id": "ITEM-009",
+        "description": "Obat: Ibuprofen 400mg (10 tablet)",
+        "category": "medicine",
+        "quantity": 10,
+        "unitPrice": 4000,
+        "totalPrice": 40000
+      }
+    ],
+    "subtotal": 650000,
+    "discount": 0,
+    "tax": 0,
+    "totalAmount": 650000,
+    "coveredByInsurance": 0,
+    "patientPaidAmount": 650000,
+    "paidAmount": 650000,
+    "balanceAmount": 0,
+    "outstandingAmount": 0,
+    "status": "paid",
+    "paymentStatus": "paid",
+    "paymentMethod": "cash",
+    "paidAt": "2026-09-20T11:00:00Z",
+    "cashierId": "USR-005",
+    "cashierName": "Maya Indah, S.E.",
+    "transactions": [
+      {
+        "id": "TRX-004",
+        "amount": 650000,
+        "paymentMethod": "cash",
+        "referenceNumber": "CASH-20260920-004",
+        "paidAt": "2026-09-20T11:00:00Z",
+        "cashierName": "Maya Indah, S.E.",
+        "notes": "Pembayaran tunai lunas kasir"
+      }
+    ],
+    "notes": "Tindakan kuretase gigi 36 dan resep antibiotik/analgesik. Status Lunas."
+  }
+]

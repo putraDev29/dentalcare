@@ -1,0 +1,28 @@
+[
+  {
+    "id": "RAD-001",
+    "orderNumber": "RAD-2026-0001",
+    "facilityId": "FAC-001",
+    "encounterId": "ENC-001",
+    "patientId": "PAT-004",
+    "patientName": "Dewi Lestari",
+    "patientMrn": "RM-2026-000004",
+    "doctorId": "DOC-001",
+    "doctorName": "drg. Jihan, S.Kep",
+    "modality": "X-Ray",
+    "examinationType": "Rontgen Dental Panoramic Digital",
+    "bodyPart": "Maksila & Mandibula (Seluruh Gigi & Rahang)",
+    "clinicalNotes": "Evaluasi impaksi gigi molar 3 kanan dan kiri bawah (#38, #48) serta kedekatan akar dengan canalis mandibularis.",
+    "status": "completed",
+    "priority": "normal",
+    "result": {
+      "id": "RES-RAD-001",
+      "findings": "Tampak impaksi mesioangular gigi 48 kelas II posisi B (Winter classification). Gigi 38 impaksi vertikal kelas I posisi A. Tidak tampak lesi kista periapikal. Jarak apeks gigi 48 terhadap canalis alveolaris inferior kurang lebih 1.5mm.",
+      "impression": "Impaksi gigi 48 mesioangular kelas IIB dan impaksi gigi 38 vertikal kelas IA.",
+      "radiologistName": "drg. Radiologi Dental",
+      "reportedAt": "2026-09-15T16:30:00Z",
+      "imageUrl": "https://images.unsplash.com/photo-1516549655169-df83a0774514?w=800&auto=format&fit=crop&q=80"
+    },
+    "createdAt": "2026-09-15T16:05:00Z"
+  }
+]

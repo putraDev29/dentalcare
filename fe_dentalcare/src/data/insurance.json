@@ -1,0 +1,58 @@
+[
+  {
+    "id": "INS-001",
+    "name": "BPJS Kesehatan (JKN-KIS)",
+    "code": "BPJS",
+    "category": "bpjs",
+    "contactPerson": "Helpdesk RS BPJS",
+    "phone": "165",
+    "email": "faskes@bpjs-kesehatan.go.id",
+    "isActive": true,
+    "claimCount": 1420
+  },
+  {
+    "id": "INS-002",
+    "name": "Mandiri Inhealth (I-Med / Blue / Gold)",
+    "code": "MI",
+    "category": "commercial",
+    "contactPerson": "dr. Ratna (Provider Relation)",
+    "phone": "(021) 525-0988",
+    "email": "provider@mandiriinhealth.co.id",
+    "isActive": true,
+    "claimCount": 385
+  },
+  {
+    "id": "INS-003",
+    "name": "Prudential Life Assurance Indonesia",
+    "code": "PRU",
+    "category": "commercial",
+    "contactPerson": "Hotline Hospital Care",
+    "phone": "1500085",
+    "email": "claim@prudential.co.id",
+    "isActive": true,
+    "claimCount": 210
+  },
+  {
+    "id": "INS-004",
+    "name": "Allianz Life Indonesia",
+    "code": "ALZ",
+    "category": "commercial",
+    "contactPerson": "Medical Claim Desk",
+    "phone": "1500136",
+    "email": "claim.allianz@allianz.co.id",
+    "isActive": true,
+    "claimCount": 165
+  },
+  {
+    "id": "INS-005",
+    "name": "PT Adhi Karya (Corporate)",
+    "code": "CORP-ADH",
+    "category": "corporate",
+    "contactPerson": "HRD Kesejahteraan Karyawan",
+    "phone": "(021) 797-5312",
+    "email": "medical@adhi.co.id",
+    "isActive": true,
+    "claimCount": 94
+  }
+]
+

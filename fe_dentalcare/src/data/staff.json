@@ -1,0 +1,68 @@
+[
+  {
+    "id": "STF-001",
+    "facilityId": "FAC-001",
+    "employeeId": "STF-2022-001",
+    "name": "Ns. Siti Nurhaliza, S.Kep",
+    "role": "Perawat Pelaksana",
+    "department": "Poli Umum",
+    "phone": "081555667788",
+    "email": "nurse@ehealth.local",
+    "joinDate": "2022-03-01",
+    "status": "active",
+    "avatarUrl": "https://images.unsplash.com/photo-1594824813576-03716d1cd41b?w=150&auto=format&fit=crop&q=80"
+  },
+  {
+    "id": "STF-002",
+    "facilityId": "FAC-001",
+    "employeeId": "STF-2021-008",
+    "name": "apt. Hendro Wibowo, S.Farm",
+    "role": "Apoteker Penanggung Jawab",
+    "department": "Instalasi Farmasi",
+    "phone": "081777889900",
+    "email": "pharmacy@ehealth.local",
+    "joinDate": "2021-06-15",
+    "status": "active",
+    "avatarUrl": "https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=150&auto=format&fit=crop&q=80"
+  },
+  {
+    "id": "STF-003",
+    "facilityId": "FAC-001",
+    "employeeId": "STF-2023-004",
+    "name": "Dewi Kartika",
+    "role": "Kasir & Billing",
+    "department": "Keuangan & Kasir",
+    "phone": "081888990011",
+    "email": "cashier@ehealth.local",
+    "joinDate": "2023-01-10",
+    "status": "active",
+    "avatarUrl": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80"
+  },
+  {
+    "id": "STF-004",
+    "facilityId": "FAC-001",
+    "employeeId": "STF-2020-011",
+    "name": "Agus Salim, A.Md.AK",
+    "role": "Analis Laboratorium",
+    "department": "Instalasi Laboratorium",
+    "phone": "081233449988",
+    "email": "agus.salim@ehealth.local",
+    "joinDate": "2020-08-01",
+    "status": "active",
+    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80"
+  },
+  {
+    "id": "STF-005",
+    "facilityId": "FAC-001",
+    "employeeId": "STF-2022-019",
+    "name": "Triyono, A.Md.Rad",
+    "role": "Radiografer",
+    "department": "Instalasi Radiologi",
+    "phone": "081377881122",
+    "email": "triyono@ehealth.local",
+    "joinDate": "2022-10-15",
+    "status": "active",
+    "avatarUrl": "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&auto=format&fit=crop&q=80"
+  }
+]
+

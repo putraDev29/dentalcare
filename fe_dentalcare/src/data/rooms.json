@@ -1,0 +1,99 @@
+[
+  {
+    "id": "RM-201",
+    "roomNumber": "201",
+    "building": "Gedung Rawat Inap Teratai",
+    "floor": "Lantai 2",
+    "ward": "Ruang Anggrek (Penyakit Dalam)",
+    "roomClass": "VIP",
+    "pricePerDay": 850000,
+    "isActive": true,
+    "beds": [
+      {
+        "id": "BED-201-A",
+        "bedNumber": "Bed A",
+        "status": "occupied",
+        "currentPatientId": "PAT-004",
+        "currentPatientName": "Ahmad Fauzi",
+        "currentPatientMrn": "RM-2026-000004",
+        "admissionId": "ADM-001",
+        "occupiedSince": "2026-09-14T08:00:00Z"
+      }
+    ]
+  },
+  {
+    "id": "RM-202",
+    "roomNumber": "202",
+    "building": "Gedung Rawat Inap Teratai",
+    "floor": "Lantai 2",
+    "ward": "Ruang Anggrek (Penyakit Dalam)",
+    "roomClass": "Kelas 1",
+    "pricePerDay": 450000,
+    "isActive": true,
+    "beds": [
+      {
+        "id": "BED-202-A",
+        "bedNumber": "Bed A",
+        "status": "available"
+      },
+      {
+        "id": "BED-202-B",
+        "bedNumber": "Bed B",
+        "status": "occupied",
+        "currentPatientId": "PAT-015",
+        "currentPatientName": "Yuliana Dewi",
+        "currentPatientMrn": "RM-2026-000015",
+        "admissionId": "ADM-002",
+        "occupiedSince": "2026-09-15T11:00:00Z"
+      }
+    ]
+  },
+  {
+    "id": "RM-203",
+    "roomNumber": "203",
+    "building": "Gedung Rawat Inap Teratai",
+    "floor": "Lantai 2",
+    "ward": "Ruang Anggrek (Penyakit Dalam)",
+    "roomClass": "Kelas 2",
+    "pricePerDay": 300000,
+    "isActive": true,
+    "beds": [
+      { "id": "BED-203-A", "bedNumber": "Bed A", "status": "available" },
+      { "id": "BED-203-B", "bedNumber": "Bed B", "status": "cleaning" },
+      { "id": "BED-203-C", "bedNumber": "Bed C", "status": "available" }
+    ]
+  },
+  {
+    "id": "RM-301",
+    "roomNumber": "301",
+    "building": "Gedung Rawat Inap Teratai",
+    "floor": "Lantai 3",
+    "ward": "Ruang Mawar (Bedah & Obgyn)",
+    "roomClass": "VVIP",
+    "pricePerDay": 1500000,
+    "isActive": true,
+    "beds": [
+      {
+        "id": "BED-301-A",
+        "bedNumber": "Bed A",
+        "status": "reserved"
+      }
+    ]
+  },
+  {
+    "id": "RM-ICU",
+    "roomNumber": "ICU-01",
+    "building": "Gedung Utama Sentosa",
+    "floor": "Lantai 3",
+    "ward": "Intensive Care Unit (ICU)",
+    "roomClass": "ICU",
+    "pricePerDay": 2200000,
+    "isActive": true,
+    "beds": [
+      { "id": "BED-ICU-1", "bedNumber": "Bed 1", "status": "occupied" },
+      { "id": "BED-ICU-2", "bedNumber": "Bed 2", "status": "available" },
+      { "id": "BED-ICU-3", "bedNumber": "Bed 3", "status": "maintenance" }
+    ]
+  }
+]
+

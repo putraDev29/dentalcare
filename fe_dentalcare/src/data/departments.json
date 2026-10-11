@@ -1,0 +1,82 @@
+[
+  {
+    "id": "DEP-001",
+    "facilityId": "FAC-001",
+    "name": "Poli Gigi Umum",
+    "code": "PGU",
+    "description": "Pemeriksaan rutin, scaling karang gigi, penambalan dan konsultasi kesehatan gigi mulut",
+    "headDoctorId": "DOC-001",
+    "location": "Lantai 1 - Dental Unit 1 & 2",
+    "isActive": true
+  },
+  {
+    "id": "DEP-002",
+    "facilityId": "FAC-001",
+    "name": "Poli Ortodonti (Kawat Gigi)",
+    "code": "ORT",
+    "description": "Pemasangan behel, perataan gigi maloklusi, dan kontrol rutin kawat gigi",
+    "headDoctorId": "DOC-002",
+    "location": "Lantai 1 - Dental Unit 3",
+    "isActive": true
+  },
+  {
+    "id": "DEP-003",
+    "facilityId": "FAC-001",
+    "name": "Poli Konservasi Gigi & PSA",
+    "code": "KON",
+    "description": "Perawatan saluran akar (endodontik), restorasi estetik, dan rekonstruksi mahkota gigi",
+    "headDoctorId": "DOC-003",
+    "location": "Lantai 2 - Dental Unit 4",
+    "isActive": true
+  },
+  {
+    "id": "DEP-004",
+    "facilityId": "FAC-001",
+    "name": "Poli Bedah Mulut & Odontektomi",
+    "code": "BM",
+    "description": "Operasi gigi geraham bungsu impaksi, pencabutan gigi komplikasi, dan bedah minor mulut",
+    "headDoctorId": "DOC-004",
+    "location": "Lantai 2 - Ruang Bedah Minor Gigi",
+    "isActive": true
+  },
+  {
+    "id": "DEP-005",
+    "facilityId": "FAC-001",
+    "name": "Poli Kedokteran Gigi Anak (Pedodonsia)",
+    "code": "PGA",
+    "description": "Perawatan gigi ramah anak, aplikasi fluoride pencegah karies, dan cabut gigi susu",
+    "headDoctorId": "DOC-005",
+    "location": "Lantai 1 - Dental Kids Room",
+    "isActive": true
+  },
+  {
+    "id": "DEP-006",
+    "facilityId": "FAC-001",
+    "name": "Poli Periodonsia & Gusi",
+    "code": "PER",
+    "description": "Perawatan gusi berdarah/bengkak, kuretase gusi, dan penanganan gigi goyang",
+    "headDoctorId": "DOC-006",
+    "location": "Lantai 2 - Dental Unit 5",
+    "isActive": true
+  },
+  {
+    "id": "DEP-007",
+    "facilityId": "FAC-001",
+    "name": "Poli Prostodonsia (Gigi Tiruan)",
+    "code": "PRO",
+    "description": "Pembuatan gigi tiruan lepasan akrilik/valplast, jembatan gigi, dan crown porselen",
+    "headDoctorId": "DOC-007",
+    "location": "Lantai 2 - Dental Unit 6",
+    "isActive": true
+  },
+  {
+    "id": "DEP-008",
+    "facilityId": "FAC-001",
+    "name": "Poli Estetika Gigi & Bleaching",
+    "code": "EST",
+    "description": "Pemutihan gigi (in-office dental bleaching), veneer porselen, dan smile makeover",
+    "headDoctorId": "DOC-008",
+    "location": "Lantai 1 - Aesthetic Suite",
+    "isActive": true
+  }
+]

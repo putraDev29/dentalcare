@@ -1,0 +1,37 @@
+# Dependencies
+**/node_modules/
+**/vendor/
+
+# Environment & credentials
+**/.env
+**/.env.*
+!**/.env.example
+
+# Next.js & Frontend builds
+**/.next/
+**/out/
+**/build/
+**/dist/
+**/*.tsbuildinfo
+
+# WhatsApp Gateway session tokens
+wa_gateway/tokens/
+wa_gateway/session/
+wa_gateway/.wwebjs_auth/
+wa_gateway/.wwebjs_cache/
+
+# Logs
+*.log
+**/*.log
+
+# OS & IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Laravel Storage & Cache
+be_dentalcare/public/storage
+be_dentalcare/public/build
+be_dentalcare/public/hot
+be_dentalcare/storage/*.key

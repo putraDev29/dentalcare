@@ -1,0 +1,242 @@
+[
+  {
+    "id": "DOC-001",
+    "facilityId": "FAC-001",
+    "employeeNumber": "DOC-2020-001",
+    "name": "drg. Jihan, S.Kep",
+    "title": "drg. S.Kep",
+    "specialization": "Dokter Gigi & Perawatan Gigi Klinis",
+    "departmentId": "DEP-001",
+    "departmentName": "Poli Gigi Umum & Bedah Mulut",
+    "sipNumber": "SIP.503/442/01/DINKES/2026",
+    "phone": "081234567890",
+    "email": "drg.jihan.skep@klinikgigi.local",
+    "avatarUrl": "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=150&auto=format&fit=crop&q=80",
+    "status": "active",
+    "consultationFee": 150000,
+    "schedules": [
+      {
+        "id": "SCH-001",
+        "doctorId": "DOC-001",
+        "dayOfWeek": 1,
+        "dayName": "Senin",
+        "startTime": "08:00",
+        "endTime": "16:00",
+        "departmentId": "DEP-001",
+        "roomNumber": "Dental Chair 1",
+        "maxQuota": 25,
+        "isActive": true
+      },
+      {
+        "id": "SCH-002",
+        "doctorId": "DOC-001",
+        "dayOfWeek": 2,
+        "dayName": "Selasa",
+        "startTime": "08:00",
+        "endTime": "16:00",
+        "departmentId": "DEP-001",
+        "roomNumber": "Dental Chair 1",
+        "maxQuota": 25,
+        "isActive": true
+      },
+      {
+        "id": "SCH-003",
+        "doctorId": "DOC-001",
+        "dayOfWeek": 3,
+        "dayName": "Rabu",
+        "startTime": "08:00",
+        "endTime": "16:00",
+        "departmentId": "DEP-001",
+        "roomNumber": "Dental Chair 1",
+        "maxQuota": 25,
+        "isActive": true
+      },
+      {
+        "id": "SCH-004",
+        "doctorId": "DOC-001",
+        "dayOfWeek": 4,
+        "dayName": "Kamis",
+        "startTime": "08:00",
+        "endTime": "16:00",
+        "departmentId": "DEP-001",
+        "roomNumber": "Dental Chair 1",
+        "maxQuota": 25,
+        "isActive": true
+      },
+      {
+        "id": "SCH-005",
+        "doctorId": "DOC-001",
+        "dayOfWeek": 5,
+        "dayName": "Jumat",
+        "startTime": "08:00",
+        "endTime": "16:00",
+        "departmentId": "DEP-001",
+        "roomNumber": "Dental Chair 1",
+        "maxQuota": 25,
+        "isActive": true
+      },
+      {
+        "id": "SCH-006",
+        "doctorId": "DOC-001",
+        "dayOfWeek": 6,
+        "dayName": "Sabtu",
+        "startTime": "08:00",
+        "endTime": "14:00",
+        "departmentId": "DEP-001",
+        "roomNumber": "Dental Chair 1",
+        "maxQuota": 20,
+        "isActive": true
+      }
+    ]
+  },
+  {
+    "id": "DOC-002",
+    "facilityId": "FAC-001",
+    "employeeNumber": "DOC-2022-002",
+    "name": "drg. Pratama Wijaya, Sp.KG",
+    "title": "drg. Sp.KG",
+    "specialization": "Spesialis Konservasi Gigi & Endodonti",
+    "departmentId": "DEP-001",
+    "departmentName": "Poli Gigi Spesialis Konservasi",
+    "sipNumber": "SIP.503/442/02/DINKES/2026",
+    "phone": "081298761234",
+    "email": "pratama.wijaya@klinikgigi.local",
+    "avatarUrl": "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&auto=format&fit=crop&q=80",
+    "status": "active",
+    "consultationFee": 200000,
+    "schedules": [
+      {
+        "id": "SCH-007",
+        "doctorId": "DOC-002",
+        "dayOfWeek": 1,
+        "dayName": "Senin",
+        "startTime": "16:30",
+        "endTime": "20:00",
+        "departmentId": "DEP-001",
+        "roomNumber": "Dental Chair 2",
+        "maxQuota": 15,
+        "isActive": true
+      },
+      {
+        "id": "SCH-008",
+        "doctorId": "DOC-002",
+        "dayOfWeek": 3,
+        "dayName": "Rabu",
+        "startTime": "16:30",
+        "endTime": "20:00",
+        "departmentId": "DEP-001",
+        "roomNumber": "Dental Chair 2",
+        "maxQuota": 15,
+        "isActive": true
+      },
+      {
+        "id": "SCH-009",
+        "doctorId": "DOC-002",
+        "dayOfWeek": 5,
+        "dayName": "Jumat",
+        "startTime": "16:30",
+        "endTime": "20:00",
+        "departmentId": "DEP-001",
+        "roomNumber": "Dental Chair 2",
+        "maxQuota": 15,
+        "isActive": true
+      }
+    ]
+  },
+  {
+    "id": "DOC-003",
+    "facilityId": "FAC-001",
+    "employeeNumber": "DOC-2023-003",
+    "name": "drg. Amanda Putri, Sp.Ort",
+    "title": "drg. Sp.Ort",
+    "specialization": "Spesialis Ortodonsia (Kawat & Behel Gigi)",
+    "departmentId": "DEP-001",
+    "departmentName": "Poli Ortodonsia Dental",
+    "sipNumber": "SIP.503/442/03/DINKES/2026",
+    "phone": "081377889900",
+    "email": "amanda.putri@klinikgigi.local",
+    "avatarUrl": "https://images.unsplash.com/photo-1594824813576-90f7d54b4131?w=150&auto=format&fit=crop&q=80",
+    "status": "active",
+    "consultationFee": 250000,
+    "schedules": [
+      {
+        "id": "SCH-010",
+        "doctorId": "DOC-003",
+        "dayOfWeek": 2,
+        "dayName": "Selasa",
+        "startTime": "13:00",
+        "endTime": "18:00",
+        "departmentId": "DEP-001",
+        "roomNumber": "Dental Unit VIP",
+        "maxQuota": 12,
+        "isActive": true
+      },
+      {
+        "id": "SCH-011",
+        "doctorId": "DOC-003",
+        "dayOfWeek": 4,
+        "dayName": "Kamis",
+        "startTime": "13:00",
+        "endTime": "18:00",
+        "departmentId": "DEP-001",
+        "roomNumber": "Dental Unit VIP",
+        "maxQuota": 12,
+        "isActive": true
+      },
+      {
+        "id": "SCH-012",
+        "doctorId": "DOC-003",
+        "dayOfWeek": 6,
+        "dayName": "Sabtu",
+        "startTime": "09:00",
+        "endTime": "15:00",
+        "departmentId": "DEP-001",
+        "roomNumber": "Dental Unit VIP",
+        "maxQuota": 15,
+        "isActive": true
+      }
+    ]
+  },
+  {
+    "id": "DOC-004",
+    "facilityId": "FAC-001",
+    "employeeNumber": "DOC-2024-004",
+    "name": "drg. Hendra Gunawan, Sp.BM",
+    "title": "drg. Sp.BM",
+    "specialization": "Spesialis Bedah Mulut & Maksilofasial",
+    "departmentId": "DEP-001",
+    "departmentName": "Poli Bedah Mulut & Dental Implant",
+    "sipNumber": "SIP.503/442/04/DINKES/2026",
+    "phone": "081122338877",
+    "email": "hendra.gunawan@klinikgigi.local",
+    "avatarUrl": "https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=150&auto=format&fit=crop&q=80",
+    "status": "active",
+    "consultationFee": 275000,
+    "schedules": [
+      {
+        "id": "SCH-013",
+        "doctorId": "DOC-004",
+        "dayOfWeek": 2,
+        "dayName": "Selasa",
+        "startTime": "16:30",
+        "endTime": "20:30",
+        "departmentId": "DEP-001",
+        "roomNumber": "Ruang Bedah Minor Gigi",
+        "maxQuota": 10,
+        "isActive": true
+      },
+      {
+        "id": "SCH-014",
+        "doctorId": "DOC-004",
+        "dayOfWeek": 4,
+        "dayName": "Kamis",
+        "startTime": "16:30",
+        "endTime": "20:30",
+        "departmentId": "DEP-001",
+        "roomNumber": "Ruang Bedah Minor Gigi",
+        "maxQuota": 10,
+        "isActive": true
+      }
+    ]
+  }
+]

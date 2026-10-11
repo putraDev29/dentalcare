@@ -1,0 +1,46 @@
+[
+  {
+    "id": "PRX-001",
+    "prescriptionNumber": "RX-2026-0001",
+    "facilityId": "FAC-001",
+    "encounterId": "ENC-001",
+    "patientId": "PAT-001",
+    "patientName": "Budi Santoso",
+    "patientMrn": "RM-2026-000001",
+    "doctorId": "DOC-001",
+    "doctorName": "drg. Jihan, S.Kep",
+    "items": [
+      {
+        "id": "PI-001",
+        "medicineId": "MED-003",
+        "medicineName": "Asam Mefenamat 500mg (Ponstan)",
+        "dosage": "1 tablet",
+        "route": "Oral",
+        "frequency": "3x sehari",
+        "duration": "3 hari",
+        "quantity": 10,
+        "instruction": "Diminum bila nyeri sesudah makan",
+        "unitPrice": 6000,
+        "totalPrice": 60000
+      },
+      {
+        "id": "PI-002",
+        "medicineId": "MED-006",
+        "medicineName": "Chlorhexidine 0.2% Obat Kumur (Minosep 150ml)",
+        "dosage": "15 ml",
+        "route": "Oral",
+        "frequency": "2x sehari",
+        "duration": "5 hari",
+        "quantity": 1,
+        "instruction": "Kumur 1 menit sesudah sikat gigi pagi dan malam",
+        "unitPrice": 42000,
+        "totalPrice": 42000
+      }
+    ],
+    "totalAmount": 102000,
+    "paymentStatus": "paid",
+    "status": "dispensed",
+    "notes": "Pasien alergi Penicillin",
+    "dispensedAt": "2026-09-16T09:05:00Z"
+  }
+]

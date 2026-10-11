@@ -1,0 +1,128 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* OKAY Dental Core Colors: Vibrant Sky Blue, Bright Pink & Pastel Yellow */
+  --color-teal-50: #f0f9ff;
+  --color-teal-100: #e0f2fe;
+  --color-teal-200: #bae6fd;
+  --color-teal-300: #7dd3fc;
+  --color-teal-400: #38bdf8;
+  --color-teal-500: #0ea5e9;
+  --color-teal-600: #0284c7;
+  --color-teal-700: #0369a1;
+  --color-teal-800: #075985;
+  --color-teal-900: #0c4a6e;
+  --color-teal-950: #082f49;
+
+  --color-okay-blue: #0284c7;
+  --color-okay-sky: #0ea5e9;
+  --color-okay-pink: #f43f5e;
+  --color-okay-rose: #fb7185;
+  --color-okay-yellow: #fde047;
+  --color-okay-pastel: #fef08a;
+}
+:root {
+  --background: #f4f9fd;
+  --foreground: #0f172a;
+  
+  --surface: #ffffff;
+  --surface-foreground: #0f172a;
+  --surface-muted: #e0f2fe;
+  
+  /* Primary: OKAY Dental Sparkling Sky Blue (Brighter & Crisp) */
+  --primary: #0284c7;
+  --primary-hover: #0369a1;
+  --primary-foreground: #ffffff;
+  --primary-light: #e0f2fe;
+  --primary-subtle: #f0f9ff;
+
+  /* Secondary: Cheerful Fresh Vivid Pink / Coral Rose */
+  --secondary: #f43f5e;
+  --secondary-foreground: #ffffff;
+  --secondary-light: #ffe4e6;
+  --secondary-subtle: #fff1f2;
+
+  /* Accent: Sunny Bright Yellow */
+  --accent: #facc15;
+  --accent-foreground: #713f12;
+  --accent-light: #fef08a;
+
+  --muted: #64748b;
+  --muted-foreground: #64748b;
+  --muted-light: #f0f7fe;
+
+  --border: #bae6fd;
+  --border-subtle: #f0f8ff;
+
+  --success: #10b981;
+  --success-foreground: #ffffff;
+  --success-light: #dcfce7;
+  --success-text: #166534;
+
+  --warning: #f59e0b;
+  --warning-foreground: #ffffff;
+  --warning-light: #fef3c7;
+  --warning-text: #92400e;
+
+  --danger: #ef4444;
+  --danger-foreground: #ffffff;
+  --danger-light: #fee2e2;
+  --danger-text: #991b1b;
+
+  --info: #0ea5e9;
+  --info-foreground: #ffffff;
+  --info-light: #e0f2fe;
+  --info-text: #075985;
+}
+
+/* Force light theme always - dark mode disabled */
+.dark {
+  --background: #f4f9fd;
+  --foreground: #0f172a;
+  --surface: #ffffff;
+  --surface-foreground: #0f172a;
+  --surface-muted: #e0f2fe;
+  --primary: #0284c7;
+  --primary-hover: #0369a1;
+  --primary-foreground: #ffffff;
+  --secondary: #f43f5e;
+  --secondary-foreground: #ffffff;
+  --accent: #facc15;
+  --accent-foreground: #713f12;
+  --muted: #64748b;
+  --muted-foreground: #64748b;
+  --border: #bae6fd;
+  --border-subtle: #f0f8ff;
+}
+
+body {
+  background: var(--background);
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+}

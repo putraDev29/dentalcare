@@ -1,0 +1,71 @@
+[
+  {
+    "id": "USR-001",
+    "name": "drg. Pratama Wijaya",
+    "email": "admin@dentalcare.local",
+    "role": "super_admin",
+    "roleName": "Super Administrator",
+    "avatarUrl": "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&auto=format&fit=crop&q=80",
+    "facilityId": "FAC-001",
+    "employeeNumber": "EMP-2024-001",
+    "phone": "081299887766",
+    "isActive": true,
+    "lastLoginAt": "2026-09-16T12:00:00Z"
+  },
+  {
+    "id": "USR-002",
+    "name": "dr. Ahmad Santoso, Sp.PD",
+    "email": "doctor@ehealth.local",
+    "role": "doctor",
+    "roleName": "Dokter Spesialis",
+    "avatarUrl": "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&auto=format&fit=crop&q=80",
+    "facilityId": "FAC-001",
+    "departmentId": "DEP-001",
+    "doctorId": "DOC-001",
+    "employeeNumber": "DOC-2020-001",
+    "phone": "081311223344",
+    "isActive": true,
+    "lastLoginAt": "2026-09-16T08:30:00Z"
+  },
+  {
+    "id": "USR-003",
+    "name": "Ns. Siti Nurhaliza, S.Kep",
+    "email": "nurse@ehealth.local",
+    "role": "nurse",
+    "roleName": "Perawat Pelaksana",
+    "avatarUrl": "https://images.unsplash.com/photo-1594824813576-03716d1cd41b?w=150&auto=format&fit=crop&q=80",
+    "facilityId": "FAC-001",
+    "departmentId": "DEP-008",
+    "employeeNumber": "NUR-2022-015",
+    "phone": "081555667788",
+    "isActive": true,
+    "lastLoginAt": "2026-09-16T07:15:00Z"
+  },
+  {
+    "id": "USR-004",
+    "name": "apt. Hendro Wibowo, S.Farm",
+    "email": "pharmacy@ehealth.local",
+    "role": "pharmacist",
+    "roleName": "Apoteker Penanggung Jawab",
+    "avatarUrl": "https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=150&auto=format&fit=crop&q=80",
+    "facilityId": "FAC-001",
+    "employeeNumber": "PHA-2021-008",
+    "phone": "081777889900",
+    "isActive": true,
+    "lastLoginAt": "2026-09-16T08:00:00Z"
+  },
+  {
+    "id": "USR-005",
+    "name": "Dewi Kartika - Kasir Utama",
+    "email": "cashier@ehealth.local",
+    "role": "cashier",
+    "roleName": "Kasir & Keuangan",
+    "avatarUrl": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
+    "facilityId": "FAC-001",
+    "employeeNumber": "CAS-2023-004",
+    "phone": "081888990011",
+    "isActive": true,
+    "lastLoginAt": "2026-09-16T07:45:00Z"
+  }
+]
+

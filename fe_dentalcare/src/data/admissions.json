@@ -1,0 +1,43 @@
+[
+  {
+    "id": "ADM-001",
+    "admissionNumber": "ADM-2026-0001",
+    "facilityId": "FAC-001",
+    "patientId": "PAT-004",
+    "patientName": "Ahmad Fauzi",
+    "patientMrn": "RM-2026-000004",
+    "patientGender": "male",
+    "doctorId": "DOC-004",
+    "doctorName": "dr. Rina Suryani, Sp.JP",
+    "ward": "Ruang Anggrek (Penyakit Dalam)",
+    "roomNumber": "201",
+    "bedNumber": "Bed A",
+    "roomClass": "VIP",
+    "admissionDate": "2026-09-14T08:00:00Z",
+    "lengthOfStayDays": 3,
+    "initialDiagnosis": "Angina Pectoris Tak Stabil (UAP) / NSTEMI",
+    "status": "in_treatment",
+    "insuranceType": "BPJS Kelas 1"
+  },
+  {
+    "id": "ADM-002",
+    "admissionNumber": "ADM-2026-0002",
+    "facilityId": "FAC-001",
+    "patientId": "PAT-015",
+    "patientName": "Yuliana Dewi",
+    "patientMrn": "RM-2026-000015",
+    "patientGender": "female",
+    "doctorId": "DOC-003",
+    "doctorName": "dr. Bambang Wijaya, Sp.B",
+    "ward": "Ruang Anggrek (Penyakit Dalam)",
+    "roomNumber": "202",
+    "bedNumber": "Bed B",
+    "roomClass": "Kelas 1",
+    "admissionDate": "2026-09-15T11:00:00Z",
+    "lengthOfStayDays": 2,
+    "initialDiagnosis": "Kolelitiasis Simtomatik",
+    "status": "in_treatment",
+    "insuranceType": "BPJS Kelas 1"
+  }
+]
+

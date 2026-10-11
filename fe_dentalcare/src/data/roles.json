@@ -1,0 +1,80 @@
+[
+  {
+    "id": "ROLE-001",
+    "code": "super_admin",
+    "name": "Super Administrator",
+    "description": "Akses menyeluruh terhadap konfigurasi sistem, database, dan otorisasi",
+    "permissions": ["*"]
+  },
+  {
+    "id": "ROLE-002",
+    "code": "hospital_admin",
+    "name": "Admin Rumah Sakit",
+    "description": "Pengelolaan operasional harian rumah sakit dan manajemen data master",
+    "permissions": ["dashboard.view", "patient.view", "patient.create", "appointment.view", "billing.view", "report.view"]
+  },
+  {
+    "id": "ROLE-003",
+    "code": "doctor",
+    "name": "Dokter Spesialis / Umum",
+    "description": "Pelayanan medis, rekam medis (EMR), diagnosa ICD, tindakan, dan resep",
+    "permissions": ["dashboard.view", "patient.view", "encounter.view", "encounter.create", "prescription.process"]
+  },
+  {
+    "id": "ROLE-004",
+    "code": "nurse",
+    "name": "Perawat / Tenaga Medis",
+    "description": "Triage IGD, vital signs, asuhan keperawatan, dan antrean poli",
+    "permissions": ["dashboard.view", "patient.view", "queue.view", "queue.manage", "inpatient.view"]
+  },
+  {
+    "id": "ROLE-005",
+    "code": "receptionist",
+    "name": "Petugas Pendaftaran",
+    "description": "Registrasi pasien baru, reservasi appointment, dan check-in antrean",
+    "permissions": ["patient.view", "patient.create", "appointment.view", "appointment.create", "queue.view"]
+  },
+  {
+    "id": "ROLE-006",
+    "code": "pharmacist",
+    "name": "Apoteker & Petugas Farmasi",
+    "description": "Telaah resep, penyiapan obat (dispensing), dan pengelolaan stok obat",
+    "permissions": ["dashboard.view", "pharmacy.view", "prescription.process", "inventory.view"]
+  },
+  {
+    "id": "ROLE-007",
+    "code": "lab_technician",
+    "name": "Petugas Laboratorium",
+    "description": "Penerimaan sampel darah/urin dan input hasil uji laboratorium",
+    "permissions": ["dashboard.view", "laboratory.view", "laboratory.process"]
+  },
+  {
+    "id": "ROLE-008",
+    "code": "radiologist",
+    "name": "Petugas Radiologi",
+    "description": "Pelaksanaan rontgen/CT/MRI dan pelaporan hasil expertise dokter radiologi",
+    "permissions": ["dashboard.view", "radiology.view", "radiology.process"]
+  },
+  {
+    "id": "ROLE-009",
+    "code": "cashier",
+    "name": "Kasir & Billing",
+    "description": "Penerbitan invoice tagihan rawat jalan/inap dan proses penerimaan pembayaran",
+    "permissions": ["dashboard.view", "billing.view", "billing.create", "payment.create"]
+  },
+  {
+    "id": "ROLE-010",
+    "code": "inventory_staff",
+    "name": "Petugas Inventori Medis",
+    "description": "Pengadaan, mutasi stok obat, alkes, dan kartu stok gudang farmasi",
+    "permissions": ["dashboard.view", "inventory.view", "inventory.manage"]
+  },
+  {
+    "id": "ROLE-011",
+    "code": "management",
+    "name": "Direksi & Manajemen",
+    "description": "Akses laporan eksekutif, analisa tren pendapatan, dan utilisasi bed",
+    "permissions": ["dashboard.view", "report.view", "analytics.view", "audit.view"]
+  }
+]
+

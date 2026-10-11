@@ -1,0 +1,55 @@
+[
+  {
+    "id": "AUD-001",
+    "timestamp": "2026-09-16T09:45:00Z",
+    "userId": "USR-002",
+    "userName": "dr. Ahmad Santoso, Sp.PD",
+    "role": "Dokter Spesialis",
+    "action": "CREATE",
+    "module": "Encounter",
+    "recordId": "ENC-2026-0002",
+    "ipAddress": "192.168.10.104",
+    "device": "Workstation Windows 11 (Poli 201)",
+    "details": "Menyimpan pemeriksaan klinis dan resep pasien Siti Rahmawati (RM-2026-000002)"
+  },
+  {
+    "id": "AUD-002",
+    "timestamp": "2026-09-16T08:15:00Z",
+    "userId": "USR-005",
+    "userName": "Dewi Kartika",
+    "role": "Kasir & Billing",
+    "action": "UPDATE",
+    "module": "Patient",
+    "recordId": "PAT-001",
+    "ipAddress": "192.168.10.22",
+    "device": "Front Desk Terminal 1",
+    "details": "Check-in pasien Budi Santoso ke antrean Poli Penyakit Dalam"
+  },
+  {
+    "id": "AUD-003",
+    "timestamp": "2026-09-15T10:45:00Z",
+    "userId": "USR-005",
+    "userName": "Dewi Kartika",
+    "role": "Kasir & Billing",
+    "action": "CREATE",
+    "module": "Billing",
+    "recordId": "INV-2026-0001",
+    "ipAddress": "192.168.10.22",
+    "device": "Kasir Utama",
+    "details": "Pelunasan tagihan BPJS Rp 1.015.000 dengan nomor SEP-0001892837492"
+  },
+  {
+    "id": "AUD-004",
+    "timestamp": "2026-09-15T10:30:00Z",
+    "userId": "USR-004",
+    "userName": "apt. Hendro Wibowo, S.Farm",
+    "role": "Apoteker",
+    "action": "UPDATE",
+    "module": "Pharmacy",
+    "recordId": "RX-2026-0001",
+    "ipAddress": "192.168.10.88",
+    "device": "Farmasi Dispensing PC",
+    "details": "Verifikasi dan penyerahan obat Amlodipine 10mg kepada pasien Budi Santoso"
+  }
+]
+

@@ -1,0 +1,69 @@
+# Apache / LiteSpeed Configuration untuk Hostinger (Next.js Deployment)
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # 1. Izinkan metode HTTP yang dibutuhkan Next.js (HEAD untuk router prefetch, GET, POST, OPTIONS, PUT, DELETE)
+  <LimitExcept GET POST HEAD OPTIONS PUT DELETE>
+    Deny from all
+  </LimitExcept>
+
+  # 2. Matikan directory indexing (mencegah 403 Directory Listing Denied)
+  Options -Indexes
+
+  # 3. Jika file asli ada, layani langsung
+  RewriteCond %{REQUEST_FILENAME} -f
+  RewriteRule ^ - [L]
+
+  # 4. Jika ada folder fisik yang memiliki index.html di dalamnya (misal /master-data/ -> master-data/index.html)
+  RewriteCond %{REQUEST_FILENAME}/index.html -f
+  RewriteRule ^(.*)/?$ $1/index.html [L]
+
+  # 5. Jika ada file .html yang sesuai (misal: /master-data -> master-data.html)
+  RewriteCond %{DOCUMENT_ROOT}/$1.html -f
+  RewriteRule ^(.*)/?$ $1.html [L]
+
+  # 6. Rute dinamis untuk ENCOUNTERS (misal: /encounters/ENC-XKBUZ2/)
+  # Mencegah fallback ke root index.html yang melempar user ke dashboard
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^encounters/[^/]+/__next\._full\.txt$ encounters/new/__next._full.txt [L]
+
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^encounters/[^/]+/__next\.__PAGE__\.txt$ encounters/new/__next.__PAGE__.txt [L]
+
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^encounters/[^/]+/?$ encounters/new/index.html [L]
+
+  # 7. Rute dinamis untuk PATIENTS EDIT (misal: /patients/PAT-XYZ/edit/)
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^patients/[^/]+/edit/?$ patients/PAT-001/edit/index.html [L]
+
+  # 8. Rute dinamis untuk PATIENTS DETAIL (misal: /patients/PAT-XYZ/)
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^patients/[^/]+/__next\._full\.txt$ patients/PAT-001/__next._full.txt [L]
+
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^patients/[^/]+/__next\.__PAGE__\.txt$ patients/PAT-001/__next.__PAGE__.txt [L]
+
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^patients/[^/]+/?$ patients/PAT-001/index.html [L]
+
+  # 9. SPA fallback untuk route lainnya ke root index.html
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+# Security & CORS Headers
+<IfModule mod_headers.c>
+  Header always set Access-Control-Allow-Origin "*"
+  Header always set Access-Control-Allow-Methods "GET, POST, HEAD, OPTIONS, PUT, DELETE"
+  Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
+</IfModule>

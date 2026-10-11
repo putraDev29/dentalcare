@@ -1,0 +1,417 @@
+[
+  {
+    "id": "ENC-001",
+    "facilityId": "FAC-001",
+    "encounterNumber": "ENC-2026-0001",
+    "patientId": "PAT-001",
+    "patientName": "Budi Santoso",
+    "patientMrn": "RM-2026-000001",
+    "patientGender": "male",
+    "patientBirthDate": "1992-04-18",
+    "patientBloodType": "O+",
+    "patientAllergies": ["Penicillin"],
+    "doctorId": "DOC-001",
+    "doctorName": "drg. Jihan, S.Kep",
+    "departmentId": "DEP-001",
+    "departmentName": "Poli Gigi Umum",
+    "appointmentId": "APT-001",
+    "visitDate": "2026-09-16",
+    "visitType": "routine_checkup",
+    "status": "in_examination",
+    "anamnesis": {
+      "chiefComplaint": "Gigi geraham kanan bawah ngilu saat minum es atau makanan manis sejak 1 minggu lalu, ingin pembersihan karang gigi.",
+      "historyOfPresentIllness": "Keluhan ngilu dirasakan tajam terutama jika terselip makanan manis atau minuman dingin, hilang setelah rangsangan disingkirkan. Tidak ada riwayat bengkak atau berdenyut spontan saat tidur malam.",
+      "duration": "1 minggu",
+      "painScale": 4,
+      "symptoms": ["Gigi ngilu sensitif", "Gusi kadang berdarah saat sikat gigi"],
+      "previousTreatment": "Pernah tambal gigi geraham kanan atas 2 tahun lalu"
+    },
+    "vitalSigns": {
+      "bloodPressureSystolic": 125,
+      "bloodPressureDiastolic": 80,
+      "heartRate": 76,
+      "respiratoryRate": 18,
+      "temperature": 36.6,
+      "weight": 70,
+      "height": 172,
+      "bmi": 23.7,
+      "oxygenSaturation": 99,
+      "consciousness": "compos_mentis"
+    },
+    "physicalExam": {
+      "generalCondition": "Baik, kooperatif",
+      "notes": "Ekstraoral: Simetris wajah normal, tidak ada pembengkakan kelenjar getah bening submandibular, TMJ normal tanpa clicking. Intraoral: Oral hygiene sedang, kalkulus supragingival regio anterior rahang bawah. Gigi 46 kavitas oklusal kedalaman dentin, sondasi (+), perkusi (-), tes dingin (+)."
+    },
+    "odontogram": {
+      "teeth": {
+        "18": { "toothNumber": 18, "condition": "extracted", "procedure": "Pencabutan Gigi Tetap Dewasa", "procedureCost": 350000, "notes": "Gigi geraham bungsu ketiga telah dicabut (post-ekstraksi)" },
+        "16": { "toothNumber": 16, "condition": "filled_composite", "surfaces": ["O"], "notes": "Tambalan komposit permanen (hijau) dalam kondisi baik" },
+        "15": { "toothNumber": 15, "condition": "filled_temporary", "surfaces": ["O"], "procedure": "Penambalan Sementara (Fletcher / Cavit)", "procedureCost": 150000, "notes": "Tambalan sementara (kuning) pasca PSA" },
+        "46": { "toothNumber": 46, "condition": "caries", "surfaces": ["O"], "diagnosis": "K02.1 Karies Dentin", "procedure": "Penambalan Komposit Sinar Light-Curing (Kelas I / II Posterior)", "procedureCost": 450000, "notes": "Kavitas dentin oklusal, sondasi +, tes CE +" },
+        "31": { "toothNumber": 31, "condition": "calculus", "diagnosis": "K05.0 Gingivitis Akut", "procedure": "Pembersihan Karang Gigi (Scaling & Polishing) Rahang Atas & Bawah", "procedureCost": 350000, "notes": "Kalkulus supragingival" },
+        "41": { "toothNumber": 41, "condition": "calculus" },
+        "32": { "toothNumber": 32, "condition": "calculus" },
+        "42": { "toothNumber": 42, "condition": "calculus" }
+      },
+      "occlusion": "normal",
+      "torusPalatinus": "none",
+      "torusMandibularis": "none",
+      "palatum": "medium",
+      "diastema": false,
+      "updatedAt": "2026-09-16T08:45:00Z"
+    },
+    "diagnoses": [
+      { "id": "ED-001", "code": "K02.1", "name": "Karies dentin gigi 46", "type": "primary", "notes": "Karies oklusal dentin vital" },
+      { "id": "ED-002", "code": "K05.0", "name": "Gingivitis akut akibat kalkulus", "type": "secondary" }
+    ],
+    "procedures": [
+      { "id": "EP-001", "code": "23.21", "name": "Penambalan Komposit Sinar Light-Curing Gigi 46", "quantity": 1, "doctorName": "drg. Jihan, S.Kep", "price": 450000 },
+      { "id": "EP-002", "code": "96.54", "name": "Pembersihan Karang Gigi (Scaling & Polishing) Rahang Atas & Bawah", "quantity": 1, "doctorName": "drg. Jihan, S.Kep", "price": 350000 }
+    ],
+    "prescriptions": [
+      {
+        "id": "PRX-001",
+        "medicineId": "MED-003",
+        "medicineName": "Asam Mefenamat 500mg (Ponstan)",
+        "dosage": "1 tablet",
+        "route": "Oral",
+        "frequency": "3x sehari",
+        "duration": "3 hari",
+        "quantity": 10,
+        "instruction": "Diminum bila terasa nyeri sesudah makan",
+        "unitPrice": 6000,
+        "totalPrice": 60000
+      },
+      {
+        "id": "PRX-002",
+        "medicineId": "MED-006",
+        "medicineName": "Chlorhexidine 0.2% Obat Kumur (Minosep 150ml)",
+        "dosage": "15 ml",
+        "route": "Oral",
+        "frequency": "2x sehari",
+        "duration": "5 hari",
+        "quantity": 1,
+        "instruction": "Kumur selama 1 menit sesudah sikat gigi pagi dan malam",
+        "unitPrice": 42000,
+        "totalPrice": 42000
+      }
+    ],
+    "dentalNotes": "Edukasi cara menyikat gigi dengan teknik Bass, gunakan benang gigi (dental floss) di sela gigi.",
+    "nextControlDate": "2027-03-16",
+    "doctorNotes": "Tindakan penambalan komposit 46 dan scaling berjalan lancar tanpa komplikasi. Pasien diedukasi kontrol rutin 6 bulan lagi.",
+    "invoiceId": "INV-001",
+    "createdAt": "2026-09-16T08:35:00Z",
+    "updatedAt": "2026-09-16T08:55:00Z"
+  },
+  {
+    "id": "ENC-002",
+    "facilityId": "FAC-001",
+    "encounterNumber": "ENC-2026-0002",
+    "patientId": "PAT-001",
+    "patientName": "Budi Santoso",
+    "patientMrn": "RM-2026-000001",
+    "patientGender": "male",
+    "patientBirthDate": "1992-04-18",
+    "patientBloodType": "O+",
+    "doctorId": "DOC-001",
+    "doctorName": "drg. Jihan, S.Kep",
+    "departmentId": "DEP-001",
+    "departmentName": "Poli Gigi Umum",
+    "visitDate": "2026-07-10",
+    "visitType": "routine_checkup",
+    "status": "completed",
+    "anamnesis": {
+      "chiefComplaint": "Kontrol berkala dan keluhan ngilu ringan pada gigi geraham atas kanan saat minum es.",
+      "historyOfPresentIllness": "Keluhan berlangsung 4 hari, ngilu sesaat tidak menetap.",
+      "painScale": 2
+    },
+    "vitalSigns": {
+      "bloodPressureSystolic": 120,
+      "bloodPressureDiastolic": 80,
+      "heartRate": 74,
+      "respiratoryRate": 18,
+      "temperature": 36.5,
+      "weight": 70,
+      "height": 172
+    },
+    "odontogram": {
+      "teeth": {
+        "16": { "toothNumber": 16, "condition": "pulpitis", "diagnosis": "K04.0 Pulpitis Reversibel", "procedure": "Aplikasi Bahan Desensitisasi / Fluoride Varnish", "procedureCost": 175000 }
+      },
+      "occlusion": "normal",
+      "updatedAt": "2026-07-10T10:00:00Z"
+    },
+    "diagnoses": [
+      { "id": "ED-003", "code": "K04.0", "name": "Pulpitis Reversibel Gigi 16", "type": "primary" }
+    ],
+    "procedures": [
+      { "id": "EP-003", "code": "96.54", "name": "Aplikasi Fluoride Varnish Topikal Gigi 16", "quantity": 1, "price": 175000 }
+    ],
+    "prescriptions": [
+      {
+        "id": "PRX-003",
+        "medicineId": "MED-008",
+        "medicineName": "Sensodyne Pasta Gigi Sensitif",
+        "dosage": "1 tube",
+        "route": "Topikal",
+        "frequency": "2x sehari",
+        "duration": "30 hari",
+        "quantity": 1,
+        "unitPrice": 38000,
+        "totalPrice": 38000
+      }
+    ],
+    "dentalNotes": "Gunakan pasta gigi khusus gigi sensitif, hindari minuman terlalu dingin sementara waktu.",
+    "createdAt": "2026-07-10T09:30:00Z",
+    "updatedAt": "2026-07-10T10:15:00Z"
+  },
+  {
+    "id": "ENC-003",
+    "facilityId": "FAC-001",
+    "encounterNumber": "ENC-2026-0003",
+    "patientId": "PAT-001",
+    "patientName": "Budi Santoso",
+    "patientMrn": "RM-2026-000001",
+    "patientGender": "male",
+    "patientBirthDate": "1992-04-18",
+    "patientBloodType": "O+",
+    "doctorId": "DOC-001",
+    "doctorName": "drg. Jihan, S.Kep",
+    "departmentId": "DEP-001",
+    "departmentName": "Poli Gigi Umum",
+    "visitDate": "2026-03-05",
+    "visitType": "routine_checkup",
+    "status": "completed",
+    "anamnesis": {
+      "chiefComplaint": "Pemeriksaan rutin berkala 6 bulanan dan pembersihan karang gigi.",
+      "historyOfPresentIllness": "Tidak ada keluhan nyeri, hanya gusi mudah berdarah saat menyikat gigi.",
+      "painScale": 0
+    },
+    "vitalSigns": {
+      "bloodPressureSystolic": 118,
+      "bloodPressureDiastolic": 78,
+      "heartRate": 72,
+      "respiratoryRate": 16,
+      "temperature": 36.6,
+      "weight": 69,
+      "height": 172
+    },
+    "odontogram": {
+      "teeth": {
+        "31": { "toothNumber": 31, "condition": "calculus", "diagnosis": "K05.0 Gingivitis Akut", "procedure": "Scaling Karang Gigi", "procedureCost": 350000 },
+        "41": { "toothNumber": 41, "condition": "calculus" }
+      },
+      "occlusion": "normal",
+      "updatedAt": "2026-03-05T11:00:00Z"
+    },
+    "diagnoses": [
+      { "id": "ED-004", "code": "K05.1", "name": "Gingivitis Kronis Akibat Plak & Kalkulus", "type": "primary" }
+    ],
+    "procedures": [
+      { "id": "EP-004", "code": "96.54", "name": "Pembersihan Karang Gigi (Scaling) Rahang Bawah", "quantity": 1, "price": 350000 }
+    ],
+    "prescriptions": [
+      {
+        "id": "PRX-004",
+        "medicineId": "MED-006",
+        "medicineName": "Chlorhexidine 0.2% Obat Kumur (Minosep)",
+        "dosage": "15 ml",
+        "route": "Oral",
+        "frequency": "2x sehari",
+        "duration": "7 hari",
+        "quantity": 1,
+        "unitPrice": 42000,
+        "totalPrice": 42000
+      }
+    ],
+    "dentalNotes": "Kalkulus berhasil dibersihkan, gingiva kembali sehat. Kontrol 6 bulan lagi.",
+    "createdAt": "2026-03-05T10:45:00Z",
+    "updatedAt": "2026-03-05T11:30:00Z"
+  },
+  {
+    "id": "ENC-004",
+    "facilityId": "FAC-001",
+    "encounterNumber": "ENC-2026-0004",
+    "patientId": "PAT-004",
+    "patientName": "Ahmad Fauzi",
+    "patientMrn": "RM-2026-000004",
+    "patientGender": "male",
+    "patientBirthDate": "1978-05-11",
+    "patientBloodType": "AB+",
+    "patientAllergies": ["Ketorolac"],
+    "doctorId": "DOC-001",
+    "doctorName": "drg. Jihan, S.Kep",
+    "departmentId": "DEP-001",
+    "departmentName": "Poli Gigi Umum",
+    "visitDate": "2026-09-20",
+    "visitType": "routine_checkup",
+    "status": "completed",
+    "paymentStatus": "paid",
+    "anamnesis": {
+      "chiefComplaint": "Gigi geraham kiri bawah goyang derajat 1 dan gusi sering bengkak berdarah sejak 2 minggu.",
+      "historyOfPresentIllness": "Pasien mengeluh rasa tidak nyaman saat mengunyah makanan keras. Gusi merah kebiruan pada regio gigi 36.",
+      "duration": "2 minggu",
+      "painScale": 3,
+      "symptoms": ["Gusi berdarah", "Gigi agak goyang"]
+    },
+    "vitalSigns": {
+      "bloodPressureSystolic": 130,
+      "bloodPressureDiastolic": 85,
+      "heartRate": 78,
+      "respiratoryRate": 18,
+      "temperature": 36.7,
+      "weight": 76,
+      "height": 170,
+      "bmi": 26.3,
+      "oxygenSaturation": 98,
+      "consciousness": "compos_mentis"
+    },
+    "physicalExam": {
+      "generalCondition": "Baik, kooperatif",
+      "notes": "Intraoral: Poket periodontal 4mm pada mesio-bukal gigi 36, kalkulus subgingival (+), perdarahan saat probing (+)."
+    },
+    "odontogram": {
+      "teeth": {
+        "36": {
+          "toothNumber": 36,
+          "condition": "periodontitis",
+          "diagnosis": "K05.3 Periodontitis Kronis",
+          "procedure": "Kuretase Gingiva / Root Planing Gigi 36",
+          "procedureCost": 400000,
+          "notes": "Poket periodontal 4mm, kuretase jaringan granulasi & subgingival scaling"
+        }
+      },
+      "occlusion": "normal",
+      "updatedAt": "2026-09-20T10:45:00Z"
+    },
+    "diagnoses": [
+      { "id": "ED-005", "code": "K05.3", "name": "Periodontitis kronis lokalisata regio gigi 36", "type": "primary", "notes": "Poket 4mm dengan kalkulus subgingival" }
+    ],
+    "procedures": [
+      { "id": "EP-005", "code": "24.31", "name": "Kuretase Gingiva & Root Planing Per Regio Gigi 36", "quantity": 1, "doctorName": "drg. Jihan, S.Kep", "price": 400000 }
+    ],
+    "prescriptions": [
+      {
+        "id": "PRX-005",
+        "medicineId": "MED-001",
+        "medicineName": "Amoxicillin 500mg",
+        "dosage": "1 kaplet",
+        "route": "Oral",
+        "frequency": "3x sehari",
+        "duration": "5 hari",
+        "quantity": 15,
+        "instruction": "Diminum setiap 8 jam sesudah makan sampai habis",
+        "unitPrice": 4000,
+        "totalPrice": 60000
+      },
+      {
+        "id": "PRX-006",
+        "medicineId": "MED-004",
+        "medicineName": "Ibuprofen 400mg",
+        "dosage": "1 tablet",
+        "route": "Oral",
+        "frequency": "3x sehari",
+        "duration": "3 hari",
+        "quantity": 10,
+        "instruction": "Diminum sesudah makan bila nyeri",
+        "unitPrice": 4000,
+        "totalPrice": 40000
+      }
+    ],
+    "dentalNotes": "Instruksi pasca kuretase: jangan menyikat keras area gigi 36 selama 48 jam, gunakan kumur air hangat garam atau chlorhexidine.",
+    "nextControlDate": "2026-09-27",
+    "doctorNotes": "Kuretase berjalan lancar, hemostasis baik. Pasien dijadwalkan kontrol 1 minggu ke depan.",
+    "invoiceId": "INV-004",
+    "createdAt": "2026-09-20T10:00:00Z",
+    "updatedAt": "2026-09-20T10:50:00Z"
+  },
+  {
+    "id": "ENC-005",
+    "facilityId": "FAC-001",
+    "encounterNumber": "ENC-2026-0005",
+    "patientId": "PAT-002",
+    "patientName": "Siti Rahma",
+    "patientMrn": "RM-2026-000002",
+    "patientGender": "female",
+    "patientBirthDate": "1985-08-23",
+    "doctorId": "DOC-001",
+    "doctorName": "drg. Jihan, S.Kep",
+    "departmentId": "DEP-001",
+    "departmentName": "Poli Gigi Umum",
+    "visitDate": "2026-09-18",
+    "visitType": "routine_checkup",
+    "status": "completed",
+    "anamnesis": {
+      "chiefComplaint": "Gigi depan atas berubah warna menjadi gelap keabu-abuan pasca terbentur 1 tahun lalu.",
+      "painScale": 1
+    },
+    "odontogram": {
+      "teeth": {
+        "11": { "toothNumber": 11, "condition": "necrosis", "diagnosis": "K04.1 Nekrosis Pulpa", "procedure": "Perawatan Saluran Akar (PSA) Gigi Anterior Sesi 1", "procedureCost": 550000 }
+      },
+      "occlusion": "normal",
+      "updatedAt": "2026-09-18T14:30:00Z"
+    },
+    "diagnoses": [
+      { "id": "ED-006", "code": "K04.1", "name": "Nekrosis pulpa non-vital gigi 11", "type": "primary" }
+    ],
+    "procedures": [
+      { "id": "EP-006", "code": "23.71", "name": "Perawatan Saluran Akar (PSA) Gigi Anterior - Open Bor & Ekstirpasi", "quantity": 1, "price": 550000 }
+    ],
+    "prescriptions": [
+      {
+        "id": "PRX-007",
+        "medicineId": "MED-003",
+        "medicineName": "Asam Mefenamat 500mg",
+        "dosage": "1 tablet",
+        "route": "Oral",
+        "frequency": "3x sehari",
+        "duration": "3 hari",
+        "quantity": 10,
+        "unitPrice": 6000,
+        "totalPrice": 60000
+      }
+    ],
+    "dentalNotes": "Saluran akar telah diirigasi NaOCl dan diberi medikamen Ca(OH)2 serta tumpatan sementara. Kontrol 1 minggu.",
+    "createdAt": "2026-09-18T14:00:00Z",
+    "updatedAt": "2026-09-18T14:45:00Z"
+  },
+  {
+    "id": "ENC-006",
+    "facilityId": "FAC-001",
+    "encounterNumber": "ENC-2026-0006",
+    "patientId": "PAT-003",
+    "patientName": "Citra Permata",
+    "patientMrn": "RM-2026-000003",
+    "patientGender": "female",
+    "patientBirthDate": "1999-12-05",
+    "doctorId": "DOC-001",
+    "doctorName": "drg. Jihan, S.Kep",
+    "departmentId": "DEP-001",
+    "departmentName": "Poli Gigi Umum",
+    "visitDate": "2026-09-19",
+    "visitType": "routine_checkup",
+    "status": "completed",
+    "anamnesis": {
+      "chiefComplaint": "Konsultasi susunan gigi depan atas yang berjejal (crowding).",
+      "painScale": 0
+    },
+    "odontogram": {
+      "teeth": {
+        "12": { "toothNumber": 12, "condition": "crowding", "diagnosis": "K07.2 Maloklusi Kelas I Dental", "procedure": "Pencetakan Model Studi Rahang Atas & Bawah", "procedureCost": 250000 }
+      },
+      "occlusion": "normal",
+      "updatedAt": "2026-09-19T11:30:00Z"
+    },
+    "diagnoses": [
+      { "id": "ED-007", "code": "K07.2", "name": "Maloklusi Kelas I dengan crowding anterior", "type": "primary" }
+    ],
+    "procedures": [
+      { "id": "EP-007", "code": "89.31", "name": "Pencetakan Model Studi Studi Ortodonti Rahang Atas & Bawah", "quantity": 1, "price": 250000 }
+    ],
+    "prescriptions": [],
+    "dentalNotes": "Model studi alginat telah diambil untuk analisis ruang (arch analysis). Rencana perawatan ortodonti cekat.",
+    "createdAt": "2026-09-19T11:00:00Z",
+    "updatedAt": "2026-09-19T11:40:00Z"
+  }
+]

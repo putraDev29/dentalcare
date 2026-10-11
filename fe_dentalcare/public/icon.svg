@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <linearGradient id="okayGradient" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0284c7" />
+      <stop offset="35%" stop-color="#0ea5e9" />
+      <stop offset="70%" stop-color="#fb7185" />
+      <stop offset="100%" stop-color="#fde047" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="1" stdDeviation="0.8" flood-color="#000000" flood-opacity="0.25" />
+    </filter>
+  </defs>
+
+  <!-- Squircle rounded background matching sidebar header icon -->
+  <rect width="32" height="32" rx="9" fill="url(#okayGradient)" />
+
+  <!-- Lucide Sparkles icon in pure white with soft shadow -->
+  <g filter="url(#glow)">
+    <!-- Primary Center Sparkle Star -->
+    <path
+      d="M16 5.5 L17.5 11.5 C17.8 12.7 18.8 13.7 20 14 L26 15.5 L20 17 C18.8 17.3 17.8 18.3 17.5 19.5 L16 25.5 L14.5 19.5 C14.2 18.3 13.2 17.3 12 17 L6 15.5 L12 14 C13.2 13.7 14.2 12.7 14.5 11.5 Z"
+      fill="#ffffff"
+    />
+    <!-- Small Top-Left Sparkle -->
+    <path
+      d="M8.5 7 L9.2 9.2 L11.5 10 L9.2 10.8 L8.5 13 L7.8 10.8 L5.5 10 L7.8 9.2 Z"
+      fill="#ffffff"
+      fill-opacity="0.9"
+    />
+    <!-- Tiny Bottom-Right Sparkle -->
+    <path
+      d="M23.5 21 L24 22.5 L25.5 23 L24 23.5 L23.5 25 L23 23.5 L21.5 23 L23 22.5 Z"
+      fill="#ffffff"
+      fill-opacity="0.9"
+    />
+  </g>
+</svg>
