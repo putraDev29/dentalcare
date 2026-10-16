@@ -24,7 +24,8 @@ const app = express();
 const PORT = process.env.PORT || 21465;
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '25mb' }));
+app.use(express.urlencoded({ extended: true, limit: '25mb' }));
 
 process.on('uncaughtException', (err) => {
   console.error('[WPPConnect Uncaught Exception]:', err?.message || err);
@@ -139,6 +140,13 @@ async function startClient() {
           '--no-first-run',
           '--no-zygote',
           '--disable-gpu',
+          '--js-flags=--max-old-space-size=256',
+          '--renderer-process-limit=2',
+          '--disable-extensions',
+          '--disable-default-apps',
+          '--disable-component-update',
+          '--mute-audio',
+          '--no-default-browser-check',
         ],
       },
     });
@@ -499,6 +507,126 @@ async function sendMessageWithLidFallback(client, phone, message) {
     chatId: targetChatId,
     messageId: sendResult.id,
     ack: sendResult.ack,
+  };
+}
+
+/**
+ * Send WhatsApp file (document, PDF, etc.) reliably to any phone number
+ */
+async function sendFileWithFallback(client, phone, fileBase64, filename = 'Invoice.pdf', caption = '') {
+  if (!client || connectionState !== 'CONNECTED') {
+    throw new Error('WPPConnect belum terhubung ke WhatsApp. Silakan scan QR code terlebih dahulu.');
+  }
+
+  const cleanPhone = formatWhatsAppPhone(phone);
+  if (!cleanPhone || cleanPhone.length < 8) {
+    throw new Error('Nomor telepon tidak valid.');
+  }
+
+  if (client.page) {
+    await dismissBlockingModals(client.page);
+  }
+
+  const standardChatId = `${cleanPhone}@c.us`;
+  let targetChatId = standardChatId;
+
+  // Pastikan data uri base64 terformat dengan benar
+  let dataUri = fileBase64;
+  if (!dataUri.startsWith('data:')) {
+    dataUri = `data:application/pdf;base64,${fileBase64}`;
+  }
+
+  let sendResult = null;
+  let lastSendError = null;
+
+  // METODE 1: Direct WPP.chat.sendFileMessage dalam browser context
+  if (client.page) {
+    try {
+      console.log(`[WPPConnect] Mengirim berkas ${filename} ke ${targetChatId}...`);
+      sendResult = await client.page.evaluate(async ({ target, file, name, text }) => {
+        if (typeof WPP === 'undefined' || !WPP.chat) {
+          throw new Error('WPP.chat tidak tersedia di browser');
+        }
+
+        try {
+          await WPP.chat.find(target);
+        } catch (e) {}
+
+        const sendPromise = WPP.chat.sendFileMessage(target, file, {
+          type: 'document',
+          filename: name,
+          caption: text || '',
+          createChat: true,
+          waitForAck: true,
+        });
+
+        const timeoutPromise = new Promise((resolve) => {
+          setTimeout(() => resolve({ isTimeout: true }), 20000);
+        });
+
+        const res = await Promise.race([sendPromise, timeoutPromise]);
+
+        if (res && !res.isTimeout) {
+          const msgId = res?.id
+            ? (typeof res.id === 'object' ? (res.id._serialized || res.id.toString()) : String(res.id))
+            : null;
+          const isFailure = !!res?.isSendFailure || (typeof res?.ack === 'number' && res.ack < 0);
+          return {
+            id: msgId || 'OK',
+            ack: typeof res?.ack === 'number' ? res.ack : 1,
+            to: res?.to ? (typeof res.to === 'object' ? (res.to._serialized || res.to.toString()) : String(res.to)) : target,
+            isSendFailure: isFailure,
+          };
+        }
+
+        const chat = WPP.chat.get(target) || WPP.chat.getActiveChat();
+        const lastMsg = chat?.msgs?.last();
+        const isFailure = !!lastMsg?.isSendFailure || (typeof lastMsg?.ack === 'number' && lastMsg.ack < 0);
+        return {
+          id: lastMsg?.id?._serialized || lastMsg?.id || ('wa-file-' + Date.now()),
+          ack: typeof lastMsg?.ack === 'number' ? lastMsg.ack : 0,
+          to: target,
+          queued: true,
+          isSendFailure: isFailure,
+        };
+      }, { target: targetChatId, file: dataUri, name: filename, text: caption });
+    } catch (errEvaluate) {
+      console.warn(`[WPPConnect] Direct WPP.chat.sendFileMessage gagal: ${errEvaluate.message}, mencoba client.sendFile...`);
+      lastSendError = errEvaluate;
+    }
+  }
+
+  // METODE 2: Fallback ke client.sendFile bawaan WPPConnect
+  if (!sendResult && typeof client.sendFile === 'function') {
+    try {
+      console.log(`[WPPConnect] Mencoba client.sendFile ke ${targetChatId}...`);
+      const fallbackRes = await client.sendFile(targetChatId, dataUri, filename, caption);
+      const msgId = fallbackRes?.id
+        ? (typeof fallbackRes.id === 'object' ? (fallbackRes.id._serialized || fallbackRes.id.toString()) : String(fallbackRes.id))
+        : 'OK';
+      sendResult = {
+        id: msgId,
+        ack: 1,
+        to: targetChatId,
+      };
+    } catch (errSendFile) {
+      console.error(`[WPPConnect] client.sendFile juga gagal:`, errSendFile.message);
+      if (!lastSendError) lastSendError = errSendFile;
+    }
+  }
+
+  if (!sendResult || !sendResult.id || sendResult.isSendFailure) {
+    throw new Error(lastSendError ? lastSendError.message : `Gagal mengirim berkas PDF WhatsApp ke ${cleanPhone}`);
+  }
+
+  console.log(`[WPPConnect] ✅ Berkas ${filename} berhasil dikirim ke ${targetChatId} (ID: ${sendResult.id}, ACK: ${sendResult.ack})`);
+
+  return {
+    to: cleanPhone,
+    chatId: targetChatId,
+    messageId: sendResult.id,
+    ack: sendResult.ack,
+    filename,
   };
 }
 
@@ -877,6 +1005,48 @@ app.post('/api/send-message', async (req, res) => {
     res.status(422).json({
       success: false,
       message: err.message,
+    });
+  }
+});
+
+/**
+ * POST /api/send-file - Kirim berkas dokumen/PDF via WhatsApp
+ */
+app.post('/api/send-file', async (req, res) => {
+  try {
+    const { phone, filename = 'Invoice.pdf', caption = '' } = req.body;
+    const fileBase64 = req.body.fileBase64 || req.body.file;
+
+    if (!phone || !fileBase64) {
+      return res.status(400).json({
+        success: false,
+        message: 'Nomor telepon (phone) dan data berkas (fileBase64/file) wajib diisi.',
+      });
+    }
+
+    if (!clientInstance || connectionState !== 'CONNECTED') {
+      return res.status(503).json({
+        success: false,
+        message: 'WPPConnect belum terhubung ke WhatsApp. Silakan scan QR code terlebih dahulu.',
+        status: connectionState,
+      });
+    }
+
+    const result = await sendFileWithFallback(clientInstance, phone, fileBase64, filename, caption);
+
+    res.json({
+      success: true,
+      message: `Berkas ${filename} berhasil dikirim via WPPConnect!`,
+      to: result.to,
+      chatId: result.chatId,
+      messageId: result.messageId,
+      filename: result.filename,
+    });
+  } catch (err) {
+    console.error(`[WPPConnect Error Kirim Berkas]:`, err.message);
+    res.status(422).json({
+      success: false,
+      message: err.message || 'Gagal mengirim berkas via WhatsApp',
     });
   }
 });

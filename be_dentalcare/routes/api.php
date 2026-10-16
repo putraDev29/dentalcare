@@ -28,6 +28,7 @@ Route::get('/auth/users', [UserController::class, 'index']);
 Route::get('/whatsapp/status', [WhatsAppGatewayController::class, 'status']);
 Route::get('/whatsapp/qr', [WhatsAppGatewayController::class, 'qr']);
 Route::post('/whatsapp/send', [WhatsAppGatewayController::class, 'send']);
+Route::post('/whatsapp/send-file', [WhatsAppGatewayController::class, 'sendFile']);
 Route::post('/whatsapp/send-bulk', [WhatsAppGatewayController::class, 'sendBulk']);
 Route::post('/whatsapp/send-h1', [WhatsAppGatewayController::class, 'sendH1']);
 Route::post('/whatsapp/logout', [WhatsAppGatewayController::class, 'logout']);

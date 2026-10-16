@@ -1,0 +1,13 @@
+@echo off
+title Dental Care Frontend (Next.js - Mode Development / Hot-Reload)
+cd /d "%~dp0"
+
+if not exist "node_modules" (
+    echo Menginstal dependensi Frontend pertama kali...
+    call npm install
+)
+
+echo Menjalankan Frontend Next.js di port 3001 (Mode Development)...
+echo [Perhatian: Mode dev membutuhkan RAM 1GB+ dan CPU lebih tinggi]
+npx next dev -p 3001
+pause

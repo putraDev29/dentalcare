@@ -67,55 +67,59 @@ export function isHMinusOne(dateStr?: string): boolean {
 const MESSAGE_TEMPLATES = [
   {
     id: "standard",
-    name: "Kontrol Rutin Gigi (Standar)",
-    template: `Halo Kak *{nama}*,
+    name: "Kontrol Rutin Gigi (OKAY Dental Therapist)",
+    template: `Halo Kak {nama},
 
-Mengingatkan jadwal kontrol kesehatan gigi Anda di *OKAY Dental*:
+Mengingatkan jadwal kontrol kesehatan gigi Anda di OKAY Dental Therapist:
 
-🗓 *Tanggal Kontrol:* {tanggal} (Besok)
-⏰ *Pukul:* 09:00 WIB
-👨‍⚕️ *Dokter DPJP:* {dokter}
-🏥 *Klinik:* OKAY Dental
-📍 *Poli:* Poli Gigi & Odontogram
-📋 *No. RM:* {no_rm}
+🗓️ Tanggal Kontrol: {tanggal} (Besok)
+⏰ Pukul: 09:00 WIB
+🏥 Klinik: OKAY Dental Therapist
+📋 No. RM: {no_rm}
 
 Mohon konfirmasi kehadiran dengan membalas pesan ini:
-Ketik *YA* jika hadir, atau infokan jika ingin penyesuaian jadwal.
+Ketik YA jika hadir, atau infokan jika ingin penyesuaian jadwal.
 
-Terima kasih atas kepercayaannya pada OKAY Dental! 🙏🦷`,
+Terima kasih atas kepercayaannya pada OKAY Dental Therapist! 🙏🦷`,
   },
   {
     id: "post_treatment",
     name: "Kontrol Pasca Tindakan / Bedah Gigi",
-    template: `Halo Kak *{nama}*,
+    template: `Halo Kak {nama},
 
-Semoga proses pemulihan gigi Anda berjalan dengan baik. Kami dari *OKAY Dental* ingin mengingatkan jadwal kontrol evaluasi pasca tindakan Anda:
+Semoga proses pemulihan gigi Anda berjalan dengan baik. Kami dari OKAY Dental Therapist ingin mengingatkan jadwal kontrol evaluasi pasca tindakan Anda:
 
-🗓 *Jadwal Kontrol:* {tanggal} (Besok)
-⏰ *Pukul:* 10:00 WIB
-👨‍⚕️ *Dokter:* {dokter}
-📋 *No. RM:* {no_rm}
+🗓️ Tanggal Kontrol: {tanggal} (Besok)
+⏰ Pukul: 10:00 WIB
+🏥 Klinik: OKAY Dental Therapist
+📋 No. RM: {no_rm}
 
-Dokter akan mengevaluasi penyembuhan gusi/tambalan gigi Anda. Mohon konfirmasi kehadiran dengan membalas pesan ini. Terima kasih! 🙏🦷`,
+Terapis/dokter akan mengevaluasi penyembuhan gusi/tambalan gigi Anda. Mohon konfirmasi kehadiran dengan membalas pesan ini:
+Ketik YA jika hadir, atau infokan jika ingin penyesuaian jadwal.
+
+Terima kasih atas kepercayaannya pada OKAY Dental Therapist! 🙏🦷`,
   },
   {
     id: "orthodontic",
     name: "Kontrol Kawat Gigi / Ortodonti",
-    template: `Halo Kak *{nama}*,
+    template: `Halo Kak {nama},
 
-Mengingatkan jadwal aktivasi dan kontrol kawat gigi (behel) Anda di *OKAY Dental*:
+Mengingatkan jadwal aktivasi dan kontrol kawat gigi (behel) Anda di OKAY Dental Therapist:
 
-🗓 *Tanggal Kontrol:* {tanggal} (Besok)
-⏰ *Pukul:* 14:00 WIB
-👨‍⚕️ *Dokter:* {dokter}
-📋 *No. RM:* {no_rm}
+🗓️ Tanggal Kontrol: {tanggal} (Besok)
+⏰ Pukul: 14:00 WIB
+🏥 Klinik: OKAY Dental Therapist
+📋 No. RM: {no_rm}
 
-Mohon hadir tepat waktu agar perawatan behel berjalan optimal. Konfirmasi kehadiran Anda dengan membalas pesan ini. Terima kasih! 🦷✨`,
+Mohon hadir tepat waktu agar perawatan behel berjalan optimal. Konfirmasi kehadiran Anda dengan membalas pesan ini:
+Ketik YA jika hadir, atau infokan jika ingin penyesuaian jadwal.
+
+Terima kasih atas kepercayaannya pada OKAY Dental Therapist! 🙏🦷`,
   },
   {
     id: "brief",
     name: "Pesan Singkat & Cepat",
-    template: `Halo Kak *{nama}*, mengingatkan jadwal kontrol gigi Anda di OKAY Dental besok pada tanggal {tanggal} bersama {dokter} (No RM: {no_rm}). Mohon konfirmasi kehadirannya ya Kak. Terima kasih! 🙏🦷`,
+    template: `Halo Kak {nama}, mengingatkan jadwal kontrol gigi Anda di OKAY Dental Therapist besok pada tanggal {tanggal} (No RM: {no_rm}). Mohon konfirmasi kehadirannya ya Kak. Terima kasih! 🙏🦷`,
   },
 ];
 

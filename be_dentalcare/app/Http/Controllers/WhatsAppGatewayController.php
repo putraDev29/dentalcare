@@ -47,6 +47,34 @@ class WhatsAppGatewayController extends Controller
     }
 
     /**
+     * Send WhatsApp document / PDF file
+     */
+    public function sendFile(Request $request)
+    {
+        $fileData = $request->input('file') ?? $request->input('fileBase64');
+        if (!$fileData) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Berkas PDF (file / fileBase64) wajib disertakan.',
+            ], 422);
+        }
+
+        $request->validate([
+            'phone' => 'required|string',
+            'filename' => 'nullable|string',
+            'caption' => 'nullable|string',
+        ]);
+
+        $res = $this->gateway->sendFile(
+            $request->input('phone'),
+            $fileData,
+            $request->input('filename', 'Invoice.pdf'),
+            $request->input('caption', '')
+        );
+        return response()->json($res);
+    }
+
+    /**
      * Send bulk WhatsApp messages
      */
     public function sendBulk(Request $request)

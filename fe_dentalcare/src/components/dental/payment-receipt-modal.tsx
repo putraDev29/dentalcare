@@ -21,6 +21,7 @@ import {
   CreditCard,
   QrCode,
   Building2,
+  Download,
 } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -28,6 +29,7 @@ import { Input } from "@/components/ui/input";
 import { Invoice, Patient } from "@/types";
 import { formatCurrency, formatDate } from "@/lib/formatting";
 import { formatWhatsAppPhone } from "./whatsapp-reminder-modal";
+import { generateInvoicePdf } from "@/lib/pdf/invoice-pdf";
 import { appConfig } from "@/config/app-config";
 import { apiClient } from "@/lib/api/client";
 import { API_ENDPOINTS } from "@/lib/api/endpoints";
@@ -200,7 +202,7 @@ Semoga lekas sembuh dan senyum sehat selalu! 🙏🦷
 _Simpan pesan ini sebagai bukti pembayaran dan transaksi kasir yang sah._`;
   };
 
-  // 1. Direct Click-to-Chat (wa.me)
+  // 1. Direct Click-to-Chat (wa.me) dengan unduhan PDF otomatis
   const handleSendViaWhatsAppWeb = () => {
     const rawPhone = getTargetPhone();
     if (!rawPhone) {
@@ -212,13 +214,24 @@ _Simpan pesan ini sebagai bukti pembayaran dan transaksi kasir yang sah._`;
       toast.error("Nomor WhatsApp tidak valid. Pastikan minimal 10 digit.");
       return;
     }
+
+    try {
+      // Otomatis unduh PDF invoice agar staf bisa langsung attach ke chat WhatsApp Web
+      const pdf = generateInvoicePdf(invoice, {
+        cashierName,
+        paymentMethod: paymentMethodLabel,
+        clinicName: "OKAY DENTAL CLINIC",
+      });
+      pdf.download();
+    } catch (e) {}
+
     const msg = encodeURIComponent(buildWhatsAppMessage());
     const url = `https://wa.me/${clean}?text=${msg}`;
     window.open(url, "_blank", "noopener,noreferrer");
-    toast.success(`Membuka WhatsApp untuk mengirim nota ke ${getRecipientLabel()}!`);
+    toast.success(`Berkas PDF diunduh & WhatsApp terbuka untuk dikirim ke ${getRecipientLabel()}!`);
   };
 
-  // 2. Direct Gateway Send via WPPConnect API
+  // 2. Direct Gateway Send via WPPConnect API (Mengirim Berkas PDF Invoice)
   const handleSendViaGateway = async () => {
     const rawPhone = getTargetPhone();
     if (!rawPhone) {
@@ -233,17 +246,31 @@ _Simpan pesan ini sebagai bukti pembayaran dan transaksi kasir yang sah._`;
 
     setIsGatewaySending(true);
     try {
-      const res = await fetch(`${appConfig.apiUrl}/whatsapp/send`, {
+      // 1. Generate PDF file as base64
+      const pdf = generateInvoicePdf(invoice, {
+        cashierName,
+        paymentMethod: paymentMethodLabel,
+        clinicName: "OKAY DENTAL CLINIC",
+      });
+      const pdfBase64 = pdf.getBase64();
+
+      const caption = `Halo Kak *${invoice.patientName}*,\n\nTerlampir berkas *PDF Bukti Pembayaran (Invoice)* resmi dari *OKAY Dental Clinic* untuk transaksi No. *${invoice.invoiceNumber}* sebesar *${formatCurrency(invoice.totalAmount)}* (LUNAS).\n\nTerima kasih atas kepercayaannya. Semoga lekas sembuh & senyum sehat selalu! 🙏🦷`;
+
+      // 2. Kirim berkas PDF via endpoint /whatsapp/send-file
+      const res = await fetch(`${appConfig.apiUrl}/whatsapp/send-file`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           phone: clean,
-          message: buildWhatsAppMessage(),
+          file: pdfBase64,
+          filename: `Nota_${invoice.invoiceNumber}.pdf`,
+          caption: caption,
         }),
       });
+
       const data = await res.json();
       if (res.ok && data.success !== false) {
-        toast.success(`Nota pembayaran berhasil dikirim via WA Gateway ke ${getRecipientLabel()}!`);
+        toast.success(`Berkas PDF Nota berhasil dikirim via WA Gateway ke ${getRecipientLabel()}!`);
       } else {
         toast.warning(
           data.message || "Gateway offline atau tidak tersambung. Mengalihkan ke WhatsApp Web..."
@@ -270,7 +297,22 @@ _Simpan pesan ini sebagai bukti pembayaran dan transaksi kasir yang sah._`;
     }
   };
 
-  // 4. Print Receipt
+  // 4. Unduh Berkas PDF Nota Kasir
+  const handleDownloadPdf = () => {
+    try {
+      const pdf = generateInvoicePdf(invoice, {
+        cashierName,
+        paymentMethod: paymentMethodLabel,
+        clinicName: "OKAY DENTAL CLINIC",
+      });
+      pdf.download();
+      toast.success("Berkas PDF Nota pembayaran berhasil diunduh!");
+    } catch (err: any) {
+      toast.error("Gagal membuat berkas PDF: " + err.message);
+    }
+  };
+
+  // 5. Print Receipt ke Thermal Printer
   const handlePrint = () => {
     window.print();
   };
@@ -279,7 +321,7 @@ _Simpan pesan ini sebagai bukti pembayaran dan transaksi kasir yang sah._`;
 
   return (
     <>
-      {/* Hidden Global Print Stylesheet for thermal / standard invoice printing */}
+      {/* Hidden Global Print Stylesheet for thermal 58mm printer */}
       <style jsx global>{`
         @media print {
           body * {
@@ -293,21 +335,21 @@ _Simpan pesan ini sebagai bukti pembayaran dan transaksi kasir yang sah._`;
             position: fixed !important;
             left: 0 !important;
             top: 0 !important;
-            width: 80mm !important;
-            max-width: 100% !important;
-            margin: 0 auto !important;
-            padding: 8px !important;
+            width: 48mm !important;
+            max-width: 48mm !important;
+            margin: 0 !important;
+            padding: 2mm 1mm !important;
             background: white !important;
             color: black !important;
             box-shadow: none !important;
             border: none !important;
             font-family: "Courier New", Courier, monospace !important;
-            font-size: 11px !important;
-            line-height: 1.3 !important;
+            font-size: 9px !important;
+            line-height: 1.25 !important;
             display: block !important;
           }
           @page {
-            size: 80mm auto;
+            size: 58mm auto;
             margin: 0;
           }
         }
@@ -371,14 +413,23 @@ _Simpan pesan ini sebagai bukti pembayaran dan transaksi kasir yang sah._`;
             {activeView === "receipt" ? (
               /* ================= VIEW 1: PRATINJAU NOTA FISIK / CETAK ================= */
               <div className="space-y-4">
-                <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/40 p-3 rounded-xl border border-slate-200 dark:border-slate-700 text-xs">
+                <div className="flex flex-wrap items-center justify-between bg-slate-50 dark:bg-slate-800/40 p-3 rounded-xl border border-slate-200 dark:border-slate-700 text-xs gap-2">
                   <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
                     <Printer className="h-4 w-4 text-teal-600" />
                     <span>
-                      Siap cetak ke printer kasir thermal (80mm) atau printer A4/standar klinik.
+                      Format nota dioptimalkan untuk <strong>Printer Kasir Thermal 58 mm</strong> &amp; Ekspor PDF.
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
+                    <Button
+                      size="sm"
+                      onClick={handleDownloadPdf}
+                      variant="outline"
+                      className="h-8 text-xs border-sky-300 text-sky-700 hover:bg-sky-50 gap-1.5 font-semibold"
+                    >
+                      <Download className="h-3.5 w-3.5" />
+                      <span>Unduh PDF Nota</span>
+                    </Button>
                     <Button
                       size="sm"
                       onClick={() => setActiveView("share")}
@@ -386,7 +437,7 @@ _Simpan pesan ini sebagai bukti pembayaran dan transaksi kasir yang sah._`;
                       className="h-8 text-xs border-emerald-300 text-emerald-700 hover:bg-emerald-50 gap-1.5 font-semibold"
                     >
                       <Share2 className="h-3.5 w-3.5" />
-                      <span>Kirim ke WhatsApp Pasien</span>
+                      <span>Kirim PDF ke WhatsApp</span>
                     </Button>
                     <Button
                       size="sm"
@@ -394,136 +445,112 @@ _Simpan pesan ini sebagai bukti pembayaran dan transaksi kasir yang sah._`;
                       className="h-8 text-xs bg-teal-600 hover:bg-teal-700 text-white gap-1.5 shadow-xs font-semibold"
                     >
                       <Printer className="h-3.5 w-3.5" />
-                      <span>Cetak Nota Sekarang</span>
+                      <span>Cetak Nota 58mm</span>
                     </Button>
                   </div>
                 </div>
 
-                {/* Printable Receipt Card */}
+                {/* Printable Receipt Card - Optimized for 58mm Thermal Printer */}
                 <div className="flex justify-center">
                   <div
                     id="printable-thermal-receipt"
-                    className="w-full max-w-md bg-white border border-slate-300 rounded-2xl p-6 shadow-sm text-slate-900 space-y-4 dark:bg-slate-950 dark:text-slate-100 dark:border-slate-800"
+                    className="w-full max-w-[320px] bg-white border border-slate-300 rounded-xl p-4 shadow-sm text-slate-900 space-y-3 font-mono text-[11px] leading-snug dark:bg-slate-950 dark:text-slate-100 dark:border-slate-800"
                   >
                     {/* Clinic Branding Header */}
-                    <div className="text-center pb-3 border-b border-dashed border-slate-300 dark:border-slate-700 space-y-1">
-                      <div className="flex items-center justify-center gap-2">
-                        <Building2 className="h-5 w-5 text-teal-600" />
-                        <h2 className="text-base font-extrabold tracking-tight uppercase">
-                          Dental Care Clinic
-                        </h2>
+                    <div className="text-center pb-2 border-b border-dashed border-slate-400 dark:border-slate-700 space-y-0.5">
+                      <div className="flex items-center justify-center gap-1.5 font-black text-sm uppercase tracking-tight text-slate-900 dark:text-white">
+                        <Sparkles className="h-4 w-4 text-sky-600 inline shrink-0" />
+                        <span>OKAY DENTAL CLINIC</span>
                       </div>
-                      <p className="text-[11px] text-slate-500 font-medium">
-                        Klinik Gigi &amp; Spesialis Konservasi / Ortodonsia
+                      <p className="text-[10px] text-slate-600 font-medium">
+                        Klinik Gigi &amp; Spesialis Konservasi
                       </p>
-                      <p className="text-[10px] text-slate-400">
-                        Jl. Kesehatan No. 45, Jakarta Pusat • Telp: (021) 555-DENTAL
+                      <p className="text-[9.5px] text-slate-500">
+                        Jl. Kesehatan No. 45, Jakarta Pusat
                       </p>
-                      <p className="text-[10px] text-slate-400">
-                        SIP/Izin Operasional: 445/092/SIP.DG/2024
+                      <p className="text-[9.5px] text-slate-500">
+                        Telp: (021) 555-DENTAL
                       </p>
                     </div>
 
                     {/* Receipt Status & Metadata */}
-                    <div className="space-y-1.5 text-xs py-1 border-b border-dashed border-slate-300 dark:border-slate-700">
+                    <div className="space-y-1 text-[10.5px] py-1 border-b border-dashed border-slate-400 dark:border-slate-700">
                       <div className="flex justify-between items-center font-bold">
-                        <span>BUKTI PEMBAYARAN KASIR</span>
-                        <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded text-[11px] border border-emerald-300 dark:bg-emerald-950 dark:text-emerald-300">
-                          LUNAS (PAID)
+                        <span>BUKTI TRANSAKSI KASIR</span>
+                        <span className="text-[10px] font-black border border-emerald-600 text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded dark:bg-emerald-950 dark:text-emerald-300">
+                          LUNAS
                         </span>
                       </div>
                       <div className="flex justify-between text-slate-600 dark:text-slate-400">
-                        <span>No. Invoice:</span>
-                        <span className="font-mono font-semibold text-slate-900 dark:text-slate-100">
+                        <span>No. Nota:</span>
+                        <span className="font-bold text-slate-900 dark:text-slate-100">
                           {invoice.invoiceNumber}
                         </span>
                       </div>
                       <div className="flex justify-between text-slate-600 dark:text-slate-400">
-                        <span>Tanggal &amp; Waktu:</span>
+                        <span>Tgl &amp; Waktu:</span>
                         <span>{formatDate(invoice.invoiceDate)}, {transactionTime}</span>
                       </div>
                       <div className="flex justify-between text-slate-600 dark:text-slate-400">
-                        <span>Kasir Petugas:</span>
+                        <span>Kasir:</span>
                         <span>{cashierName}</span>
                       </div>
                       <div className="flex justify-between text-slate-600 dark:text-slate-400">
-                        <span>Metode Pembayaran:</span>
+                        <span>Pasien:</span>
+                        <span className="font-bold text-slate-900 dark:text-slate-100 truncate max-w-[170px]">
+                          {invoice.patientName}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-slate-600 dark:text-slate-400">
+                        <span>No. RM:</span>
+                        <span className="font-bold text-sky-700 dark:text-sky-400">
+                          {invoice.patientMrn}
+                        </span>
+                      </div>
+                      {patientPhone && (
+                        <div className="flex justify-between text-slate-600 dark:text-slate-400">
+                          <span>No. HP:</span>
+                          <span>{patientPhone}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between text-slate-600 dark:text-slate-400">
+                        <span>Metode Bayar:</span>
                         <span className="font-semibold text-teal-700 dark:text-teal-400">
                           {paymentMethodLabel}
                         </span>
                       </div>
                     </div>
 
-                    {/* Patient Information */}
-                    <div className="space-y-1 text-xs py-1 border-b border-dashed border-slate-300 dark:border-slate-700">
-                      <div className="flex justify-between">
-                        <span className="text-slate-500">Nama Pasien:</span>
-                        <span className="font-bold">{invoice.patientName}</span>
+                    {/* Itemized Table (2-Row Layout for 58mm Thermal Printers) */}
+                    <div className="py-1 border-b border-dashed border-slate-400 dark:border-slate-700 space-y-1.5">
+                      <div className="flex justify-between text-[10px] font-bold text-slate-700 dark:text-slate-300 pb-0.5 border-b border-slate-200 dark:border-slate-800">
+                        <span>LAYANAN / TINDAKAN</span>
+                        <span>SUBTOTAL</span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-slate-500">No. Rekam Medis:</span>
-                        <span className="font-mono font-semibold text-teal-700 dark:text-teal-400">
-                          {invoice.patientMrn}
-                        </span>
-                      </div>
-                      {patientPhone && (
-                        <div className="flex justify-between">
-                          <span className="text-slate-500">No. HP / WA:</span>
-                          <span className="font-mono">{patientPhone}</span>
+                      {invoice.items.map((it, idx) => (
+                        <div key={idx} className="text-[10px] space-y-0.5">
+                          <div className="font-semibold text-slate-900 dark:text-white break-words leading-tight">
+                            {idx + 1}. {it.description}
+                          </div>
+                          <div className="flex justify-between text-slate-600 dark:text-slate-400 pl-3">
+                            <span>{it.quantity} x {formatCurrency(it.unitPrice)}</span>
+                            <span className="font-bold text-slate-900 dark:text-white font-mono">
+                              {formatCurrency(it.totalPrice)}
+                            </span>
+                          </div>
                         </div>
-                      )}
-                      {emergencyContact?.phone && (
-                        <div className="flex justify-between text-[11px] text-slate-500">
-                          <span>Kontak Darurat:</span>
-                          <span>
-                            {emergencyContact.name || "Kerabat"} ({emergencyContact.relationship || "-"}) - {emergencyContact.phone}
-                          </span>
-                        </div>
-                      )}
-                      <div className="flex justify-between">
-                        <span className="text-slate-500">Jenis Penjamin:</span>
-                        <span className="uppercase font-medium text-slate-700 dark:text-slate-300">
-                          Umum (Mandiri)
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Itemized Table */}
-                    <div className="space-y-2 py-1">
-                      <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                        Rincian Layanan &amp; Tindakan Gigi:
-                      </p>
-                      <table className="w-full text-xs">
-                        <thead>
-                          <tr className="border-b border-slate-200 dark:border-slate-800 text-slate-500 text-left">
-                            <th className="py-1">Item Layanan</th>
-                            <th className="py-1 text-center w-10">Qty</th>
-                            <th className="py-1 text-right">Subtotal</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-100 dark:divide-slate-900">
-                          {invoice.items.map((it, idx) => (
-                            <tr key={idx} className="py-1">
-                              <td className="py-1 font-medium">{it.description}</td>
-                              <td className="py-1 text-center font-mono">{it.quantity}</td>
-                              <td className="py-1 text-right font-mono font-semibold">
-                                {formatCurrency(it.totalPrice)}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                      ))}
                     </div>
 
                     {/* Financial Summary */}
-                    <div className="space-y-1.5 pt-2 border-t border-dashed border-slate-300 dark:border-slate-700 text-xs">
+                    <div className="space-y-1 text-[10.5px] py-1 border-b border-dashed border-slate-400 dark:border-slate-700">
                       <div className="flex justify-between text-slate-600 dark:text-slate-400">
-                        <span>Subtotal Tindakan &amp; Obat:</span>
+                        <span>Subtotal:</span>
                         <span className="font-mono">{formatCurrency(invoice.subtotal)}</span>
                       </div>
                       {invoice.insuranceCoverage > 0 && (
                         <div className="flex justify-between text-teal-700 dark:text-teal-400">
-                          <span>Jaminan Asuransi / BPJS:</span>
+                          <span>Asuransi/BPJS:</span>
                           <span className="font-mono">- {formatCurrency(invoice.insuranceCoverage)}</span>
                         </div>
                       )}
@@ -533,34 +560,34 @@ _Simpan pesan ini sebagai bukti pembayaran dan transaksi kasir yang sah._`;
                           <span className="font-mono">- {formatCurrency(invoice.discount)}</span>
                         </div>
                       )}
-                      <div className="flex justify-between font-bold text-sm pt-1 border-t border-slate-200 dark:border-slate-800">
-                        <span>Total Tagihan:</span>
-                        <span className="font-mono text-teal-700 dark:text-teal-400">
+                      <div className="flex justify-between font-black text-xs pt-1 border-t border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white">
+                        <span>TOTAL BAYAR:</span>
+                        <span className="font-mono text-sky-700 dark:text-sky-400">
                           {formatCurrency(invoice.totalAmount)}
                         </span>
                       </div>
-                      <div className="flex justify-between font-bold text-slate-900 dark:text-slate-100">
-                        <span>Jumlah Dibayar ({paymentMethodLabel}):</span>
-                        <span className="font-mono text-emerald-600">
+                      <div className="flex justify-between text-slate-700 dark:text-slate-300">
+                        <span>Jumlah Bayar:</span>
+                        <span className="font-mono font-bold">
                           {formatCurrency(invoice.paidAmount || invoice.totalAmount)}
                         </span>
                       </div>
-                      <div className="flex justify-between font-bold text-slate-600 dark:text-slate-400 text-xs">
-                        <span>Sisa Tagihan:</span>
-                        <span className="font-mono text-emerald-600">Rp 0 (LUNAS)</span>
+                      <div className="flex justify-between text-slate-600 dark:text-slate-400">
+                        <span>Kembali / Sisa:</span>
+                        <span className="font-mono font-bold text-emerald-600">Rp 0 (LUNAS)</span>
                       </div>
                     </div>
 
                     {/* Footer / Thank you */}
-                    <div className="text-center pt-3 border-t border-dashed border-slate-300 dark:border-slate-700 space-y-1">
-                      <p className="text-[11px] font-semibold text-slate-800 dark:text-slate-200">
-                        Terima kasih atas kunjungan Anda di Dental Care Clinic!
+                    <div className="text-center pt-2 space-y-0.5 text-[9.5px] text-slate-500">
+                      <p className="font-bold text-slate-800 dark:text-slate-200">
+                        Terima kasih atas kunjungan Anda!
                       </p>
-                      <p className="text-[10px] text-slate-500">
-                        Semoga senyum sehat dan ceria selalu menyertai Anda. 🙏🦷
+                      <p>
+                        Semoga senyum sehat selalu menyertai Anda. 🙏🦷
                       </p>
-                      <p className="text-[9px] text-slate-400 font-mono pt-1">
-                        *** Simpan nota ini sebagai bukti pembayaran sah ***
+                      <p className="text-[8.5px] text-slate-400 pt-1 font-mono">
+                        === Simpan nota ini sebagai bukti sah ===
                       </p>
                     </div>
                   </div>

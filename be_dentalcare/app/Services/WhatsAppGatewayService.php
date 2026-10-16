@@ -140,6 +140,36 @@ class WhatsAppGatewayService
     }
 
     /**
+     * Send file (document / PDF invoice) to a WhatsApp recipient
+     */
+    public function sendFile(string $phone, string $fileBase64, string $filename = 'Invoice.pdf', ?string $caption = null): array
+    {
+        try {
+            $response = Http::timeout(45)->post("{$this->baseUrl}/api/send-file", [
+                'phone' => $phone,
+                'fileBase64' => $fileBase64,
+                'filename' => $filename,
+                'caption' => $caption ?? '',
+            ]);
+
+            if ($response->successful()) {
+                return $response->json();
+            }
+
+            return [
+                'success' => false,
+                'message' => $response->json('message') ?? 'Gagal mengirim berkas PDF via WhatsApp Gateway.',
+            ];
+        } catch (\Exception $e) {
+            Log::error('WhatsAppGateway sendFile error: ' . $e->getMessage());
+            return [
+                'success' => false,
+                'message' => 'Koneksi ke gateway gagal: ' . $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
      * Send bulk messages
      */
     public function sendBulk(array $recipients): array
@@ -206,9 +236,7 @@ class WhatsAppGatewayService
             $enc = $encounters->firstWhere('patient_id', $p->id);
             $apt = $appointments->firstWhere('patient_id', $p->id);
 
-            $doctorName = $enc->doctor_name ?? $apt->doctor_name ?? 'drg. DPJP';
-
-            $defaultTemplate = "Halo Kak *{nama}*,\n\nMengingatkan jadwal kontrol kesehatan gigi Anda di *Dental Care Clinic*:\n\n🗓 *Tanggal:* {tanggal} (Besok)\n⏰ *Pukul:* 09:00 WIB\n👨‍⚕️ *Dokter DPJP:* {dokter}\n🏥 *Klinik:* Dental Care Clinic\n📋 *No. RM:* {no_rm}\n\nMohon konfirmasi kehadiran dengan membalas pesan ini ya Kak (Ketik *YA* jika hadir). Terima kasih! 🙏🦷";
+            $defaultTemplate = "Halo Kak {nama},\n\nMengingatkan jadwal kontrol kesehatan gigi Anda di OKAY Dental Therapist:\n\n🗓️ Tanggal Kontrol: {tanggal} (Besok)\n⏰ Pukul: 09:00 WIB\n🏥 Klinik: OKAY Dental Therapist\n📋 No. RM: {no_rm}\n\nMohon konfirmasi kehadiran dengan membalas pesan ini:\nKetik YA jika hadir, atau infokan jika ingin penyesuaian jadwal.\n\nTerima kasih atas kepercayaannya pada OKAY Dental Therapist! 🙏🦷";
 
             $template = $customTemplate ?: $defaultTemplate;
             $msg = str_replace(
