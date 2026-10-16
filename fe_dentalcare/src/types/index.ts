@@ -9,8 +9,8 @@ export interface Address {
   rtRw?: string;
   subDistrict?: string; // Kelurahan
   district?: string;    // Kecamatan
-  city: string;        // Kota/Kabupaten
-  province: string;
+  city?: string;        // Kota/Kabupaten
+  province?: string;
   postalCode?: string;
 }
 
@@ -724,6 +724,8 @@ export interface Invoice {
   patientId: string;
   patientName: string;
   patientMrn: string;
+  patientPhone?: string;
+  emergencyContact?: EmergencyContact;
   encounterId?: string;
   admissionId?: string;
   invoiceDate: string;

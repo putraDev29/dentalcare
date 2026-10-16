@@ -13,6 +13,7 @@ import { Invoice } from "@/types";
 import { formatCurrency, formatDate } from "@/lib/formatting";
 import { ColumnDef } from "@tanstack/react-table";
 import { toast } from "sonner";
+import { PaymentReceiptModal } from "@/components/dental/payment-receipt-modal";
 
 export default function BillingPage() {
   const { invoices, recordPayment } = useBilling();
@@ -21,25 +22,44 @@ export default function BillingPage() {
   const [paymentMethod, setPaymentMethod] = React.useState<string>("qris");
   const [paying, setPaying] = React.useState(false);
 
+  // Receipt Modal State for Printing & WhatsApp Sharing
+  const [receiptInvoice, setReceiptInvoice] = React.useState<Invoice | null>(null);
+  const [isReceiptOpen, setIsReceiptOpen] = React.useState(false);
+
   const handleOpenPayment = (inv: Invoice) => {
     setSelectedInvoice(inv);
     setIsPaymentOpen(true);
+  };
+
+  const handleOpenReceipt = (inv: Invoice) => {
+    setReceiptInvoice(inv);
+    setIsReceiptOpen(true);
   };
 
   const handleProcessPayment = async () => {
     if (!selectedInvoice) return;
     setPaying(true);
     try {
-      await recordPayment(
+      const updated = await recordPayment(
         selectedInvoice.id,
         paymentMethod,
         selectedInvoice.balanceAmount,
         "Dewi Kartika - Kasir"
       );
       toast.success(
-        `Pembayaran invoice ${selectedInvoice.invoiceNumber} sebesar ${formatCurrency(selectedInvoice.balanceAmount)} berhasil! Otomatis dicatat ke Kas Masuk Keuangan.`
+        `Pembayaran invoice ${selectedInvoice.invoiceNumber} sebesar ${formatCurrency(selectedInvoice.balanceAmount)} berhasil! Nota siap dicetak & dibagikan ke WhatsApp.`
       );
       setIsPaymentOpen(false);
+
+      // Automatically pop open the digital receipt / invoice modal!
+      const completedInvoice: Invoice = updated || {
+        ...selectedInvoice,
+        paidAmount: selectedInvoice.totalAmount,
+        balanceAmount: 0,
+        status: "paid",
+      };
+      setReceiptInvoice(completedInvoice);
+      setIsReceiptOpen(true);
       setSelectedInvoice(null);
     } catch {
       toast.error("Gagal memproses pembayaran.");
@@ -126,25 +146,49 @@ export default function BillingPage() {
       header: "Aksi",
       cell: ({ row }) => {
         const inv = row.original;
+        const isPaid = inv.balanceAmount <= 0 || inv.status === "paid";
         return (
           <div className="flex items-center gap-1.5">
-            {inv.balanceAmount > 0 ? (
-              <Button
-                size="sm"
-                className="h-7 text-xs bg-teal-600 shadow-xs"
-                onClick={() => handleOpenPayment(inv)}
-              >
-                Bayar Kasir
-              </Button>
+            {isPaid ? (
+              <>
+                <Button
+                  size="sm"
+                  className="h-7 text-xs bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5 shadow-xs font-semibold"
+                  onClick={() => handleOpenReceipt(inv)}
+                  title="Cetak nota kuitansi atau bagikan ke nomor WhatsApp pasien / kontak darurat"
+                >
+                  <Receipt className="h-3.5 w-3.5" />
+                  <span>Nota &amp; WA</span>
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs text-slate-600"
+                  onClick={() => handleOpenPayment(inv)}
+                >
+                  Rincian
+                </Button>
+              </>
             ) : (
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-7 text-xs text-slate-600"
-                onClick={() => handleOpenPayment(inv)}
-              >
-                Rincian
-              </Button>
+              <>
+                <Button
+                  size="sm"
+                  className="h-7 text-xs bg-teal-600 hover:bg-teal-700 text-white shadow-xs font-semibold"
+                  onClick={() => handleOpenPayment(inv)}
+                >
+                  Bayar Kasir
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs text-slate-600 gap-1"
+                  onClick={() => handleOpenReceipt(inv)}
+                  title="Pratinjau Nota & Share WA"
+                >
+                  <Receipt className="h-3 w-3" />
+                  <span>Nota</span>
+                </Button>
+              </>
             )}
           </div>
         );
@@ -327,9 +371,37 @@ export default function BillingPage() {
                 </div>
               </div>
             )}
+
+            {/* Quick Action Button for Paid Invoices */}
+            {selectedInvoice.balanceAmount <= 0 && (
+              <div className="pt-3 flex justify-between items-center border-t border-slate-100 dark:border-slate-800">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-8 text-xs border-emerald-400 text-emerald-700 hover:bg-emerald-50 gap-1.5 font-semibold"
+                  onClick={() => {
+                    setIsPaymentOpen(false);
+                    handleOpenReceipt(selectedInvoice);
+                  }}
+                >
+                  <Receipt className="h-3.5 w-3.5 text-emerald-600" />
+                  <span>Cetak Nota &amp; Kirim WhatsApp</span>
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => setIsPaymentOpen(false)}>
+                  Tutup
+                </Button>
+              </div>
+            )}
           </div>
         </Dialog>
       )}
+
+      {/* Payment Receipt Modal with Print & WhatsApp Sharing */}
+      <PaymentReceiptModal
+        open={isReceiptOpen}
+        onOpenChange={setIsReceiptOpen}
+        invoice={receiptInvoice}
+      />
     </div>
   );
 }

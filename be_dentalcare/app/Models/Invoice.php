@@ -26,7 +26,14 @@ class Invoice extends BaseModel
         'patientResponsibility',
         'transactions',
         'invoiceDate',
+        'patientPhone',
+        'emergencyContact',
     ];
+
+    public function patient()
+    {
+        return $this->belongsTo(Patient::class, 'patient_id');
+    }
 
     public function getBalanceAmountAttribute(): float
     {
@@ -67,4 +74,20 @@ class Invoice extends BaseModel
         }
         return date('Y-m-d');
     }
+
+    public function getPatientPhoneAttribute(): ?string
+    {
+        if (!empty($this->attributes['patient_phone'])) {
+            return $this->attributes['patient_phone'];
+        }
+        $p = $this->relationLoaded('patient') ? $this->patient : Patient::find($this->patient_id);
+        return $p ? $p->phone : null;
+    }
+
+    public function getEmergencyContactAttribute(): ?array
+    {
+        $p = $this->relationLoaded('patient') ? $this->patient : Patient::find($this->patient_id);
+        return $p ? $p->emergency_contact : null;
+    }
 }
+

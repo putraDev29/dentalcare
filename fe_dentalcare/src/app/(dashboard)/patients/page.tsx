@@ -356,15 +356,7 @@ export default function PatientsPage() {
           );
         },
       },
-      {
-        accessorKey: "bloodType",
-        header: "Gol. Darah",
-        cell: ({ row }) => (
-          <Badge variant="neutral" size="sm" className="font-semibold">
-            {row.original.bloodType || "-"}
-          </Badge>
-        ),
-      },
+
       {
         id: "insurance",
         header: "Penjamin",
@@ -618,26 +610,8 @@ export default function PatientsPage() {
           <option value="female">Perempuan</option>
         </select>
 
-        {/* Blood Type Filter */}
-        <select
-          value={query.bloodType || ""}
-          onChange={(e) =>
-            setQuery((prev) => ({
-              ...prev,
-              bloodType: e.target.value || undefined,
-              page: 1,
-            }))
-          }
-          className="rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs text-slate-700 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-300"
-        >
-          <option value="">Semua Gol. Darah</option>
-          <option value="A+">A+</option>
-          <option value="B+">B+</option>
-          <option value="AB+">AB+</option>
-          <option value="O+">O+</option>
-        </select>
 
-        {(query.gender || query.insuranceType || query.bloodType || query.search || filterControlH1Only) && (
+        {(query.gender || query.insuranceType || query.search || filterControlH1Only) && (
           <Button
             variant="ghost"
             size="sm"

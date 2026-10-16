@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@wppconnect-team/wppconnect": "^1.35.4",
-    "@wppconnect/wa-js": "^4.6.1",
+    "@wppconnect/wa-js": "4.7.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",

@@ -30,12 +30,12 @@ class BillingController extends Controller
             $query->where('patient_id', $request->input('patientId'));
         }
 
-        return response()->json($query->orderByDesc('created_at')->get());
+        return response()->json($query->with('patient')->orderByDesc('created_at')->get());
     }
 
     public function show($id)
     {
-        $invoice = Invoice::findOrFail($id);
+        $invoice = Invoice::with('patient')->where('id', $id)->orWhere('invoice_number', $id)->firstOrFail();
         return response()->json($invoice);
     }
 
@@ -180,6 +180,7 @@ class BillingController extends Controller
             'notes' => "ID Pembayaran: {$paymentRecord['id']} | Metode: {$method}",
         ]);
 
+        $invoice->load('patient');
         return response()->json($invoice);
     }
 }

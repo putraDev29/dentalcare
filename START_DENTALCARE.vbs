@@ -19,8 +19,8 @@ End If
 ' 3. Jalankan Backend Laravel di port 8000 (Mode Senyap / Hidden)
 WshShell.Run """" & currentDir & "\be_dentalcare\run_backend.bat""", 0, False
 
-' 4. Jalankan WhatsApp Gateway di port 21465 (Mode Senyap / Hidden)
-WshShell.Run """" & currentDir & "\wa_gateway\run_wa_gateway.bat""", 0, False
+' 4. Jalankan WhatsApp Gateway di port 21465 (Mode Minimized di taskbar agar koneksi WA Web tetap aktif & tidak di-freeze oleh Windows)
+WshShell.Run """" & currentDir & "\wa_gateway\run_wa_gateway.bat""", 7, False
 
 ' 5. Jalankan Frontend Next.js di port 3001 (Mode Senyap / Hidden)
 WshShell.Run """" & currentDir & "\fe_dentalcare\run_frontend.bat""", 0, False

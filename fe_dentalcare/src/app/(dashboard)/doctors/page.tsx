@@ -94,7 +94,7 @@ export default function DoctorsPage() {
   const [formSipNumber, setFormSipNumber] = React.useState("");
   const [formPhone, setFormPhone] = React.useState("");
   const [formEmail, setFormEmail] = React.useState("");
-  const [formConsultationFee, setFormConsultationFee] = React.useState<number>(150000);
+  const [formConsultationFee, setFormConsultationFee] = React.useState<number>(0);
   const [formStatus, setFormStatus] = React.useState<"active" | "on_leave" | "resigned">("active");
   const [formSchedules, setFormSchedules] = React.useState<DoctorSchedule[]>([]);
 
@@ -145,7 +145,7 @@ export default function DoctorsPage() {
     setFormSipNumber(`SIP.503/442/${String(doctors.length + 1).padStart(2, "0")}/DINKES/2026`);
     setFormPhone("081234567890");
     setFormEmail(`dokter${doctors.length + 1}@klinikgigi.local`);
-    setFormConsultationFee(150000);
+    setFormConsultationFee(0);
     setFormStatus("active");
     setFormSchedules([
       {
@@ -198,7 +198,7 @@ export default function DoctorsPage() {
     setFormSipNumber(doc.sipNumber || "");
     setFormPhone(doc.phone || "");
     setFormEmail(doc.email || "");
-    setFormConsultationFee(doc.consultationFee || 150000);
+    setFormConsultationFee(doc.consultationFee || 0);
     setFormStatus(doc.status || "active");
     setFormSchedules(doc.schedules ? JSON.parse(JSON.stringify(doc.schedules)) : []);
     setIsFormModalOpen(true);
@@ -401,15 +401,15 @@ export default function DoctorsPage() {
           <CardContent className="p-4 flex items-center justify-between">
             <div>
               <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                Tarif Konsultasi Rata-Rata
+                Dokter Siaga Melayani
               </p>
               <h3 className="text-xl font-bold text-slate-900 dark:text-white mt-1">
-                {formatCurrency(avgFee)}
+                {activeDoctors} Dokter
               </h3>
-              <p className="text-[10px] text-purple-600 font-medium mt-0.5">Jasa Medis Dental</p>
+              <p className="text-[10px] text-emerald-600 font-medium mt-0.5">Praktik Siap Pelayanan</p>
             </div>
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-purple-50 text-purple-600 dark:bg-purple-950 dark:text-purple-400">
-              <DollarSign className="h-6 w-6" />
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400">
+              <UserCheck className="h-6 w-6" />
             </div>
           </CardContent>
         </Card>
@@ -519,18 +519,12 @@ export default function DoctorsPage() {
                   </CardHeader>
 
                   <CardContent className="p-4 space-y-3 text-xs">
-                    {/* SIP and Consultation Fee */}
+                    {/* SIP and Contact */}
                     <div className="rounded-xl bg-slate-50 p-2.5 dark:bg-slate-800/50 space-y-1.5 border border-slate-100 dark:border-slate-800/60">
                       <div className="flex justify-between items-center text-[11px]">
                         <span className="text-slate-500">Nomor SIP:</span>
                         <span className="font-mono text-slate-700 dark:text-slate-300 font-semibold truncate max-w-[160px]">
                           {doc.sipNumber || "-"}
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center text-[11px]">
-                        <span className="text-slate-500">Tarif Konsultasi:</span>
-                        <span className="font-bold text-teal-700 dark:text-teal-300">
-                          {formatCurrency(doc.consultationFee)}
                         </span>
                       </div>
                       <div className="flex justify-between items-center text-[11px]">
@@ -715,18 +709,7 @@ export default function DoctorsPage() {
                 />
               </div>
 
-              <div className="space-y-1">
-                <label className="font-semibold text-slate-700 dark:text-slate-300">
-                  Biaya Jasa Konsultasi (Rp)
-                </label>
-                <Input
-                  type="number"
-                  value={formConsultationFee}
-                  onChange={(e) => setFormConsultationFee(Number(e.target.value))}
-                  placeholder="150000"
-                  className="text-xs h-8 bg-white dark:bg-slate-900"
-                />
-              </div>
+
 
               <div className="space-y-1">
                 <label className="font-semibold text-slate-700 dark:text-slate-300">

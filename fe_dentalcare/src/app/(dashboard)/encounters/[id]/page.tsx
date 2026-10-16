@@ -648,10 +648,10 @@ export default function DentalEncounterWorkspacePage() {
     setPrescriptions((prev) => prev.filter((p) => p.id !== id));
   };
 
-  const consultationFee = 150000;
+  const consultationFee = 0;
   const proceduresTotal = procedures.reduce((sum, p) => sum + p.price * p.quantity, 0);
   const prescriptionsTotal = prescriptions.reduce((sum, p) => sum + p.totalPrice, 0);
-  const grandTotal = consultationFee + proceduresTotal + prescriptionsTotal;
+  const grandTotal = proceduresTotal + prescriptionsTotal;
 
   const handleCompleteEncounter = async () => {
     setIsSubmitting(true);
@@ -1613,13 +1613,6 @@ export default function DentalEncounterWorkspacePage() {
       <div className="sticky bottom-0 z-30 -mx-4 -mb-4 sm:-mx-6 sm:-mb-6 lg:-mx-8 lg:-mb-8 border-t border-slate-200/90 bg-white/95 px-4 sm:px-6 lg:px-8 py-3.5 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/95">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs">
-            <div>
-              <p className="text-slate-500">Konsultasi Dokter Gigi</p>
-              <p className="font-mono font-bold text-slate-800 dark:text-slate-200">
-                {formatCurrency(consultationFee)}
-              </p>
-            </div>
-            <div className="h-6 w-px bg-slate-200 dark:bg-slate-800" />
             <div>
               <p className="text-slate-500">Tindakan Odontogram ({procedures.length})</p>
               <p className="font-mono font-bold text-slate-800 dark:text-slate-200">

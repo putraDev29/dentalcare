@@ -9,6 +9,8 @@ import {
   Radio,
   Smartphone,
   LogOut,
+  AlertCircle,
+  Trash2,
 } from "lucide-react";
 import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -156,13 +158,40 @@ export function WhatsAppGatewayDialog({
       if (res.ok && data.success) {
         toast.success(`Pesan uji coba berhasil terkirim ke ${data.to || testPhone}!`);
       } else {
-        toast.error(data.message || "Gagal mengirim pesan uji coba.");
+        toast.error(data.message || "Gagal mengirim pesan uji coba.", { duration: 10000 });
       }
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Terjadi kesalahan";
-      toast.error("Gagal menghubungi server WhatsApp: " + msg);
+      toast.error("Gagal menghubungi server WhatsApp: " + msg, { duration: 6000 });
     } finally {
       setIsSendingTest(false);
+    }
+  };
+
+  const [isClearingChat, setIsClearingChat] = React.useState(false);
+
+  const handleClearChat = async () => {
+    if (!testPhone.trim()) {
+      toast.error("Masukkan nomor HP yang ingin di-reset antriannya.");
+      return;
+    }
+    setIsClearingChat(true);
+    try {
+      const res = await fetch("http://127.0.0.1:21465/api/clear-chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: testPhone }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success(`Berhasil membersihkan antrian/sesi obrolan nomor ${testPhone}.`);
+      } else {
+        toast.error(data.message || "Gagal membersihkan antrian obrolan.");
+      }
+    } catch {
+      toast.error("Gagal menghubungi WhatsApp Gateway.");
+    } finally {
+      setIsClearingChat(false);
     }
   };
 
@@ -360,6 +389,24 @@ export function WhatsAppGatewayDialog({
                   {isSendingTest ? "Mengirim..." : "Kirim"}
                 </Button>
               </div>
+            </div>
+
+            <div className="flex items-center justify-between pt-1">
+              <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                Mendukung pengiriman ke nomor pasien, rekan, maupun nomor sendiri (Pesan ke diri sendiri).
+              </span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={handleClearChat}
+                disabled={isClearingChat || !testPhone.trim()}
+                className="h-6 px-2 text-[11px] text-amber-700 hover:text-amber-800 hover:bg-amber-100/60 dark:text-amber-400 dark:hover:bg-amber-950/60 gap-1"
+                title="Hapus riwayat/antrian pesan gagal di nomor ini"
+              >
+                <Trash2 className={`h-3 w-3 ${isClearingChat ? "animate-spin" : ""}`} />
+                <span>{isClearingChat ? "Mereset..." : "Reset Antrian Chat"}</span>
+              </Button>
             </div>
           </div>
         )}

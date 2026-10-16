@@ -42,6 +42,7 @@ import { formatDate, formatDateTime, formatCurrency, maskNik, maskPhone } from "
 import { Odontogram } from "@/components/dental/odontogram";
 import { ControlScheduleModal } from "@/components/dental/control-schedule-modal";
 import { isHMinusOne } from "@/components/dental/whatsapp-reminder-modal";
+import { PaymentReceiptModal } from "@/components/dental/payment-receipt-modal";
 
 export default function PatientDetailPage() {
   const params = useParams();
@@ -62,6 +63,8 @@ export default function PatientDetailPage() {
   const loadedTabs = React.useRef<Record<string, boolean>>({ overview: true });
   const [isBackdateModalOpen, setIsBackdateModalOpen] = React.useState(false);
   const [isControlModalOpen, setIsControlModalOpen] = React.useState(false);
+  const [receiptInvoice, setReceiptInvoice] = React.useState<Invoice | null>(null);
+  const [isReceiptOpen, setIsReceiptOpen] = React.useState(false);
 
   const reloadEncounters = React.useCallback(() => {
     if (patient?.id) {
@@ -276,18 +279,24 @@ export default function PatientDetailPage() {
                   <span className="text-slate-500">Tempat, Tanggal Lahir</span>
                   <span className="font-semibold text-slate-800 dark:text-slate-200">{patient.birthPlace}, {formatDate(patient.birthDate)}</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800">
-                  <span className="text-slate-500">Agama</span>
-                  <span className="text-slate-800 dark:text-slate-200">{patient.religion || "-"}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800">
-                  <span className="text-slate-500">Status Pernikahan</span>
-                  <span className="capitalize text-slate-800 dark:text-slate-200">{patient.maritalStatus || "-"}</span>
-                </div>
-                <div className="flex justify-between py-1">
-                  <span className="text-slate-500">Pekerjaan</span>
-                  <span className="text-slate-800 dark:text-slate-200">{patient.occupation || "-"}</span>
-                </div>
+                {patient.religion && (
+                  <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800">
+                    <span className="text-slate-500">Agama</span>
+                    <span className="text-slate-800 dark:text-slate-200">{patient.religion}</span>
+                  </div>
+                )}
+                {patient.maritalStatus && (
+                  <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800">
+                    <span className="text-slate-500">Status Pernikahan</span>
+                    <span className="capitalize text-slate-800 dark:text-slate-200">{patient.maritalStatus}</span>
+                  </div>
+                )}
+                {patient.occupation && (
+                  <div className="flex justify-between py-1">
+                    <span className="text-slate-500">Pekerjaan</span>
+                    <span className="text-slate-800 dark:text-slate-200">{patient.occupation}</span>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -313,11 +322,17 @@ export default function PatientDetailPage() {
                   <div>
                     <span className="text-slate-500">Alamat Lengkap:</span>
                     <p className="font-medium text-slate-800 dark:text-slate-200 mt-0.5 leading-relaxed">
-                      {patient.address.street} {patient.address.rtRw ? `RT/RW ${patient.address.rtRw}` : ""},{" "}
-                      {patient.address.subDistrict ? `Kel. ${patient.address.subDistrict}, ` : ""}
-                      {patient.address.district ? `Kec. ${patient.address.district}, ` : ""}
-                      {patient.address.city}, {patient.address.province}{" "}
-                      {patient.address.postalCode}
+                      {[
+                        patient.address?.street,
+                        patient.address?.rtRw ? `RT/RW ${patient.address.rtRw}` : null,
+                        patient.address?.subDistrict ? `Kel. ${patient.address.subDistrict}` : null,
+                        patient.address?.district ? `Kec. ${patient.address.district}` : null,
+                        patient.address?.city,
+                        patient.address?.province,
+                        patient.address?.postalCode,
+                      ]
+                        .filter(Boolean)
+                        .join(", ") || patient.address?.street || "-"}
                     </p>
                   </div>
                 </div>
@@ -732,11 +747,24 @@ export default function PatientDetailPage() {
                           Total: {formatCurrency(inv.totalAmount)} | Dijamin: {formatCurrency(inv.insuranceCoverage)} | Bayar Pasien: {formatCurrency(inv.patientResponsibility)}
                         </p>
                       </div>
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2">
                         <StatusBadge type="invoice" status={inv.status} />
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-7 text-xs border-emerald-300 text-emerald-700 hover:bg-emerald-50 gap-1 font-semibold"
+                          onClick={() => {
+                            setReceiptInvoice(inv);
+                            setIsReceiptOpen(true);
+                          }}
+                          title="Buka nota untuk cetak atau share ke WhatsApp"
+                        >
+                          <Receipt className="h-3 w-3" />
+                          <span>Nota &amp; WA</span>
+                        </Button>
                         <Link href={`/billing`}>
-                          <Button variant="outline" size="sm" className="h-7 text-xs">
-                            Detail Invoice
+                          <Button variant="outline" size="sm" className="h-7 text-xs text-slate-600">
+                            Kasir
                           </Button>
                         </Link>
                       </div>
@@ -762,6 +790,13 @@ export default function PatientDetailPage() {
             window.dispatchEvent(new CustomEvent("refresh-notifications"));
           }
         }}
+      />
+
+      {/* Payment Receipt Modal */}
+      <PaymentReceiptModal
+        open={isReceiptOpen}
+        onOpenChange={setIsReceiptOpen}
+        invoice={receiptInvoice}
       />
     </div>
   );

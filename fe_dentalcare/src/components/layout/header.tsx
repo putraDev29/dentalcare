@@ -11,6 +11,7 @@ import {
   Settings,
   Calendar,
   CheckCheck,
+  MessageSquare,
 } from "lucide-react";
 import { useAuthStore } from "@/features/auth/auth-store";
 import { appConfig } from "@/config/app-config";
@@ -19,6 +20,7 @@ import { useNotifications } from "@/hooks";
 import { formatTime } from "@/lib/formatting";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { WhatsAppGatewayDialog } from "@/components/dental/whatsapp-gateway-dialog";
 
 interface HeaderProps {
   onToggleSidebar: () => void;
@@ -35,6 +37,33 @@ export function Header({
 
   const [isNotifOpen, setIsNotifOpen] = React.useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = React.useState(false);
+  const [isWaDialogOpen, setIsWaDialogOpen] = React.useState(false);
+  const [waStatus, setWaStatus] = React.useState<{
+    status?: string;
+    connected?: boolean;
+    phone?: string;
+  } | null>(null);
+
+  React.useEffect(() => {
+    let isMounted = true;
+    const checkWaStatus = async () => {
+      try {
+        const res = await fetch(`${appConfig.apiUrl}/whatsapp/status`);
+        if (res.ok && isMounted) {
+          const data = await res.json();
+          setWaStatus(data);
+        }
+      } catch {
+        if (isMounted) setWaStatus({ status: "OFFLINE", connected: false });
+      }
+    };
+    checkWaStatus();
+    const timer = setInterval(checkWaStatus, 6000);
+    return () => {
+      isMounted = false;
+      clearInterval(timer);
+    };
+  }, []);
 
   const notifRef = React.useRef<HTMLDivElement>(null);
   const userMenuRef = React.useRef<HTMLDivElement>(null);
@@ -170,6 +199,43 @@ export function Header({
           <Search className="h-4 w-4" />
         </button>
 
+
+        {/* WhatsApp Gateway Quick Trigger */}
+        <button
+          onClick={() => setIsWaDialogOpen(true)}
+          className={`flex items-center gap-1.5 rounded-xl border px-2.5 py-1.5 text-xs font-semibold transition-all shadow-xs cursor-pointer ${
+            waStatus?.connected
+              ? "border-emerald-300 bg-emerald-50 text-emerald-800 hover:bg-emerald-100"
+              : waStatus?.status === "QR_READY"
+              ? "border-amber-400 bg-amber-50 text-amber-900 hover:bg-amber-100 animate-pulse ring-2 ring-amber-300/60"
+              : "border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100"
+          }`}
+          title={
+            waStatus?.connected
+              ? `WhatsApp Gateway Online (${waStatus?.phone || "Terhubung"})`
+              : waStatus?.status === "QR_READY"
+              ? "WhatsApp Gateway: Klik untuk scan QR Code!"
+              : "WhatsApp Gateway Offline"
+          }
+        >
+          <MessageSquare className="h-3.5 w-3.5 shrink-0" />
+          <span className="hidden sm:inline">
+            {waStatus?.connected
+              ? "WA Terhubung"
+              : waStatus?.status === "QR_READY"
+              ? "Scan QR WA"
+              : "WA Gateway"}
+          </span>
+          <span
+            className={`h-2 w-2 rounded-full ${
+              waStatus?.connected
+                ? "bg-emerald-500"
+                : waStatus?.status === "QR_READY"
+                ? "bg-amber-500 animate-ping"
+                : "bg-rose-400"
+            }`}
+          />
+        </button>
 
         {/* Notification Bell Dropdown */}
         <div ref={notifRef} className="relative">
@@ -340,6 +406,10 @@ export function Header({
           )}
         </div>
       </div>
+      <WhatsAppGatewayDialog
+        open={isWaDialogOpen}
+        onOpenChange={setIsWaDialogOpen}
+      />
     </header>
   );
 }

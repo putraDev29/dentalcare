@@ -117,7 +117,7 @@ class WhatsAppGatewayService
     public function sendMessage(string $phone, string $message): array
     {
         try {
-            $response = Http::timeout(15)->post("{$this->baseUrl}/api/send-message", [
+            $response = Http::timeout(30)->post("{$this->baseUrl}/api/send-message", [
                 'phone' => $phone,
                 'message' => $message,
             ]);

@@ -4,6 +4,15 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
+// Clean up any outdated nested wa-js in @wppconnect-team/wppconnect to ensure the latest root version is always used
+try {
+  const nestedWaJs = path.join(__dirname, 'node_modules', '@wppconnect-team', 'wppconnect', 'node_modules', '@wppconnect', 'wa-js');
+  if (fs.existsSync(nestedWaJs)) {
+    fs.rmSync(nestedWaJs, { recursive: true, force: true });
+    console.log('[WPPConnect] Membersihkan nested wa-js lama agar menggunakan versi terbaru.');
+  }
+} catch (e) {}
+
 let wppconnect;
 try {
   wppconnect = require('@wppconnect-team/wppconnect');
@@ -16,6 +25,13 @@ const PORT = process.env.PORT || 21465;
 
 app.use(cors());
 app.use(express.json());
+
+process.on('uncaughtException', (err) => {
+  console.error('[WPPConnect Uncaught Exception]:', err?.message || err);
+});
+process.on('unhandledRejection', (reason) => {
+  console.error('[WPPConnect Unhandled Rejection]:', reason?.message || reason);
+});
 
 // Session state
 let clientInstance = null;
@@ -104,7 +120,7 @@ async function startClient() {
           clientInstance = null;
         }
       },
-      headless: 'new',
+      headless: process.env.HEADLESS === 'false' || process.argv.includes('--visible') ? false : 'new',
       devtools: false,
       useChrome: true,
       debug: false,
@@ -115,6 +131,7 @@ async function startClient() {
       puppeteerOptions: {
         executablePath: chromePath,
         args: [
+          '--remote-debugging-port=54109',
           '--no-sandbox',
           '--disable-setuid-sandbox',
           '--disable-dev-shm-usage',
@@ -143,7 +160,7 @@ async function startClient() {
       try {
         const info = await clientInstance.page.evaluate(() => {
           if (typeof WPP !== 'undefined' && WPP.conn) {
-            const wid = WPP.conn.getMyUserId();
+            const wid = typeof WPP.conn.getMyUserWid === 'function' ? WPP.conn.getMyUserWid() : (typeof WPP.conn.getMyUserId === 'function' ? WPP.conn.getMyUserId() : null);
             return {
               user: wid ? (wid.user || wid._serialized) : null,
               pushname: (typeof WPP.whatsapp !== 'undefined' && WPP.whatsapp.Conn) ? WPP.whatsapp.Conn.pushname : null,
@@ -199,22 +216,27 @@ app.get('/api/qr', (req, res) => {
  */
 function killLingeringChrome() {
   try {
-    execSync('powershell -NoProfile -Command "Get-CimInstance Win32_Process -Filter \\"Name = \'chrome.exe\'\\" | Where-Object { $_.CommandLine -like \'*dental-care-clinic*\' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }"', { stdio: 'ignore' });
+    const scriptPath = path.join(__dirname, 'kill_chrome.ps1');
+    if (fs.existsSync(scriptPath)) {
+      execSync(`powershell -NoProfile -ExecutionPolicy Bypass -File "${scriptPath}"`, { stdio: 'ignore' });
+    } else {
+      execSync('powershell -NoProfile -Command "Get-CimInstance Win32_Process -Filter \\"Name = \'chrome.exe\'\\" | Where-Object { $_.CommandLine -like \'*dental-care-clinic*\' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }"', { stdio: 'ignore' });
+    }
   } catch (e) {}
 }
 
 /**
  * Safely and thoroughly cleanup client session without hanging
  */
-async function cleanupSession() {
-  console.log('[WPPConnect] Membersihkan sesi & proses browser...');
+async function cleanupSession(clearTokens = false) {
+  console.log(`[WPPConnect] Membersihkan sesi & proses browser (clearTokens: ${clearTokens})...`);
   const current = clientInstance;
   clientInstance = null;
 
   if (current) {
     try {
-      // 1. Send page logout command with max 1.5s timeout
-      if (current.page) {
+      // 1. Send page logout command with max 1.5s timeout (hanya jika memang logout permanen)
+      if (clearTokens && current.page) {
         await Promise.race([
           current.page.evaluate(() => {
             if (typeof WPP !== 'undefined' && WPP.conn && typeof WPP.conn.logout === 'function') {
@@ -245,15 +267,17 @@ async function cleanupSession() {
   currentQrAscii = null;
   lastError = null;
 
-  // 4. Remove session folder so clean tokens state is reached
-  const tokenDir = path.join(__dirname, 'tokens', 'dental-care-clinic');
-  try {
-    if (fs.existsSync(tokenDir)) {
-      fs.rmSync(tokenDir, { recursive: true, force: true });
-      console.log('[WPPConnect] Folder token sesi berhasil dihapus.');
+  // 4. Hapus folder token HANYA jika diminta logout secara eksplisit
+  if (clearTokens) {
+    const tokenDir = path.join(__dirname, 'tokens', 'dental-care-clinic');
+    try {
+      if (fs.existsSync(tokenDir)) {
+        fs.rmSync(tokenDir, { recursive: true, force: true });
+        console.log('[WPPConnect] Folder token sesi berhasil dihapus (logout).');
+      }
+    } catch (rmErr) {
+      console.warn('[WPPConnect] Gagal menghapus folder token:', rmErr.message);
     }
-  } catch (rmErr) {
-    console.warn('[WPPConnect] Gagal menghapus folder token:', rmErr.message);
   }
 }
 
@@ -263,7 +287,8 @@ async function cleanupSession() {
 app.post('/api/reconnect', async (req, res) => {
   try {
     console.log('[WPPConnect] Menerima permintaan reconnect...');
-    await cleanupSession();
+    // Pertahankan kredensial token sesi agar tidak perlu scan QR ulang jika sudah login
+    await cleanupSession(false);
     res.json({ success: true, message: 'Inisialisasi ulang dimulai.' });
 
     setTimeout(() => {
@@ -275,7 +300,38 @@ app.post('/api/reconnect', async (req, res) => {
 });
 
 /**
- * Send WhatsApp message with LID resolution and multiple fallbacks
+ * Automatically dismiss any blocking modals in WhatsApp Web (e.g. What's New, Retry, Close buttons)
+ */
+async function dismissBlockingModals(page) {
+  if (!page) return;
+  try {
+    await page.evaluate(() => {
+      // 1. Close icon buttons
+      const closeButtons = document.querySelectorAll('span[data-icon="x"], span[data-icon="close"]');
+      closeButtons.forEach((btn) => btn.closest('button')?.click());
+
+      // 2. Click "Coba Lagi" if error dialog
+      const retryBtn = Array.from(document.querySelectorAll('button, div[role="button"]')).find((b) =>
+        (b.innerText || '').includes('Coba Lagi')
+      );
+      if (retryBtn) retryBtn.click();
+
+      // 3. Action buttons
+      const actionButtons = Array.from(document.querySelectorAll('button, div[role="button"]'));
+      for (const b of actionButtons) {
+        const t = (b.innerText || '').trim().toLowerCase();
+        if (['lanjut', 'tutup', 'oke', 'ok', 'mengerti'].includes(t)) {
+          if (b.closest('[role="dialog"]') || b.closest('[data-animate-modal-popup="true"]')) {
+            b.click();
+          }
+        }
+      }
+    });
+  } catch (e) {}
+}
+
+/**
+ * Send WhatsApp message reliably to any phone number (including own number or other numbers)
  */
 async function sendMessageWithLidFallback(client, phone, message) {
   if (!client || connectionState !== 'CONNECTED') {
@@ -287,139 +343,503 @@ async function sendMessageWithLidFallback(client, phone, message) {
     throw new Error('Nomor telepon tidak valid.');
   }
 
+  if (client.page) {
+    await dismissBlockingModals(client.page);
+  }
+
+  // Canonical WhatsApp phone JID is ALWAYS <phone>@c.us (never @lid!)
   const standardChatId = `${cleanPhone}@c.us`;
   let targetChatId = standardChatId;
-  let resolvedVia = 'default';
 
-  // Step 1: Query contact information to resolve LID & check if number is on WhatsApp
-  if (client.page) {
+  // Cek apakah nomor tujuan adalah nomor WhatsApp gateway sendiri (Catatan ke Diri Sendiri / Message Yourself)
+  let isOwnNumber = false;
+  if (connectedPhone) {
+    const cleanConnected = formatWhatsAppPhone(connectedPhone);
+    if (
+      cleanPhone === cleanConnected ||
+      (cleanPhone.length >= 8 && cleanConnected.length >= 8 && (cleanPhone.endsWith(cleanConnected.slice(-9)) || cleanConnected.endsWith(cleanPhone.slice(-9))))
+    ) {
+      isOwnNumber = true;
+      console.log(`[WPPConnect] Mengirim ke nomor gateway sendiri (${cleanPhone}) via fitur Catatan ke Diri Sendiri.`);
+    }
+  }
+
+  // Jika bukan nomor sendiri, validasi keberadaan nomor di WhatsApp via queryWidExists
+  if (!isOwnNumber && client.page) {
     try {
       const contactInfo = await client.page.evaluate(async (rawId) => {
+        if (typeof WPP === 'undefined' || !WPP.contact) return { exists: true };
         try {
-          if (typeof WPP === 'undefined') {
-            return { rawId, error: 'WPP not initialized in page' };
-          }
-
-          // 1. Check existing chat in store
-          if (WPP.chat && typeof WPP.chat.get === 'function') {
-            const existing = WPP.chat.get(rawId);
-            if (existing && existing.id) {
-              return {
-                targetId: existing.id._serialized || existing.id.toString(),
-                exists: true,
-                from: 'chatStore',
-              };
-            }
-          }
-
-          // 2. Query contact existence from WhatsApp server (resolves LID & registers in cache)
-          if (WPP.contact && typeof WPP.contact.queryExists === 'function') {
-            const queryRes = await WPP.contact.queryExists(rawId);
-            if (queryRes) {
-              const lidStr = queryRes.lid ? (queryRes.lid._serialized || queryRes.lid.toString()) : null;
-              const widStr = queryRes.wid ? (queryRes.wid._serialized || queryRes.wid.toString()) : null;
-              return {
-                targetId: lidStr || widStr || rawId,
-                lid: lidStr,
-                wid: widStr,
-                exists: true,
-                from: 'queryExists',
-              };
-            } else {
-              return { exists: false };
-            }
-          }
-
-          // 3. Fallback: try getPnLidEntry if available
-          if (WPP.contact && typeof WPP.contact.getPnLidEntry === 'function') {
-            const entry = await WPP.contact.getPnLidEntry(rawId);
-            if (entry && entry.lid) {
-              const lidStr = entry.lid._serialized || entry.lid.toString();
-              return {
-                targetId: lidStr,
-                lid: lidStr,
-                exists: true,
-                from: 'getPnLidEntry',
-              };
-            }
+          if (typeof WPP.contact.queryWidExists === 'function') {
+            const queryRes = await WPP.contact.queryWidExists(rawId);
+            if (!queryRes) return { exists: false };
+            const widStr = queryRes.wid ? (queryRes.wid._serialized || queryRes.wid.toString()) : rawId;
+            return {
+              exists: true,
+              targetId: (widStr && !widStr.endsWith('@lid')) ? widStr : rawId,
+            };
           }
         } catch (err) {
-          return { error: err.message };
+          return { error: err.message, targetId: rawId };
         }
-        return { targetId: rawId, from: 'none' };
+        return { exists: true, targetId: rawId };
       }, standardChatId);
 
-      if (contactInfo) {
-        if (contactInfo.exists === false) {
-          throw new Error(`Nomor ${cleanPhone} tidak terdaftar di WhatsApp.`);
-        }
-        if (contactInfo.targetId) {
-          targetChatId = contactInfo.targetId;
-          resolvedVia = contactInfo.from || 'query';
-          console.log(`[WPPConnect] Resolusi nomor ${cleanPhone}: target = ${targetChatId} (${resolvedVia})`);
-        }
+      if (contactInfo && contactInfo.exists === false) {
+        throw new Error(`Nomor ${cleanPhone} tidak terdaftar di WhatsApp.`);
+      }
+
+      if (contactInfo && contactInfo.targetId && !contactInfo.targetId.endsWith('@lid')) {
+        targetChatId = contactInfo.targetId;
       }
     } catch (evalErr) {
       if (evalErr.message && evalErr.message.includes('tidak terdaftar di WhatsApp')) {
         throw evalErr;
       }
-      console.warn(`[WPPConnect] Warning evaluasi kontak ${cleanPhone}: ${evalErr.message}`);
+      console.warn(`[WPPConnect] Warning validasi kontak ${cleanPhone}:`, evalErr.message);
     }
   }
 
-  // Step 2: Attempt sending text message
+  // Pastikan targetChatId SELALU berakhiran @c.us, jangan pernah kirim ke @lid
+  if (!targetChatId || targetChatId.endsWith('@lid')) {
+    targetChatId = standardChatId;
+  }
+
   let sendResult = null;
   let lastSendError = null;
 
-  // Try 1: sendText with targetChatId
-  try {
-    console.log(`[WPPConnect] Mengirim pesan ke ${targetChatId}...`);
-    sendResult = await client.sendText(targetChatId, message);
-  } catch (err1) {
-    lastSendError = err1;
-    console.warn(`[WPPConnect] Gagal kirim ke ${targetChatId}: ${err1.message}`);
+  // METODE 1: Direct WPP.chat.sendTextMessage dalam browser context dengan race timeout aman
+  if (client.page) {
+    try {
+      console.log(`[WPPConnect] Mengirim pesan ke ${targetChatId} (isOwnNumber: ${isOwnNumber})...`);
+      sendResult = await client.page.evaluate(async ({ target, text }) => {
+        if (typeof WPP === 'undefined' || !WPP.chat) {
+          throw new Error('WPP.chat tidak tersedia di halaman browser');
+        }
 
-    // Try 2: If targetChatId differed from standardChatId, try standardChatId
-    if (targetChatId !== standardChatId) {
-      try {
-        console.log(`[WPPConnect] Mencoba alternatif ke standardChatId ${standardChatId}...`);
-        sendResult = await client.sendText(standardChatId, message);
-      } catch (err2) {
-        lastSendError = err2;
-        console.warn(`[WPPConnect] Alternatif standardChatId juga gagal: ${err2.message}`);
-      }
-    }
+        // Buka / cari chat terlebih dahulu agar state chat terinisialisasi
+        try {
+          await WPP.chat.find(target);
+        } catch (e) {}
 
-    // Try 3: Direct WPP.chat.sendTextMessage in browser page evaluate
-    if (!sendResult && client.page) {
-      try {
-        console.log(`[WPPConnect] Mencoba kirim langsung via evaluate WPP.chat.sendTextMessage...`);
-        sendResult = await client.page.evaluate(async ({ to, text }) => {
-          if (typeof WPP === 'undefined' || !WPP.chat) {
-            throw new Error('WPP.chat tidak tersedia di halaman');
-          }
-          return await WPP.chat.sendTextMessage(to, text, {
-            waitForAck: true,
-            createChat: true,
-          });
-        }, { to: targetChatId, text: message });
-      } catch (err3) {
-        lastSendError = err3;
-        console.warn(`[WPPConnect] Evaluate sendTextMessage gagal: ${err3.message}`);
-      }
+        // Kirim dengan createChat: true dan waitForAck: true
+        const sendPromise = WPP.chat.sendTextMessage(target, text, {
+          createChat: true,
+          waitForAck: true,
+        });
+
+        // Timeout balap 12 detik agar tidak hang jika server WA lambat mengirim ACK
+        const timeoutPromise = new Promise((resolve) => {
+          setTimeout(() => resolve({ isTimeout: true }), 12000);
+        });
+
+        const res = await Promise.race([sendPromise, timeoutPromise]);
+
+        if (res && !res.isTimeout) {
+          const msgId = res?.id
+            ? (typeof res.id === 'object' ? (res.id._serialized || res.id.toString()) : String(res.id))
+            : null;
+          const isFailure = !!res?.isSendFailure || (typeof res?.ack === 'number' && res.ack < 0);
+          return {
+            id: msgId || 'OK',
+            ack: typeof res?.ack === 'number' ? res.ack : 1,
+            to: res?.to ? (typeof res.to === 'object' ? (res.to._serialized || res.to.toString()) : String(res.to)) : target,
+            isSendFailure: isFailure,
+          };
+        }
+
+        // Jika timeout ACK 12 detik, cek apakah pesan sudah masuk ke obrolan
+        const chat = WPP.chat.get(target) || WPP.chat.getActiveChat();
+        const lastMsg = chat?.msgs?.last();
+        const isFailure = !!lastMsg?.isSendFailure || (typeof lastMsg?.ack === 'number' && lastMsg.ack < 0);
+        return {
+          id: lastMsg?.id?._serialized || lastMsg?.id || ('wa-msg-' + Date.now()),
+          ack: typeof lastMsg?.ack === 'number' ? lastMsg.ack : 0,
+          to: target,
+          queued: true,
+          isSendFailure: isFailure,
+        };
+      }, { target: targetChatId, text: message });
+    } catch (errEvaluate) {
+      console.warn(`[WPPConnect] Direct WPP.chat.sendTextMessage gagal: ${errEvaluate.message}, mencoba client.sendText...`);
+      lastSendError = errEvaluate;
     }
   }
 
+  // METODE 2: Fallback ke client.sendText bawaan WPPConnect
   if (!sendResult) {
-    throw new Error(lastSendError ? lastSendError.message : 'Gagal mengirim pesan WhatsApp');
+    try {
+      console.log(`[WPPConnect] Mencoba client.sendText ke ${targetChatId}...`);
+      const fallbackRes = await client.sendText(targetChatId, message, {
+        createChat: true,
+        waitForAck: false,
+      });
+      const msgId = fallbackRes?.id
+        ? (typeof fallbackRes.id === 'object' ? (fallbackRes.id._serialized || fallbackRes.id.toString()) : String(fallbackRes.id))
+        : 'OK';
+      sendResult = {
+        id: msgId,
+        ack: 1,
+        to: targetChatId,
+      };
+    } catch (errSendText) {
+      console.error(`[WPPConnect] client.sendText juga gagal:`, errSendText.message);
+      if (!lastSendError) lastSendError = errSendText;
+    }
   }
+
+  if (!sendResult || !sendResult.id || sendResult.isSendFailure) {
+    throw new Error(lastSendError ? lastSendError.message : `Gagal mengirim pesan WhatsApp ke ${cleanPhone}: pesan ditolak oleh WhatsApp (isSendFailure: true).`);
+  }
+
+  console.log(`[WPPConnect] ✅ Pesan sukses terkirim ke ${targetChatId} (ID: ${sendResult.id}, ACK: ${sendResult.ack})`);
 
   return {
     to: cleanPhone,
     chatId: targetChatId,
-    messageId: sendResult?.id || sendResult?.to?._serialized || (typeof sendResult === 'object' ? JSON.stringify(sendResult) : 'OK'),
+    messageId: sendResult.id,
+    ack: sendResult.ack,
   };
 }
+
+
+/**
+ * GET /api/check-phone - Periksa status nomor dan histori pesan di WhatsApp
+ */
+app.get('/api/check-phone', async (req, res) => {
+  try {
+    const phone = req.query.phone;
+    if (!phone) {
+      return res.status(400).json({ success: false, message: 'Parameter phone wajib diisi' });
+    }
+    const clean = formatWhatsAppPhone(phone);
+    const standardChatId = `${clean}@c.us`;
+
+    if (!clientInstance || connectionState !== 'CONNECTED' || !clientInstance.page) {
+      return res.status(503).json({ success: false, message: 'WPPConnect belum terhubung' });
+    }
+
+    const check = await clientInstance.page.evaluate(async (rawId) => {
+      let queryRes = null;
+      if (typeof WPP !== 'undefined' && WPP.contact && typeof WPP.contact.queryExists === 'function') {
+        try {
+          queryRes = await WPP.contact.queryExists(rawId);
+        } catch (e) {}
+      }
+
+      const widStr = queryRes?.wid ? (queryRes.wid._serialized || queryRes.wid.toString()) : rawId;
+      const lidStr = queryRes?.lid ? (queryRes.lid._serialized || queryRes.lid.toString()) : null;
+
+      const chat = (typeof WPP !== 'undefined' && WPP.chat)
+        ? (WPP.chat.get(lidStr || widStr) || WPP.chat.get(widStr))
+        : null;
+
+      const lastMsgs = (chat?.msgs || []).slice(-5).map((m) => {
+        const safeProps = {};
+        for (const k of Object.keys(m || {})) {
+          if (typeof m[k] !== 'function' && typeof m[k] !== 'object') {
+            safeProps[k] = m[k];
+          }
+        }
+        return {
+          id: m?.id?._serialized || m?.id,
+          body: m?.body,
+          ack: m?.ack,
+          isSendFailure: !!m?.isSendFailure,
+          type: m?.type,
+          subtype: m?.subtype,
+          t: m?.t,
+          to: m?.to?._serialized || m?.to,
+          props: safeProps,
+        };
+      });
+
+      return {
+        exists: !!queryRes,
+        wid: widStr,
+        lid: lidStr,
+        biz: !!queryRes?.biz,
+        bizName: queryRes?.bizInfo?.verifiedName?.name || null,
+        chatFound: !!chat,
+        chatId: chat?.id?._serialized || null,
+        chatCanSend: chat?.canSendMsg ? (typeof chat.canSendMsg === 'function' ? chat.canSendMsg() : chat.canSendMsg) : null,
+        chatIsReadOnly: chat?.isReadOnly,
+        contactIsBlocked: chat?.contact?.isBlocked,
+        lastMessages: lastMsgs,
+      };
+    }, standardChatId);
+
+    res.json({ success: true, phone: clean, ...check });
+  } catch (e) {
+    res.status(500).json({ success: false, message: e.message });
+  }
+});
+
+/**
+ * GET /api/debug-chats - Ambil daftar chat aktif dan histori terbaru
+ */
+app.get('/api/debug-chats', async (req, res) => {
+  try {
+    if (!clientInstance || connectionState !== 'CONNECTED' || !clientInstance.page) {
+      return res.status(503).json({ success: false, message: 'WPPConnect belum terhubung' });
+    }
+
+    const chats = await clientInstance.page.evaluate(async () => {
+      if (typeof WPP === 'undefined' || !WPP.chat) return [];
+      const list = await WPP.chat.list({ count: 15 });
+      return (list || []).map((c) => {
+        const lastMsg = c?.msgs?.last();
+        return {
+          id: c.id?._serialized || c.id,
+          name: c.name || c.formattedTitle || c.contact?.name || c.contact?.pushname,
+          isGroup: !!c.isGroup,
+          unreadCount: c.unreadCount || 0,
+          lastMsg: lastMsg ? {
+            id: lastMsg.id?._serialized || lastMsg.id,
+            body: (lastMsg.body || '').substring(0, 40),
+            ack: lastMsg.ack,
+            isSendFailure: !!lastMsg.isSendFailure,
+          } : null,
+        };
+      });
+    });
+
+    res.json({ success: true, chats });
+  } catch (e) {
+    res.status(500).json({ success: false, message: e.message });
+  }
+});
+
+/**
+ * GET /api/screenshot - Capture current WhatsApp Web screenshot for debugging
+ */
+app.get('/api/screenshot', async (req, res) => {
+  try {
+    if (!clientInstance || !clientInstance.page) {
+      return res.status(503).json({ success: false, message: 'Browser belum siap' });
+    }
+    const buffer = await clientInstance.page.screenshot({ type: 'png' });
+    res.set('Content-Type', 'image/png');
+    res.send(buffer);
+  } catch (e) {
+    res.status(500).json({ success: false, message: e.message });
+  }
+});
+
+/**
+ * POST /api/diagnose-send - Run precise diagnostic on sendTextMessage
+ */
+app.post('/api/diagnose-send', async (req, res) => {
+  try {
+    const { to, text = 'Pesan uji coba diagnostik' } = req.body;
+    if (!clientInstance || !clientInstance.page) {
+      return res.status(503).json({ success: false, message: 'Browser belum siap' });
+    }
+
+    const diag = await clientInstance.page.evaluate(async ({ target, message }) => {
+      let findChat = null;
+      let findErr = null;
+      try {
+        findChat = await WPP.chat.find(target);
+      } catch (e) {
+        findErr = e.message;
+      }
+
+      let openBottomRes = null;
+      try {
+        openBottomRes = await WPP.chat.openChatBottom(target);
+      } catch (e) {}
+
+      let sendRes = null;
+      let sendErr = null;
+      try {
+        sendRes = await WPP.chat.sendTextMessage(target, message, { waitForAck: false });
+      } catch (e) {
+        sendErr = e.message;
+      }
+
+      await new Promise((r) => setTimeout(r, 2000));
+
+      const chat = WPP.chat.get(target);
+      const msgsArray = Array.isArray(chat?.msgs) ? chat.msgs : (chat?.msgs?.models ? chat.msgs.models : (chat?.msgs ? Array.from(chat.msgs) : []));
+
+      const messages = msgsArray.map((m) => ({
+        id: m.id?._serialized || m.id,
+        body: m.body,
+        isSendFailure: !!m.isSendFailure,
+        ack: m.ack,
+        type: m.type,
+        subtype: m.subtype,
+        status: m.status,
+      }));
+
+      return {
+        target,
+        findErr,
+        findChatId: findChat?.id?._serialized || findChat?.id,
+        openBottomRes,
+        sendRes: {
+          id: sendRes?.id?._serialized || sendRes?.id,
+          ack: sendRes?.ack,
+          to: sendRes?.to?._serialized || sendRes?.to,
+          sendMsgResult: sendRes?.sendMsgResult,
+        },
+        sendErr,
+        chatFound: !!chat,
+        messagesCount: msgsArray.length,
+        messages,
+      };
+    }, { target: to, message: text });
+
+    res.json({ success: true, diag });
+  } catch (e) {
+    res.status(500).json({ success: false, message: e.message });
+  }
+});
+
+/**
+ * POST /api/send-via-dom - Send message using native DOM keyboard typing (100% human-like flow)
+ */
+app.post('/api/send-via-dom', async (req, res) => {
+  try {
+    const { phone, message } = req.body;
+    if (!phone || !message) {
+      return res.status(400).json({ success: false, message: 'Nomor telepon dan pesan wajib diisi' });
+    }
+    const clean = formatWhatsAppPhone(phone);
+    const standardChatId = `${clean}@c.us`;
+
+    if (!clientInstance || connectionState !== 'CONNECTED' || !clientInstance.page) {
+      return res.status(503).json({ success: false, message: 'WPPConnect belum terhubung' });
+    }
+
+    const page = clientInstance.page;
+    await dismissBlockingModals(page);
+
+    // 1. Find and open chat natively via WPP
+    const chatInfo = await page.evaluate(async (to) => {
+      const c = await WPP.chat.find(to);
+      const chatId = c.id?._serialized || c.id?.toString();
+      await WPP.chat.openChatBottom(chatId);
+      return { id: chatId, name: c.name };
+    }, standardChatId);
+
+    // 2. Wait for chat UI and input box
+    await new Promise((r) => setTimeout(r, 1200));
+
+    // 3. Find and click input box
+    const inputSelector = 'footer div[contenteditable="true"], div[contenteditable="true"][data-tab="10"], footer [role="textbox"]';
+    await page.waitForSelector(inputSelector, { timeout: 6000 });
+    await page.click(inputSelector);
+
+    // 4. Type the message
+    await page.keyboard.type(message, { delay: 10 });
+    await new Promise((r) => setTimeout(r, 400));
+
+    // 5. Click the Send button or press Enter
+    const sentViaClick = await page.evaluate(() => {
+      const sendBtn = document.querySelector('button span[data-icon="send"]')?.closest('button') ||
+                      document.querySelector('span[data-icon="send"]')?.closest('button') ||
+                      document.querySelector('footer button[aria-label="Kirim"], footer button[aria-label="Send"]');
+      if (sendBtn) {
+        sendBtn.click();
+        return true;
+      }
+      return false;
+    });
+
+    if (!sentViaClick) {
+      await page.keyboard.press('Enter');
+    }
+
+    // 6. Wait for message to be sent and observe status
+    await new Promise((r) => setTimeout(r, 2000));
+
+    const lastMsg = await page.evaluate((chatId) => {
+      const chat = WPP.chat.get(chatId) || WPP.chat.getActiveChat();
+      const last = chat?.msgs?.last();
+      return last ? {
+        id: last.id?._serialized || last.id,
+        body: last.body,
+        ack: last.ack,
+        isSendFailure: !!last.isSendFailure,
+      } : null;
+    }, chatInfo.id);
+
+    res.json({
+      success: true,
+      chat: chatInfo,
+      lastMsg,
+    });
+  } catch (e) {
+    console.error('[WPPConnect DOM Send Error]:', e.message);
+    res.status(500).json({ success: false, message: e.message });
+  }
+});
+
+
+
+/**
+ * POST /api/clear-chat - Hapus atau bersihkan pesan gagal dalam chat tertentu
+ */
+app.post('/api/clear-chat', async (req, res) => {
+  try {
+    const { phone } = req.body;
+    if (!phone) {
+      return res.status(400).json({ success: false, message: 'Parameter phone wajib diisi' });
+    }
+    const clean = formatWhatsAppPhone(phone);
+    const standardChatId = `${clean}@c.us`;
+
+    if (!clientInstance || connectionState !== 'CONNECTED' || !clientInstance.page) {
+      return res.status(503).json({ success: false, message: 'WPPConnect belum terhubung' });
+    }
+
+    const result = await clientInstance.page.evaluate(async (rawId) => {
+      if (typeof WPP === 'undefined' || !WPP.chat) {
+        return { success: false, error: 'WPP.chat unavailable' };
+      }
+
+      let queryRes = null;
+      if (WPP.contact && typeof WPP.contact.queryExists === 'function') {
+        try {
+          queryRes = await WPP.contact.queryExists(rawId);
+        } catch (e) {}
+      }
+
+      const widStr = queryRes?.wid ? (queryRes.wid._serialized || queryRes.wid.toString()) : rawId;
+      const lidStr = queryRes?.lid ? (queryRes.lid._serialized || queryRes.lid.toString()) : null;
+
+      const targetIds = [lidStr, widStr, rawId].filter(Boolean);
+      let cleared = [];
+
+      for (const tId of targetIds) {
+        try {
+          const chat = WPP.chat.get(tId);
+          if (chat) {
+            // Coba hapus chat secara keseluruhan agar WhatsApp Web membuat sesi chat baru yang bersih
+            if (typeof WPP.chat.delete === 'function') {
+              await WPP.chat.delete(tId);
+              cleared.push({ id: tId, action: 'delete' });
+            } else if (typeof WPP.chat.clear === 'function') {
+              await WPP.chat.clear(tId);
+              cleared.push({ id: tId, action: 'clear' });
+            }
+          }
+        } catch (err) {
+          cleared.push({ id: tId, error: err.message });
+        }
+      }
+
+      return { success: true, cleared };
+    }, standardChatId);
+
+    res.json(result);
+  } catch (e) {
+    res.status(500).json({ success: false, message: e.message });
+  }
+});
+
 
 /**
  * POST /api/send-message - Kirim pesan tunggal
@@ -453,10 +873,10 @@ app.post('/api/send-message', async (req, res) => {
       messageId: result.messageId,
     });
   } catch (err) {
-    console.error('[WPPConnect] Gagal mengirim pesan:', err);
-    res.status(500).json({
+    console.error('[WPPConnect] Gagal mengirim pesan:', err.message);
+    res.status(422).json({
       success: false,
-      message: `Gagal mengirim pesan: ${err.message}`,
+      message: err.message,
     });
   }
 });
@@ -539,7 +959,7 @@ app.post('/api/send-bulk', async (req, res) => {
 app.post('/api/logout', async (req, res) => {
   try {
     console.log('[WPPConnect] Menerima permintaan logout...');
-    await cleanupSession();
+    await cleanupSession(true);
 
     res.json({
       success: true,

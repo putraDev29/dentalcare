@@ -313,6 +313,8 @@ export class ApiBillingRepository implements IBillingRepository {
       patientId: inv.patientId,
       patientName: inv.patientName,
       patientMrn: inv.patientMrn || "-",
+      patientPhone: inv.patientPhone || inv.patient_phone || undefined,
+      emergencyContact: inv.emergencyContact || inv.emergency_contact || undefined,
       totalAmount: total,
       subtotal: Number(inv.subtotal) || total,
       discount: Number(inv.discount) || 0,

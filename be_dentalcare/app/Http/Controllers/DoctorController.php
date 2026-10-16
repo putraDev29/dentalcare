@@ -56,7 +56,7 @@ class DoctorController extends Controller
             'email' => $request->input('email', ''),
             'avatar_url' => $request->input('avatarUrl'),
             'status' => $request->input('status', 'active'),
-            'consultation_fee' => $request->input('consultationFee', 150000),
+            'consultation_fee' => $request->input('consultationFee', 0),
             'schedules' => $request->input('schedules', []),
         ]);
 

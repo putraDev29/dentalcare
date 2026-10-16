@@ -20,20 +20,10 @@ const patientSchema = z.object({
   gender: z.enum(["male", "female"]),
   birthPlace: z.string().min(2, "Tempat lahir harus diisi"),
   birthDate: z.string().min(1, "Tanggal lahir harus diisi"),
-  bloodType: z.enum(["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]).optional(),
-  maritalStatus: z.enum(["single", "married", "widowed", "divorced"]).optional(),
-  religion: z.string().optional(),
-  occupation: z.string().optional(),
   phone: z.string().min(9, "Nomor telepon minimal 9 digit"),
   email: z.string().email("Format email tidak valid").optional().or(z.literal("")),
   address: z.object({
-    street: z.string().min(3, "Alamat jalan harus diisi"),
-    rtRw: z.string().optional(),
-    subDistrict: z.string().optional(),
-    district: z.string().optional(),
-    city: z.string().min(2, "Kota harus diisi"),
-    province: z.string().min(2, "Provinsi harus diisi"),
-    postalCode: z.string().optional(),
+    street: z.string().min(3, "Alamat jalan & domisili harus diisi"),
   }),
   emergencyContact: z
     .object({
@@ -86,20 +76,10 @@ export function PatientForm({
           gender: initialData.gender,
           birthPlace: initialData.birthPlace,
           birthDate: initialData.birthDate,
-          bloodType: initialData.bloodType,
-          maritalStatus: initialData.maritalStatus,
-          religion: initialData.religion || "Islam",
-          occupation: initialData.occupation || "",
           phone: initialData.phone,
           email: initialData.email || "",
           address: {
-            street: initialData.address.street,
-            rtRw: initialData.address.rtRw || "",
-            subDistrict: initialData.address.subDistrict || "",
-            district: initialData.address.district || "",
-            city: initialData.address.city,
-            province: initialData.address.province,
-            postalCode: initialData.address.postalCode || "",
+            street: initialData.address?.street || "",
           },
           emergencyContact: {
             name: initialData.emergencyContact?.name || "",
@@ -119,13 +99,11 @@ export function PatientForm({
         }
       : {
           gender: "male",
-          religion: "Islam",
           insurance: {
             type: "umum",
           },
           address: {
-            city: "Jakarta Pusat",
-            province: "DKI Jakarta",
+            street: "",
           },
         },
   });
@@ -141,13 +119,11 @@ export function PatientForm({
         gender: data.gender,
         birthPlace: data.birthPlace,
         birthDate: data.birthDate,
-        bloodType: data.bloodType,
-        maritalStatus: data.maritalStatus,
-        religion: data.religion,
-        occupation: data.occupation,
         phone: data.phone,
         email: data.email || undefined,
-        address: data.address as any,
+        address: {
+          street: data.address.street,
+        },
         insurance: {
           type: "umum",
           providerName: data.insurance?.providerName,
@@ -211,7 +187,7 @@ export function PatientForm({
       <Card>
         <CardHeader>
           <CardTitle>1. Data Pribadi Pasien</CardTitle>
-          <CardDescription>Informasi identitas kependudukan dan demografis pasien</CardDescription>
+          <CardDescription>Informasi identitas kependudukan pasien</CardDescription>
         </CardHeader>
         <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="space-y-1.5 sm:col-span-2">
@@ -253,56 +229,6 @@ export function PatientForm({
             </label>
             <Input type="date" {...register("birthDate")} error={!!errors.birthDate} />
           </div>
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-              Golongan Darah
-            </label>
-            <Select {...register("bloodType")}>
-              <option value="">Pilih Golongan</option>
-              <option value="A+">A+</option>
-              <option value="B+">B+</option>
-              <option value="AB+">AB+</option>
-              <option value="O+">O+</option>
-              <option value="A-">A-</option>
-              <option value="B-">B-</option>
-              <option value="AB-">AB-</option>
-              <option value="O-">O-</option>
-            </Select>
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-              Status Pernikahan
-            </label>
-            <Select {...register("maritalStatus")}>
-              <option value="single">Belum Menikah</option>
-              <option value="married">Menikah</option>
-              <option value="divorced">Cerai Hidup</option>
-              <option value="widowed">Cerai Mati</option>
-            </Select>
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-              Agama
-            </label>
-            <Select {...register("religion")}>
-              <option value="Islam">Islam</option>
-              <option value="Kristen">Kristen Protestan</option>
-              <option value="Katolik">Katolik</option>
-              <option value="Hindu">Hindu</option>
-              <option value="Buddha">Buddha</option>
-              <option value="Konghucu">Konghucu</option>
-            </Select>
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-              Pekerjaan
-            </label>
-            <Input {...register("occupation")} placeholder="Pekerjaan / Profesi" />
-          </div>
         </CardContent>
       </Card>
 
@@ -310,10 +236,10 @@ export function PatientForm({
       <Card>
         <CardHeader>
           <CardTitle>2. Kontak & Alamat Domisili</CardTitle>
-          <CardDescription>Nomor telepon yang dapat dihubungi dan alamat lengkap</CardDescription>
+          <CardDescription>Nomor telepon/WhatsApp aktif dan alamat lengkap pasien</CardDescription>
         </CardHeader>
         <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div className="space-y-1.5">
+          <div className="space-y-1.5 sm:col-span-1">
             <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
               No. Handphone / WhatsApp <span className="text-rose-500">*</span>
             </label>
@@ -323,58 +249,24 @@ export function PatientForm({
 
           <div className="space-y-1.5 sm:col-span-2">
             <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-              Alamat Email
+              Alamat Email <span className="text-slate-400 font-normal text-[11px]">(Opsional)</span>
             </label>
             <Input type="email" {...register("email")} error={!!errors.email} placeholder="email@contoh.com" />
           </div>
 
           <div className="space-y-1.5 sm:col-span-3">
             <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-              Alamat Lengkap (Jalan, No Rumah) <span className="text-rose-500">*</span>
+              Alamat Lengkap (Jalan, No Rumah, Domisili) <span className="text-rose-500">*</span>
             </label>
-            <Input {...register("address.street")} error={!!errors.address?.street} placeholder="Nama jalan, nomor rumah, perumahan" />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-              RT / RW
-            </label>
-            <Input {...register("address.rtRw")} placeholder="001/002" />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-              Kelurahan / Desa
-            </label>
-            <Input {...register("address.subDistrict")} placeholder="Kelurahan" />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-              Kecamatan
-            </label>
-            <Input {...register("address.district")} placeholder="Kecamatan" />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-              Kota / Kabupaten <span className="text-rose-500">*</span>
-            </label>
-            <Input {...register("address.city")} error={!!errors.address?.city} placeholder="Kota/Kab" />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-              Provinsi <span className="text-rose-500">*</span>
-            </label>
-            <Input {...register("address.province")} error={!!errors.address?.province} placeholder="Provinsi" />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-              Kode Pos
-            </label>
-            <Input {...register("address.postalCode")} placeholder="12345" />
+            <Textarea
+              {...register("address.street")}
+              error={!!errors.address?.street}
+              placeholder="Nama jalan, nomor rumah, RT/RW, kelurahan, kecamatan, kota domisili"
+              rows={3}
+            />
+            {errors.address?.street && (
+              <p className="text-[11px] text-rose-500">{errors.address.street.message}</p>
+            )}
           </div>
         </CardContent>
       </Card>

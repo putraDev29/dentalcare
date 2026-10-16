@@ -559,16 +559,7 @@ export class MockEncounterRepository implements IEncounterRepository {
     state.invoices = state.invoices || [];
     const invIdx = state.invoices.findIndex((i: any) => i.encounterId === enc.id || (enc.patientId && i.patientId === enc.patientId && i.status !== "paid"));
     
-    const invoiceItems: any[] = [
-      {
-        id: `ITM-CONS-${enc.id}`,
-        description: `Jasa Konsultasi & Pemeriksaan Odontogram (${enc.doctorName || "drg. Jihan, S.Kep"})`,
-        category: "consultation",
-        quantity: 1,
-        unitPrice: 150000,
-        totalPrice: 150000,
-      },
-    ];
+    const invoiceItems: any[] = [];
 
     const proceduresToBill: any[] = [];
     if (enc.procedures && Array.isArray(enc.procedures)) {

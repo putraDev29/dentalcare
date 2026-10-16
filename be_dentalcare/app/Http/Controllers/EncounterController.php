@@ -379,19 +379,7 @@ class EncounterController extends Controller
         $items = [];
         $subtotal = 0;
 
-        // 1. Jasa Konsultasi & Pemeriksaan Odontogram
-        $consultationFee = 150000;
-        $items[] = [
-            'id' => 'ITM-CONS-' . $encounter->id,
-            'category' => 'consultation',
-            'description' => "Konsultasi & Pemeriksaan Odontogram ({$encounter->doctor_name})",
-            'quantity' => 1,
-            'unitPrice' => $consultationFee,
-            'totalPrice' => $consultationFee,
-        ];
-        $subtotal += $consultationFee;
-
-        // 2. Tindakan Medis Dental (Procedures)
+        // 1. Tindakan Medis Dental (Procedures)
         $procedures = is_array($encounter->procedures) ? $encounter->procedures : [];
         if (!empty($encounter->odontogram['teeth']) && is_array($encounter->odontogram['teeth'])) {
             foreach ($encounter->odontogram['teeth'] as $toothNum => $tRecord) {
