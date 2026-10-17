@@ -1,10 +1,13 @@
 $wsh = New-Object -ComObject WScript.Shell
-$iconPath = "C:\project\dental care\okay_dental.ico"
+$iconPath = "C:\project\dental care\START_DENTALCARE.ico"
 $vbsPath = "C:\project\dental care\START_DENTALCARE.vbs"
 $workingDir = "C:\project\dental care"
 
-# 1. Project Directory Shortcut
+# 1. Project Directory Shortcut (START_DENTALCARE.lnk)
 $projLnkPath = "C:\project\dental care\START_DENTALCARE.lnk"
+if (Test-Path $projLnkPath) {
+    Remove-Item $projLnkPath -Force
+}
 $projLnk = $wsh.CreateShortcut($projLnkPath)
 $projLnk.TargetPath = "wscript.exe"
 $projLnk.Arguments = "`"$vbsPath`""
@@ -14,9 +17,12 @@ $projLnk.Description = "Mulai Aplikasi OKAY Dental Clinic"
 $projLnk.Save()
 Write-Host "Created Project Shortcut: $projLnkPath"
 
-# 2. Desktop Shortcut
+# 2. Desktop Shortcut (OKAY Dental Clinic.lnk)
 $desktopPath = [Environment]::GetFolderPath("Desktop")
 $deskLnkPath = Join-Path $desktopPath "OKAY Dental Clinic.lnk"
+if (Test-Path $deskLnkPath) {
+    Remove-Item $deskLnkPath -Force
+}
 $deskLnk = $wsh.CreateShortcut($deskLnkPath)
 $deskLnk.TargetPath = "wscript.exe"
 $deskLnk.Arguments = "`"$vbsPath`""
@@ -26,10 +32,23 @@ $deskLnk.Description = "Mulai Aplikasi OKAY Dental Clinic"
 $deskLnk.Save()
 Write-Host "Created Desktop Shortcut: $deskLnkPath"
 
-# Verify Icon
-if (Test-Path $iconPath) {
-    $size = (Get-Item $iconPath).Length
-    Write-Host "Icon file exists ($size bytes)"
-} else {
-    Write-Host "WARNING: Icon file not found at $iconPath"
+# 3. Notify Windows Shell to refresh icon cache immediately
+try {
+    Add-Type -TypeDefinition @'
+using System;
+using System.Runtime.InteropServices;
+public class ShellRefresh {
+    [DllImport("shell32.dll")]
+    public static extern void SHChangeNotify(int wEventId, int uFlags, IntPtr dwItem1, IntPtr dwItem2);
 }
+'@
+    [ShellRefresh]::SHChangeNotify(0x08000000, 0, [IntPtr]::Zero, [IntPtr]::Zero)
+    Write-Host "Windows Shell notified of icon update"
+} catch {
+    Write-Host "SHChangeNotify skipped"
+}
+
+# Also call ie4uinit to force icon cache refresh
+Start-Process -FilePath "ie4uinit.exe" -ArgumentList "-show" -NoNewWindow -Wait -ErrorAction SilentlyContinue
+
+Write-Host "Shortcut and Icon refresh completed!"

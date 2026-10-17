@@ -45,6 +45,7 @@ import {
   DentalDepartmentMaster,
   DentalInsuranceMaster,
 } from "@/types";
+import diagnosesSeed from "@/data/diagnoses.json";
 
 export class MockPatientRepository implements IPatientRepository {
   async getPatients(query: PatientQuery = {}): Promise<PaginatedResult<Patient>> {
@@ -1210,16 +1211,14 @@ export class MockFinanceRepository implements IFinanceRepository {
 }
 
 // In-Memory Master Data State for Mock Mode
-let mockDiagnoses: DentalDiagnosisMaster[] = [
-  { id: "DX-001", code: "K02.1", name: "Caries of dentine (Karies Dentin Profunda)", category: "Dental Caries", description: "Kavitas mencapai lapisan dentin dengan rasa ngilu bila terkena rangsangan termal/kimiawi.", isActive: true },
-  { id: "DX-002", code: "K04.0", name: "Pulpitis (Pulpitis Reversibel & Ireversibel Akut)", category: "Pulpal Diseases", description: "Peradangan pada jaringan pulpa gigi dengan nyeri berdenyut tajam spontan.", isActive: true },
-  { id: "DX-003", code: "K05.1", name: "Chronic periodontitis (Periodontitis Kronis)", category: "Periodontal Diseases", description: "Kerusakan jaringan penyangga gigi, kedalaman poket bertambah, dan kegoyangan gigi.", isActive: true },
-  { id: "DX-004", code: "K05.0", name: "Acute gingivitis (Gingivitis Akut)", category: "Periodontal Diseases", description: "Gusi merah bengkak dan mudah berdarah saat menyikat gigi.", isActive: true },
-  { id: "DX-005", code: "K01.1", name: "Impacted teeth (Impaksi Gigi Molar Ketiga / M3)", category: "Tooth Development Disorders", description: "Gigi geraham bungsu terhalang erupsi normal oleh tulang atau gigi tetangga.", isActive: true },
-  { id: "DX-006", code: "K03.6", name: "Deposits on teeth (Kalkulus Gigi / Karang Gigi)", category: "Dental Deposits", description: "Penumpukan plak termineralisasi supra dan subgingiva.", isActive: true },
-  { id: "DX-007", code: "K04.7", name: "Periapical abscess without sinus (Abses Periapikal Gigi)", category: "Periapical Diseases", description: "Pembengkakan bernanah pada ujung akar gigi akibat nekrosis pulpa lanjut.", isActive: true },
-  { id: "DX-008", code: "K07.2", name: "Anomalies of dental arch relationship (Maloklusi Kelas II/III)", category: "Dentofacial Anomalies", description: "Ketidakharmonisan hubungan lengkung rahang atas dan rahang bawah.", isActive: true },
-];
+let mockDiagnoses: DentalDiagnosisMaster[] = diagnosesSeed.map((d) => ({
+  id: d.id,
+  code: d.code,
+  name: d.name,
+  category: d.category || "Umum",
+  description: d.description || d.name,
+  isActive: true,
+}));
 
 let mockProcedures: DentalProcedureMaster[] = [
   { id: "PROC-001", code: "23.2", name: "Penambalan Gigi Komposit / Composite Resin Restoration", category: "Konservasi Gigi", cost: 350000, description: "Restorasi kavitas gigi estetik sewarna gigi dengan aktivasi sinar light-curing.", isActive: true },

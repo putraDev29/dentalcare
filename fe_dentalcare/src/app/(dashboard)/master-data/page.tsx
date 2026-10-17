@@ -92,14 +92,14 @@ export default function MasterDataDentalPage() {
   const [dxForm, setDxForm] = React.useState({
     code: "",
     name: "",
-    category: "Dental Caries",
+    category: "Karies Gigi",
     description: "",
     isActive: true,
   });
 
   const openCreateDx = () => {
     setEditingDx(null);
-    setDxForm({ code: "", name: "", category: "Dental Caries", description: "", isActive: true });
+    setDxForm({ code: "", name: "", category: "Karies Gigi", description: "", isActive: true });
     setIsDxModalOpen(true);
   };
 
@@ -108,7 +108,7 @@ export default function MasterDataDentalPage() {
     setDxForm({
       code: dx.code,
       name: dx.name,
-      category: dx.category || "Dental Caries",
+      category: dx.category || "Karies Gigi",
       description: dx.description || "",
       isActive: dx.isActive,
     });
@@ -441,6 +441,7 @@ export default function MasterDataDentalPage() {
   // ========================================================
   // FILTERED DATASETS
   // ========================================================
+  // Filtered diagnoses
   const filteredDiagnoses = diagnoses.filter((d) => {
     const matchCat = selectedCategory === "all" || d.category === selectedCategory;
     const matchSearch =
@@ -450,6 +451,22 @@ export default function MasterDataDentalPage() {
       (d.description && d.description.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchCat && matchSearch;
   });
+
+  // Pagination & lazy scroll loading for Master ICD-10 diagnoses (initial 10, +10 on scroll)
+  const [visibleMasterDxCount, setVisibleMasterDxCount] = React.useState(10);
+
+  React.useEffect(() => {
+    setVisibleMasterDxCount(10);
+  }, [searchQuery, selectedCategory, activeTab]);
+
+  const handleMasterDxScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+    if (scrollTop + clientHeight >= scrollHeight - 60) {
+      if (visibleMasterDxCount < filteredDiagnoses.length) {
+        setVisibleMasterDxCount((prev) => Math.min(prev + 10, filteredDiagnoses.length));
+      }
+    }
+  };
 
   const filteredProcedures = procedures.filter((p) => {
     const matchCat = selectedCategory === "all" || p.category === selectedCategory;
@@ -754,9 +771,12 @@ export default function MasterDataDentalPage() {
       {/* ========================================================================= */}
       {activeTab === "diagnoses" && (
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs dark:border-slate-800 dark:bg-slate-900">
-          <div className="overflow-x-auto">
+          <div
+            onScroll={handleMasterDxScroll}
+            className="overflow-x-auto max-h-[480px] overflow-y-auto"
+          >
             <table className="w-full text-left text-xs">
-              <thead className="border-b border-slate-100 bg-slate-50 text-slate-500 dark:border-slate-800 dark:bg-slate-800/40">
+              <thead className="border-b border-slate-100 bg-slate-50 text-slate-500 dark:border-slate-800 dark:bg-slate-800/80 sticky top-0 z-10 backdrop-blur-xs">
                 <tr>
                   <th className="px-4 py-3 font-semibold w-24">Kode ICD-10</th>
                   <th className="px-4 py-3 font-semibold">Nama Diagnosa Penyakit Gigi</th>
@@ -767,7 +787,7 @@ export default function MasterDataDentalPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                {filteredDiagnoses.map((dx) => (
+                {filteredDiagnoses.slice(0, visibleMasterDxCount).map((dx) => (
                   <tr key={dx.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
                     <td className="px-4 py-3">
                       <span className="rounded-md bg-teal-50 px-2 py-1 font-mono font-bold text-teal-700 border border-teal-200 dark:bg-teal-950/40 dark:text-teal-300 dark:border-teal-900">
@@ -828,6 +848,22 @@ export default function MasterDataDentalPage() {
               </tbody>
             </table>
           </div>
+          {visibleMasterDxCount < filteredDiagnoses.length ? (
+            <div className="p-3 text-center border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setVisibleMasterDxCount((prev) => Math.min(prev + 10, filteredDiagnoses.length))}
+                className="text-xs text-teal-600 border-teal-200 hover:bg-teal-50 dark:border-teal-900 dark:text-teal-400 font-medium"
+              >
+                + Muat 10 diagnosis berikutnya (Menampilkan {Math.min(visibleMasterDxCount, filteredDiagnoses.length)} dari {filteredDiagnoses.length} data • Scroll untuk +10)
+              </Button>
+            </div>
+          ) : (
+            <div className="p-2.5 text-center text-[11px] text-slate-400 border-t border-slate-100 dark:border-slate-800">
+              ✓ Seluruh {filteredDiagnoses.length} diagnosis telah ditampilkan
+            </div>
+          )}
         </div>
       )}
 
@@ -1238,14 +1274,25 @@ export default function MasterDataDentalPage() {
                 className="w-full rounded-xl border border-slate-200 bg-white p-2 text-xs dark:border-slate-800 dark:bg-slate-900"
                 required
               >
-                <option value="Dental Caries">Dental Caries (Karies / Gigi Berlubang)</option>
-                <option value="Pulpal Diseases">Pulpal Diseases (Penyakit Pulpa & Saraf)</option>
-                <option value="Periodontal Diseases">Periodontal Diseases (Penyakit Gusi / Periodonsia)</option>
-                <option value="Tooth Development Disorders">Tooth Development Disorders (Impaksi / Pertumbuhan)</option>
-                <option value="Dental Deposits">Dental Deposits (Kalkulus / Karang Gigi)</option>
-                <option value="Periapical Diseases">Periapical Diseases (Abses / Periapikal)</option>
-                <option value="Dentofacial Anomalies">Dentofacial Anomalies (Maloklusi / Ortodonti)</option>
-                <option value="Umum">Lainnya / Umum</option>
+                <option value="Karies Gigi">Karies Gigi (Dental Caries)</option>
+                <option value="Penyakit Pulpa & Periapikal">Penyakit Pulpa & Periapikal (Endodontik)</option>
+                <option value="Gusi & Periodontal">Gusi & Periodontal (Periodonsia)</option>
+                <option value="Gigi Impaksi & Erupsi">Gigi Impaksi & Erupsi Gigi</option>
+                <option value="Kelainan Jaringan Keras Gigi">Kelainan Jaringan Keras Gigi</option>
+                <option value="Kelainan Bentuk & Struktur Gigi">Kelainan Bentuk & Struktur Gigi</option>
+                <option value="Kehilangan Gigi & Radiks">Kehilangan Gigi & Radiks</option>
+                <option value="Maloklusi & Ortodonti">Maloklusi & Ortodonti</option>
+                <option value="Sendi Rahang (TMJ)">Sendi Rahang (TMJ)</option>
+                <option value="Kelainan Rahang & Alveolus">Kelainan Rahang & Alveolus</option>
+                <option value="Kista Regio Mulut & Rahang">Kista Regio Mulut & Rahang</option>
+                <option value="Penyakit Kelenjar Liur">Penyakit Kelenjar Liur (Saliva)</option>
+                <option value="Mukosa Mulut & Bibir">Mukosa Mulut & Bibir (Stomatitis)</option>
+                <option value="Penyakit Lidah">Penyakit Lidah</option>
+                <option value="Trauma Gigi & Maksilofasial">Trauma Gigi & Maksilofasial</option>
+                <option value="Infeksi Spesifik Rongga Mulut">Infeksi Spesifik Rongga Mulut</option>
+                <option value="Kelainan Kongenital Gigi-Mulut">Kelainan Kongenital Gigi-Mulut</option>
+                <option value="Pemeriksaan & Kontrol Gigi">Pemeriksaan & Kontrol Gigi</option>
+                <option value="Umum">Umum / Lainnya</option>
               </select>
             </div>
           </div>

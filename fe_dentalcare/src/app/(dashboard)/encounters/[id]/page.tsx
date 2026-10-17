@@ -10,6 +10,7 @@ import {
   Plus,
   Trash2,
   Search,
+  X,
   CheckCircle2,
   FileText,
   AlertTriangle,
@@ -37,7 +38,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog } from "@/components/ui/dialog";
 import { calculateBmi, formatCurrency, formatRupiahInput } from "@/lib/formatting";
 import { useDoctors } from "@/hooks";
-import { PatientService, EncounterService, QueueService, PharmacyService, BillingService } from "@/services";
+import { PatientService, EncounterService, QueueService, PharmacyService, BillingService, DentalMasterService } from "@/services";
 import { Odontogram, TOOTH_CONDITIONS } from "@/components/dental/odontogram";
 import { MedicinePrescriptionModal } from "@/components/dental/medicine-prescription-modal";
 import { PatientExaminationHistoryModal } from "@/components/dental/patient-examination-history-modal";
@@ -498,12 +499,48 @@ export default function DentalEncounterWorkspacePage() {
     router.push(`/encounters/new?patientId=${selected.id}${qParam}`);
   };
 
+  // Master diagnoses state (hydrated with diagnosesSeed initially, updated from API if available)
+  const [allDiagnoses, setAllDiagnoses] = React.useState<any[]>(diagnosesSeed);
+  // Show initial 10 items, load next 10 on scroll
+  const [visibleDxCount, setVisibleDxCount] = React.useState<number>(10);
+
+  React.useEffect(() => {
+    DentalMasterService.getDiagnoses()
+      .then((data) => {
+        if (data && data.length > 0) {
+          setAllDiagnoses(data);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   // Filter diagnoses for quick search
-  const filteredDiagnoses = diagnosesSeed.filter(
-    (d) =>
-      d.name.toLowerCase().includes(dxSearch.toLowerCase()) ||
-      d.code.toLowerCase().includes(dxSearch.toLowerCase())
-  );
+  const filteredDiagnoses = React.useMemo(() => {
+    if (!dxSearch.trim()) return allDiagnoses;
+    const q = dxSearch.toLowerCase();
+    return allDiagnoses.filter(
+      (d) =>
+        d.name.toLowerCase().includes(q) ||
+        d.code.toLowerCase().includes(q) ||
+        (d.category && d.category.toLowerCase().includes(q)) ||
+        (d.description && d.description.toLowerCase().includes(q))
+    );
+  }, [allDiagnoses, dxSearch]);
+
+  // Reset visible count to 10 whenever search query changes
+  React.useEffect(() => {
+    setVisibleDxCount(10);
+  }, [dxSearch]);
+
+  // Handle scroll to load next 10 items
+  const handleDxScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+    if (scrollTop + clientHeight >= scrollHeight - 60) {
+      if (visibleDxCount < filteredDiagnoses.length) {
+        setVisibleDxCount((prev) => Math.min(prev + 10, filteredDiagnoses.length));
+      }
+    }
+  };
 
   // Handle auto-adding / updating procedure from Odontogram click
   const handleOdontogramProcedureSelect = (proc: {
@@ -1453,31 +1490,93 @@ export default function DentalEncounterWorkspacePage() {
                 <Input
                   value={dxSearch}
                   onChange={(e) => setDxSearch(e.target.value)}
-                  placeholder="Cari kode atau nama diagnosis gigi (e.g. Karies, K02, Pulpitis, Impaksi)..."
-                  className="pl-9"
+                  placeholder="Cari kode atau nama diagnosis gigi (e.g. Karies, K02, Pulpitis, Impaksi, Gigi)..."
+                  className="pl-9 pr-8"
                 />
+                {dxSearch && (
+                  <button
+                    type="button"
+                    onClick={() => setDxSearch("")}
+                    className="absolute right-2.5 top-2.5 p-0.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-full"
+                    title="Hapus pencarian"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
               </div>
 
-              {dxSearch && (
-                <div className="max-h-48 overflow-y-auto rounded-xl border border-slate-200 bg-white p-2 dark:border-slate-800 dark:bg-slate-900 shadow-md space-y-1">
-                  {filteredDiagnoses.map((d) => (
-                    <button
-                      type="button"
-                      key={d.id}
-                      onClick={() => handleAddDiagnosis(d)}
-                      className="w-full text-left p-2 rounded-lg hover:bg-teal-50 dark:hover:bg-teal-950/40 flex items-center justify-between text-xs"
-                    >
-                      <div>
-                        <span className="font-mono font-bold text-teal-700 dark:text-teal-400 mr-2">
-                          {d.code}
-                        </span>
-                        <span className="text-slate-800 dark:text-slate-200">{d.name}</span>
-                      </div>
-                      <Plus className="h-3.5 w-3.5 text-teal-600" />
-                    </button>
-                  ))}
+              {/* ICD-10 Diagnosis List: Appears directly with 10 initial items, loads +10 on scroll */}
+              <div
+                onScroll={handleDxScroll}
+                className="max-h-64 overflow-y-auto rounded-xl border border-slate-200 bg-white p-2 dark:border-slate-800 dark:bg-slate-900 shadow-xs space-y-1"
+              >
+                <div className="px-2 py-1.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 flex justify-between items-center border-b border-slate-100 dark:border-slate-800 mb-1 sticky top-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xs z-10">
+                  <span className="font-bold text-slate-700 dark:text-slate-200">
+                    {dxSearch
+                      ? `Hasil Pencarian (${filteredDiagnoses.length} ditemukan)`
+                      : `Daftar Master ICD-10 Gigi (${filteredDiagnoses.length} total)`}
+                  </span>
+                  <span className="text-[10px] text-teal-600 dark:text-teal-400 font-medium">
+                    Menampilkan {Math.min(visibleDxCount, filteredDiagnoses.length)} dari {filteredDiagnoses.length} item • Scroll untuk +10
+                  </span>
                 </div>
-              )}
+
+                {filteredDiagnoses.length === 0 ? (
+                  <div className="p-6 text-center text-xs text-slate-400">
+                    Tidak ada diagnosis yang sesuai &quot;{dxSearch}&quot;
+                  </div>
+                ) : (
+                  <>
+                    {filteredDiagnoses.slice(0, visibleDxCount).map((d) => (
+                      <button
+                        type="button"
+                        key={d.id}
+                        onClick={() => handleAddDiagnosis(d)}
+                        className="w-full text-left p-2.5 rounded-lg hover:bg-teal-50 dark:hover:bg-teal-950/40 flex items-center justify-between text-xs transition-colors group cursor-pointer border border-transparent hover:border-teal-200/50"
+                      >
+                        <div className="flex-1 mr-2">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="font-mono font-bold text-teal-700 dark:text-teal-400 bg-teal-50 dark:bg-teal-950/60 px-1.5 py-0.5 rounded border border-teal-200 dark:border-teal-900 text-[11px]">
+                              {d.code}
+                            </span>
+                            <span className="text-slate-800 dark:text-slate-200 font-semibold group-hover:text-teal-700 dark:group-hover:text-teal-300">
+                              {d.name}
+                            </span>
+                            {d.category && (
+                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 font-normal">
+                                {d.category}
+                              </span>
+                            )}
+                          </div>
+                          {d.description && d.description !== d.name && (
+                            <p className="text-[11px] text-slate-400 line-clamp-1 mt-0.5">{d.description}</p>
+                          )}
+                        </div>
+                        <span className="shrink-0 flex items-center gap-1 text-[11px] font-semibold text-teal-600 dark:text-teal-400 opacity-70 group-hover:opacity-100 bg-teal-50 dark:bg-teal-950 px-2 py-1 rounded-md">
+                          <span>+ Pilih</span>
+                          <Plus className="h-3.5 w-3.5" />
+                        </span>
+                      </button>
+                    ))}
+
+                    {visibleDxCount < filteredDiagnoses.length ? (
+                      <div className="pt-2 pb-1 text-center">
+                        <button
+                          type="button"
+                          onClick={() => setVisibleDxCount((prev) => Math.min(prev + 10, filteredDiagnoses.length))}
+                          className="text-xs text-teal-600 hover:text-teal-700 dark:text-teal-400 font-medium py-1.5 px-3 rounded-lg hover:bg-teal-50 dark:hover:bg-teal-950/50 transition-colors border border-dashed border-teal-200 dark:border-teal-900"
+                        >
+                          + Tampilkan 10 diagnosis berikutnya ({filteredDiagnoses.length - visibleDxCount} tersisa)
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="py-2 text-center text-[10px] text-slate-400">
+                        ✓ Seluruh {filteredDiagnoses.length} diagnosis telah dimuat
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
 
               {/* Active Diagnoses List */}
               <div className="space-y-2 pt-2">

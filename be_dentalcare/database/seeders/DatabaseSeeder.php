@@ -505,7 +505,7 @@ class DatabaseSeeder extends Seeder
                     'id' => $d['id'],
                     'name' => $d['name'],
                     'category' => $d['category'] ?? 'Umum',
-                    'description' => $d['name'],
+                    'description' => $d['description'] ?? $d['name'],
                     'is_active' => true,
                 ]
             );
