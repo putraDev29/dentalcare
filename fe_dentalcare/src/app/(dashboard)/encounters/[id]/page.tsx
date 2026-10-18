@@ -62,6 +62,12 @@ export default function DentalEncounterWorkspacePage() {
   const queryPatientId = searchParams?.get("patientId") || null;
   const queryQueueId = searchParams?.get("queueId") || null;
   const queryDate = searchParams?.get("date") || searchParams?.get("visitDate") || null;
+  const queryEncounterId = searchParams?.get("encounterId") || searchParams?.get("id") || null;
+
+  // Effective encounter ID: query parameter takes precedence, then valid pathname ID
+  const effectiveEncounterId = (queryEncounterId && queryEncounterId !== "new")
+    ? queryEncounterId
+    : (rawParamId && rawParamId !== "new" && !rawParamId.startsWith("PAT-") ? rawParamId : null);
 
   const [patient, setPatient] = React.useState<Patient | null>(null);
   const [activeEncounter, setActiveEncounter] = React.useState<Encounter | null>(null);
@@ -299,11 +305,11 @@ export default function DentalEncounterWorkspacePage() {
         let targetPatientId = queryPatientId;
         let loadedEnc: Encounter | null = null;
 
-        // 1. Load existing encounter if rawParamId is an established encounter
-        const isQueueDraft = Boolean(queryQueueId && rawParamId && rawParamId.includes(queryQueueId.replace("QUE-", "")));
-        if (rawParamId && !rawParamId.startsWith("PAT-") && rawParamId !== "new" && !isQueueDraft) {
+        // 1. Load existing encounter if effectiveEncounterId is an established encounter
+        const isQueueDraft = Boolean(queryQueueId && effectiveEncounterId && effectiveEncounterId.includes(queryQueueId.replace("QUE-", "")));
+        if (effectiveEncounterId && !effectiveEncounterId.startsWith("PAT-") && !isQueueDraft) {
           try {
-            loadedEnc = await EncounterService.getEncounterById(rawParamId);
+            loadedEnc = await EncounterService.getEncounterById(effectiveEncounterId);
             if (loadedEnc) {
               if (isMounted) {
                 setActiveEncounter(loadedEnc);
@@ -370,7 +376,7 @@ export default function DentalEncounterWorkspacePage() {
         }
 
         // Explicit check for ENC-004
-        if (rawParamId === "ENC-004") {
+        if (effectiveEncounterId === "ENC-004" || rawParamId === "ENC-004") {
           foundPaid = true;
         }
 
@@ -491,12 +497,12 @@ export default function DentalEncounterWorkspacePage() {
     return () => {
       isMounted = false;
     };
-  }, [rawParamId, queryPatientId, queryQueueId]);
+  }, [rawParamId, effectiveEncounterId, queryPatientId, queryQueueId, queryEncounterId]);
 
   const handleSelectPatient = (selected: Patient, qItem?: any) => {
     setIsPatientModalOpen(false);
     const qParam = qItem?.id ? `&queueId=${qItem.id}` : "";
-    router.push(`/encounters/new?patientId=${selected.id}${qParam}`);
+    router.push(`/encounters/new/?patientId=${selected.id}${qParam}`);
   };
 
   // Master diagnoses state (hydrated with diagnosesSeed initially, updated from API if available)
@@ -699,7 +705,7 @@ export default function DentalEncounterWorkspacePage() {
       const finalPatientGender = patient?.gender || "male";
       const finalPatientBirthDate = patient?.birthDate || "1990-01-01";
       const finalPatientAllergies = patient?.allergies || [];
-      const targetEncounterId = activeEncounter?.id || (rawParamId.startsWith("ENC-") && rawParamId !== "ENC-001" ? rawParamId : `ENC-${Date.now()}`);
+      const targetEncounterId = activeEncounter?.id || (effectiveEncounterId && effectiveEncounterId.startsWith("ENC-") && effectiveEncounterId !== "ENC-001" ? effectiveEncounterId : `ENC-${Date.now()}`);
 
       const selectedDoctor = doctors.find((d) => d.id === selectedDoctorId);
       const finalDoctorId = selectedDoctor?.id || selectedDoctorId || "DOC-001";
@@ -820,7 +826,7 @@ export default function DentalEncounterWorkspacePage() {
                 Ruang Pemeriksaan Dokter Gigi & Odontogram
               </h1>
               <span className="rounded-full bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800 px-2.5 py-0.5 text-xs font-semibold text-teal-700 dark:text-teal-300">
-                {rawParamId}
+                {effectiveEncounterId || (rawParamId !== "new" ? rawParamId : "Pemeriksaan Baru")}
               </span>
             </div>
           </div>

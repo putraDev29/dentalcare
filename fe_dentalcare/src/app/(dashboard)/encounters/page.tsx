@@ -1,14 +1,17 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function EncountersPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   React.useEffect(() => {
-    router.replace("/encounters/new");
-  }, [router]);
+    const qStr = searchParams?.toString();
+    const dest = qStr ? `/encounters/new/?${qStr}` : "/encounters/new/";
+    router.replace(dest);
+  }, [router, searchParams]);
 
   return (
     <div className="flex min-h-[400px] items-center justify-center">

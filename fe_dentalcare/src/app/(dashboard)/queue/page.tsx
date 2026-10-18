@@ -61,8 +61,8 @@ export default function QueuePage() {
       await updateStatus(id, status);
       toast.success(`Antrean diperbarui: ${label}`);
       if (status === "in_progress") {
-        const targetEnc = encounterId || `ENC-${id.replace("QUE-", "")}`;
-        router.push(`/encounters/${targetEnc}?patientId=${patientId || ""}&queueId=${id}`);
+        const targetPatientId = patientId || "";
+        router.push(`/encounters/new/?patientId=${targetPatientId}&queueId=${id}`);
       }
     } catch {
       toast.error("Gagal memperbarui antrean.");
@@ -366,7 +366,7 @@ export default function QueuePage() {
                       size="sm"
                       variant="outline"
                       className="h-7 text-xs flex-1 gap-1 border-sky-300 text-sky-700 hover:bg-sky-50 font-bold"
-                      onClick={() => handleAction(q.id, "called", "Panggil Pasien", q.encounterId, q.patientId)}
+                      onClick={() => handleAction(q.id, "called", "Panggil Pasien", q.encounterId, q.patientId || (q as any).patient_id)}
                     >
                       <Volume2 className="h-3.5 w-3.5" />
                       <span>Panggil</span>
@@ -374,7 +374,7 @@ export default function QueuePage() {
                     <Button
                       size="sm"
                       className="h-7 text-xs flex-1 gap-1 bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-600 hover:to-sky-700 text-white font-bold shadow-xs"
-                      onClick={() => handleAction(q.id, "in_progress", "Mulai Pemeriksaan", q.encounterId, q.patientId)}
+                      onClick={() => handleAction(q.id, "in_progress", "Mulai Pemeriksaan", q.encounterId, q.patientId || (q as any).patient_id)}
                     >
                       <Play className="h-3.5 w-3.5" />
                       <span>Mulai</span>
@@ -386,7 +386,7 @@ export default function QueuePage() {
                   <Button
                     size="sm"
                     className="h-7 text-xs w-full gap-1 bg-gradient-to-r from-sky-500 to-sky-600 text-white font-bold shadow-xs"
-                    onClick={() => handleAction(q.id, "in_progress", "Masuk Ruang Dokter", q.encounterId, q.patientId)}
+                    onClick={() => handleAction(q.id, "in_progress", "Masuk Ruang Dokter", q.encounterId, q.patientId || (q as any).patient_id)}
                   >
                     <Stethoscope className="h-3.5 w-3.5" />
                     <span>Masuk Pemeriksaan</span>
@@ -395,7 +395,7 @@ export default function QueuePage() {
 
                 {q.status === "in_progress" && (
                   <>
-                    <Link href={`/encounters/${q.encounterId || ('ENC-' + q.id.replace('QUE-', ''))}?patientId=${q.patientId}&queueId=${q.id}`} className="flex-1">
+                    <Link href={`/encounters/new/?patientId=${q.patientId || (q as any).patient_id || ""}&queueId=${q.id}`} className="flex-1">
                       <Button size="sm" variant="subtle" className="h-7 text-xs w-full font-bold">
                         Buka SOAP
                       </Button>
@@ -403,7 +403,7 @@ export default function QueuePage() {
                     <Button
                       size="sm"
                       className="h-7 text-xs flex-1 gap-1 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold shadow-xs"
-                      onClick={() => handleAction(q.id, "completed", "Selesai Pemeriksaan", q.encounterId, q.patientId)}
+                      onClick={() => handleAction(q.id, "completed", "Selesai Pemeriksaan", q.encounterId, q.patientId || (q as any).patient_id)}
                     >
                       <CheckCircle2 className="h-3.5 w-3.5" />
                       <span>Selesai</span>
@@ -469,13 +469,20 @@ export default function QueuePage() {
                       </Button>
                     )}
                     {q.status === "in_progress" && (
-                      <Button
-                        size="sm"
-                        className="h-6 px-2 text-[11px]"
-                        onClick={() => handleAction(q.id, "completed", "Selesai")}
-                      >
-                        Selesai
-                      </Button>
+                      <div className="inline-flex items-center gap-1">
+                        <Link href={`/encounters/new/?patientId=${q.patientId || (q as any).patient_id || ""}&queueId=${q.id}`}>
+                          <Button size="sm" variant="outline" className="h-6 px-2 text-[11px] font-bold text-sky-700 border-sky-300 hover:bg-sky-50">
+                            Buka SOAP
+                          </Button>
+                        </Link>
+                        <Button
+                          size="sm"
+                          className="h-6 px-2 text-[11px] bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
+                          onClick={() => handleAction(q.id, "completed", "Selesai", q.encounterId, q.patientId || (q as any).patient_id)}
+                        >
+                          Selesai
+                        </Button>
+                      </div>
                     )}
                   </td>
                 </tr>

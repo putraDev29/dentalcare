@@ -86,8 +86,8 @@ export default function OutpatientDentalPage() {
       id: "action",
       header: "Pemeriksaan Gigi",
       cell: ({ row }) => (
-        <Link href={`/encounters/new?patientId=${row.original.patientId}&appointmentId=${row.original.id}`}>
-          <Button size="sm" className="h-7 text-xs gap-1 shadow-xs bg-teal-600 hover:bg-teal-700">
+        <Link href={`/encounters/new/?patientId=${row.original.patientId}&appointmentId=${row.original.id}`}>
+          <Button size="sm" className="h-7 text-xs gap-1 shadow-xs bg-teal-600 hover:bg-teal-700 cursor-pointer">
             <Stethoscope className="h-3.5 w-3.5" />
             <span>Odontogram & Tindakan</span>
           </Button>

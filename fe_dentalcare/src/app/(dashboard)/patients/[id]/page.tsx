@@ -168,7 +168,7 @@ export default function PatientDetailPage() {
                 <span>Buat Appointment</span>
               </Button>
             </Link>
-            <Link href={`/encounters/new?patientId=${patient.id}&backdate=true`}>
+            <Link href={`/encounters/new/?patientId=${patient.id}&backdate=true`}>
               <Button
                 variant="outline"
                 size="sm"
@@ -179,7 +179,7 @@ export default function PatientDetailPage() {
                 <span>Input Backdate</span>
               </Button>
             </Link>
-            <Link href={`/encounters/new?patientId=${patient.id}`}>
+            <Link href={`/encounters/new/?patientId=${patient.id}`}>
               <Button size="sm" className="text-xs gap-1.5 shadow-xs">
                 <Stethoscope className="h-3.5 w-3.5" />
                 <span>Mulai Pemeriksaan</span>
@@ -439,7 +439,7 @@ export default function PatientDetailPage() {
                   Peta visual status anatomi gigi standar FDI 2-digit, karies, tambalan, dan riwayat tindakan
                 </CardDescription>
               </div>
-              <Link href={`/encounters/new?patientId=${patient.id}`}>
+              <Link href={`/encounters/new/?patientId=${patient.id}`}>
                 <Button size="sm" className="text-xs gap-1.5 shadow-xs">
                   <Stethoscope className="h-3.5 w-3.5" />
                   <span>Buka Odontogram Dokter</span>
@@ -483,7 +483,7 @@ export default function PatientDetailPage() {
                               DPJP: {enc.doctorName}
                             </p>
                           </div>
-                          <Link href={`/encounters/${enc.id}?patientId=${patient.id}`}>
+                          <Link href={`/encounters/new/?encounterId=${enc.id}&patientId=${patient.id}`}>
                             <Button variant="outline" size="sm" className="text-xs h-7">
                               Lihat Encounter
                             </Button>
@@ -539,7 +539,7 @@ export default function PatientDetailPage() {
                 <CardTitle>Daftar Pemeriksaan Klinis (Encounters)</CardTitle>
                 <CardDescription>Semua rekam sesi konsultasi dengan dokter spesialis & umum</CardDescription>
               </div>
-              <Link href={`/encounters/new?patientId=${patient.id}&backdate=true`}>
+              <Link href={`/encounters/new/?patientId=${patient.id}&backdate=true`}>
                 <Button
                   variant="outline"
                   size="sm"
@@ -571,7 +571,7 @@ export default function PatientDetailPage() {
                           {(enc.diagnoses || []).map((d) => `[${d.code}] ${d.name}`).join(", ") || "-"}
                         </p>
                       </div>
-                      <Link href={`/encounters/${enc.id}?patientId=${patient.id}`}>
+                      <Link href={`/encounters/new/?encounterId=${enc.id}&patientId=${patient.id}`}>
                         <Button variant="outline" size="sm" className="text-xs">
                           Buka Rekam Medis
                         </Button>

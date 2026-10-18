@@ -15,6 +15,31 @@ export default function Home() {
   React.useEffect(() => {
     if (isHydrated) {
       if (isAuthenticated) {
+        if (typeof window !== "undefined") {
+          const path = window.location.pathname;
+          const search = window.location.search;
+
+          // If this was an SPA fallback for an encounter path (e.g. /encounters/ENC-2026-0001 or /encounters/new)
+          if (path.startsWith("/encounters")) {
+            const trimmed = path.replace(/^\/|\/$/g, "");
+            const segments = trimmed.split("/");
+            const encId = segments[1];
+
+            const params = new URLSearchParams(search);
+            if (encId && encId !== "new") {
+              params.set("encounterId", encId);
+            }
+            const qStr = params.toString();
+            router.replace(qStr ? `/encounters/new/?${qStr}` : "/encounters/new/");
+            return;
+          }
+
+          // If this was an SPA fallback for other valid routes (e.g. /medical-records, /queue, /patients/PAT-001)
+          if (path && path !== "/" && path !== "/login" && path !== "/login/") {
+            router.replace(`${path}${search}`);
+            return;
+          }
+        }
         router.replace("/dashboard/");
       } else {
         router.replace("/login/");

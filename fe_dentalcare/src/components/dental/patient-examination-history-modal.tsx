@@ -194,10 +194,10 @@ export function PatientExaminationHistoryModal({
 
                       <div className="flex items-center gap-2 self-end sm:self-auto">
                         <Link
-                          href={`/encounters/${enc.id}?patientId=${enc.patientId}`}
+                          href={`/encounters/new/?encounterId=${enc.id}&patientId=${enc.patientId}`}
                           onClick={(e) => e.stopPropagation()}
                         >
-                          <Button variant="outline" size="sm" className="h-7 text-xs gap-1 border-teal-200 text-teal-700">
+                          <Button variant="outline" size="sm" className="h-7 text-xs gap-1 border-teal-200 text-teal-700 cursor-pointer">
                             <Eye className="h-3.5 w-3.5" />
                             <span>Buka EMR Lengkap</span>
                           </Button>

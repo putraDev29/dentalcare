@@ -79,8 +79,8 @@ export default function DashboardPage() {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Link href="/encounters/new">
-              <Button size="sm" className="bg-white text-sky-700 hover:bg-sky-50 font-bold shadow-md shadow-black/10 border-0">
+            <Link href="/encounters/new/">
+              <Button size="sm" className="bg-white text-sky-700 hover:bg-sky-50 font-bold shadow-md shadow-black/10 border-0 cursor-pointer">
                 <Sparkles className="h-4 w-4 text-amber-500" />
                 <span>Pemeriksaan Baru</span>
               </Button>

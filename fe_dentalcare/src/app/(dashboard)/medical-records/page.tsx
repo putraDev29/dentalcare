@@ -239,11 +239,11 @@ export default function PatientExaminationHistoryPage() {
           </Button>
 
           <Link
-            href={`/encounters/${row.original.latestEncounterId}?patientId=${row.original.patientId}`}
+            href={`/encounters/new/?encounterId=${row.original.latestEncounterId || ""}&patientId=${row.original.patientId}`}
           >
             <Button
               size="sm"
-              className="h-8 text-xs bg-slate-800 hover:bg-slate-900 text-white dark:bg-slate-700 dark:hover:bg-slate-600"
+              className="h-8 text-xs bg-slate-800 hover:bg-slate-900 text-white dark:bg-slate-700 dark:hover:bg-slate-600 cursor-pointer"
               title="Buka ruang pemeriksaan rekam medis terakhir"
             >
               <span>Buka EMR</span>
@@ -260,7 +260,7 @@ export default function PatientExaminationHistoryPage() {
         title="Riwayat Pemeriksaan Pasien"
         description="Pusat rekap riwayat pemeriksaan gigi per nama pasien. Klik tombol detail pada pasien untuk melihat rincian kronologis seluruh sesi konsultasi, odontogram, tindakan klinis, dan resep obat."
       >
-        <Link href="/encounters/new?backdate=true">
+        <Link href="/encounters/new/?backdate=true">
           <Button
             className="h-9 text-xs bg-teal-600 hover:bg-teal-700 text-white font-semibold gap-1.5 shadow-xs cursor-pointer"
           >
