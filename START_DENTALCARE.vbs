@@ -95,10 +95,36 @@ Function GetChromePath()
     Next
 End Function
 
+' 0. Pastikan shortcut di Desktop dan Folder Project selalu sinkron dengan folder saat ini
+Dim desktopLnkPath, autoDeskLnk, projLnkPath, autoProjLnk
+desktopLnkPath = WshShell.SpecialFolders("Desktop") & "\OKAY Dental Clinic.lnk"
+Set autoDeskLnk = WshShell.CreateShortcut(desktopLnkPath)
+autoDeskLnk.TargetPath = "wscript.exe"
+autoDeskLnk.Arguments = """" & currentDir & "\START_DENTALCARE.vbs"""
+autoDeskLnk.WorkingDirectory = currentDir
+autoDeskLnk.IconLocation = currentDir & "\START_DENTALCARE.ico, 0"
+autoDeskLnk.Description = "Mulai Aplikasi OKAY Dental Clinic"
+autoDeskLnk.Save
+Set autoDeskLnk = Nothing
+
+projLnkPath = currentDir & "\START_DENTALCARE.lnk"
+Set autoProjLnk = WshShell.CreateShortcut(projLnkPath)
+autoProjLnk.TargetPath = "wscript.exe"
+autoProjLnk.Arguments = """" & currentDir & "\START_DENTALCARE.vbs"""
+autoProjLnk.WorkingDirectory = currentDir
+autoProjLnk.IconLocation = currentDir & "\START_DENTALCARE.ico, 0"
+autoProjLnk.Description = "Mulai Aplikasi OKAY Dental Clinic"
+autoProjLnk.Save
+Set autoProjLnk = Nothing
+
 ' 1. Pastikan MySQL XAMPP berjalan sebelum membuka aplikasi
 If Not IsProcessRunning("mysqld.exe") Then
     If fso.FileExists("C:\xampp\mysql_start.bat") Then
         WshShell.Run """C:\xampp\mysql_start.bat""", 0, False
+    ElseIf fso.FileExists("D:\xampp\mysql_start.bat") Then
+        WshShell.Run """D:\xampp\mysql_start.bat""", 0, False
+    ElseIf fso.FileExists("E:\xampp\mysql_start.bat") Then
+        WshShell.Run """E:\xampp\mysql_start.bat""", 0, False
     End If
     ' Tunggu sampai MySQL siap menerima koneksi (Max 30 detik)
     Call WaitForMySql(30)
@@ -115,22 +141,46 @@ If Not CheckHttp("http://127.0.0.1:21465/api/status") Then
     WshShell.Run """" & currentDir & "\wa_gateway\run_wa_gateway.bat""", 7, False
 End If
 
-' 4. Jalankan Frontend Next.js (Port 3001 - Mode Senyap) jika belum aktif
-If Not CheckHttp("http://127.0.0.1:3001") Then
+' 4. Periksa apakah Frontend sudah aktif di port 3001 atau 3000
+Dim fePort, isFeRunning
+fePort = 3001
+isFeRunning = False
+
+If CheckHttp("http://127.0.0.1:3001") Then
+    fePort = 3001
+    isFeRunning = True
+ElseIf CheckHttp("http://127.0.0.1:3000") Then
+    fePort = 3000
+    isFeRunning = True
+Else
+    ' Jalankan Frontend Next.js (Port 3001 - Mode Senyap) jika belum aktif
     WshShell.Run """" & currentDir & "\fe_dentalcare\run_frontend.bat""", 0, False
 End If
 
 ' 5. Tunggu Backend dan Frontend benar-benar siap sebelum membuka browser
-Call WaitForHttpUrl("http://127.0.0.1:8000/api/whatsapp/status", 15)
-Call WaitForHttpUrl("http://127.0.0.1:3001", 15)
+Call WaitForHttpUrl("http://127.0.0.1:8000/api/whatsapp/status", 20)
+
+If Not isFeRunning Then
+    Dim waitCount
+    For waitCount = 1 To 25
+        If CheckHttp("http://127.0.0.1:3001") Then
+            fePort = 3001
+            Exit For
+        ElseIf CheckHttp("http://127.0.0.1:3000") Then
+            fePort = 3000
+            Exit For
+        End If
+        WScript.Sleep 1000
+    Next
+End If
 WScript.Sleep 1000
 
-' 6. Buka Google Chrome ke http://localhost:3001
+' 6. Buka Google Chrome ke port Frontend yang aktif (3001 atau 3000)
 chromeExe = GetChromePath()
 If chromeExe <> "" Then
-    WshShell.Run """" & chromeExe & """ http://localhost:3001", 1, False
+    WshShell.Run """" & chromeExe & """ http://localhost:" & fePort, 1, False
 Else
-    WshShell.Run "http://localhost:3001", 1, False
+    WshShell.Run "http://localhost:" & fePort, 1, False
 End If
 
 Set WshShell = Nothing

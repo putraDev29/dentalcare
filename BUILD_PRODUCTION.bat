@@ -63,6 +63,9 @@ call npm install
 echo       - Mengompilasi build Frontend Next.js...
 call npm run build
 
+echo       - Memasang icon shortcut ke Desktop...
+call "%ROOT_DIR%PASANG_ICON_DESKTOP.bat" auto
+
 echo.
 echo ================================================================
 echo   SETUP & BUILD PERTAMA KALI BERHASIL SELESAI!

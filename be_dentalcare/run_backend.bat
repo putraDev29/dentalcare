@@ -2,6 +2,15 @@
 title Dental Care Backend (Laravel)
 cd /d "%~dp0"
 
+:: Pastikan file .env tersedia
+if not exist ".env" (
+    if exist ".env.example" (
+        echo Menyiapkan file .env Backend pertama kali...
+        copy .env.example .env >nul
+        call php artisan key:generate
+    )
+)
+
 :: Cek pengaman jika folder vendor belum ada (belum pernah di-install)
 if not exist "vendor" (
     echo Folder vendor belum ditemukan. Menjalankan composer install...

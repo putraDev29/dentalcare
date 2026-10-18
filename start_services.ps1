@@ -14,9 +14,9 @@ $feDir = Join-Path $baseDir "fe_dentalcare"
 # 1. Cek MySQL (Port 3306)
 $mysqlPort = Get-NetTCPConnection -State Listen -LocalPort 3306 -ErrorAction SilentlyContinue
 if (-not $mysqlPort) {
-    Write-Host "[*] Database MySQL belum aktif, mencoba menyalakan XAMPP MySQL..." -ForegroundColor Yellow
-    if (Test-Path "C:\xampp\mysql_start.bat") {
-        Start-Process "C:\xampp\mysql_start.bat" -WindowStyle Minimized
+    $xamppBat = @("C:\xampp\mysql_start.bat", "D:\xampp\mysql_start.bat", "E:\xampp\mysql_start.bat") | Where-Object { Test-Path $_ } | Select-Object -First 1
+    if ($xamppBat) {
+        Start-Process $xamppBat -WindowStyle Minimized
         Start-Sleep -Seconds 3
     }
 } else {

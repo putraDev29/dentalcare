@@ -115,7 +115,7 @@ foreach ($s in $sizes) {
     $bmp.Save($ms, [System.Drawing.Imaging.ImageFormat]::Png)
     $pngStreams[$s] = $ms.ToArray()
     if ($s -eq 256) {
-        $bmp.Save("C:\project\dental care\okay_dental.png", [System.Drawing.Imaging.ImageFormat]::Png)
+        $bmp.Save((Join-Path $PSScriptRoot "okay_dental.png"), [System.Drawing.Imaging.ImageFormat]::Png)
     }
     $ms.Dispose()
     $bmp.Dispose()
@@ -155,7 +155,7 @@ foreach ($s in $sizes) {
 }
 
 $writer.Flush()
-[System.IO.File]::WriteAllBytes("C:\project\dental care\okay_dental.ico", $icoStream.ToArray())
+[System.IO.File]::WriteAllBytes((Join-Path $PSScriptRoot "okay_dental.ico"), $icoStream.ToArray())
 $writer.Dispose()
 $icoStream.Dispose()
 

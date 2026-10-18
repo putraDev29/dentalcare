@@ -1,10 +1,10 @@
 $wsh = New-Object -ComObject WScript.Shell
-$iconPath = "C:\project\dental care\START_DENTALCARE.ico"
-$vbsPath = "C:\project\dental care\START_DENTALCARE.vbs"
-$workingDir = "C:\project\dental care"
+$workingDir = $PSScriptRoot
+$iconPath = Join-Path $workingDir "START_DENTALCARE.ico"
+$vbsPath = Join-Path $workingDir "START_DENTALCARE.vbs"
 
 # 1. Project Directory Shortcut (START_DENTALCARE.lnk)
-$projLnkPath = "C:\project\dental care\START_DENTALCARE.lnk"
+$projLnkPath = Join-Path $workingDir "START_DENTALCARE.lnk"
 if (Test-Path $projLnkPath) {
     Remove-Item $projLnkPath -Force
 }

@@ -147,8 +147,8 @@ foreach ($res in $resolutions) {
     $bmp = Generate-IconBitmap $res
 
     if ($res -eq 256) {
-        $bmp.Save("C:\project\dental care\okay_dental.png", [System.Drawing.Imaging.ImageFormat]::Png)
-        $bmp.Save("C:\project\dental care\START_DENTALCARE.png", [System.Drawing.Imaging.ImageFormat]::Png)
+        $bmp.Save((Join-Path $PSScriptRoot "okay_dental.png"), [System.Drawing.Imaging.ImageFormat]::Png)
+        $bmp.Save((Join-Path $PSScriptRoot "START_DENTALCARE.png"), [System.Drawing.Imaging.ImageFormat]::Png)
 
         # 256x256 as PNG in ICO
         $pms = New-Object System.IO.MemoryStream
@@ -201,7 +201,7 @@ function Save-IcoFile([string]$path, $entries) {
 }
 
 # Write to both okay_dental.ico and START_DENTALCARE.ico
-Save-IcoFile "C:\project\dental care\okay_dental.ico" $imageEntries
-Save-IcoFile "C:\project\dental care\START_DENTALCARE.ico" $imageEntries
+Save-IcoFile (Join-Path $PSScriptRoot "okay_dental.ico") $imageEntries
+Save-IcoFile (Join-Path $PSScriptRoot "START_DENTALCARE.ico") $imageEntries
 
 Write-Host "Icons generated successfully with DIB and PNG formats!"
