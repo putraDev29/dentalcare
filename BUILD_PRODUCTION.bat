@@ -3,7 +3,7 @@ title Setup & Build Pertama Kali - Dental Care System
 color 0b
 
 echo ================================================================
-echo       SETUP & BUILD PERTAMA KALI - DENTAL CARE SYSTEM
+echo       SETUP DAN BUILD PERTAMA KALI - DENTAL CARE SYSTEM
 echo ================================================================
 echo.
 echo Langkah ini hanya perlu dijalankan sekali saat setup pertama kali
@@ -68,7 +68,7 @@ call "%ROOT_DIR%PASANG_ICON_DESKTOP.bat" auto
 
 echo.
 echo ================================================================
-echo   SETUP & BUILD PERTAMA KALI BERHASIL SELESAI!
+echo   SETUP DAN BUILD PERTAMA KALI BERHASIL SELESAI!
 echo.
 echo   Sekarang Anda bisa langsung menjalankan aplikasi sekali klik
 echo   menggunakan: START_DENTALCARE.vbs (tanpa jendela CMD)

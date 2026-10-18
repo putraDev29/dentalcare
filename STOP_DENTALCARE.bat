@@ -24,5 +24,5 @@ echo.
 echo ================================================================
 echo   Semua layanan Dental Care berhasil dihentikan!
 echo ================================================================
-timeout /t 3 >nul
+ping 127.0.0.1 -n 3 >nul
 exit

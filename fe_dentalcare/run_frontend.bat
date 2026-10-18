@@ -23,7 +23,7 @@ if not exist "node_modules\serve" (
 
 :: Jika build produksi belum ada di out/index.html, buat build sekarang
 if not exist "out\index.html" (
-    echo [Info] Menyiapkan build awal agar hemat RAM & CPU di spek laptop minim...
+    echo [Info] Menyiapkan build awal agar hemat RAM dan CPU di spek laptop minim...
     call npm run build
 )
 
@@ -35,8 +35,8 @@ if not exist "out\index.html" (
 )
 
 echo ========================================================
-echo  Dental Care Frontend (Mode Produksi - Hemat RAM & Cepat)
-echo  Port: 3001 | RAM ~25MB | Navigasi Instan
+echo  Dental Care Frontend (Mode Produksi - Hemat RAM dan Cepat)
+echo  Port: 3001 - RAM ~25MB - Navigasi Instan
 echo  (Gunakan run_frontend_dev.bat jika ingin mode koding)
 echo ========================================================
 call npx --yes serve -s out -l 3001
