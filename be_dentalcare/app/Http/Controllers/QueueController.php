@@ -16,8 +16,19 @@ class QueueController extends Controller
     {
         $query = QueueItem::query();
 
+        // Default: Hanya ambil antrean hari ini (otomatis hilang saat ganti hari)
+        if (!$request->boolean('allDates') && !$request->filled('date')) {
+            $query->whereDate('created_at', now()->toDateString());
+        } elseif ($request->filled('date')) {
+            $query->whereDate('created_at', $request->input('date'));
+        }
+
         if ($request->filled('status')) {
-            $query->where('status', $request->input('status'));
+            if ($request->input('status') === 'active') {
+                $query->whereIn('status', ['waiting', 'called', 'in_progress']);
+            } else {
+                $query->where('status', $request->input('status'));
+            }
         }
 
         if ($request->filled('doctorId')) {
@@ -92,7 +103,8 @@ class QueueController extends Controller
 
     public function callNext(Request $request)
     {
-        $query = QueueItem::where('status', 'waiting');
+        $query = QueueItem::where('status', 'waiting')
+            ->whereDate('created_at', now()->toDateString());
 
         if ($request->filled('departmentId')) {
             $query->where('department_id', $request->input('departmentId'));

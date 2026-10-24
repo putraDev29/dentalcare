@@ -1,6 +1,6 @@
 ' ================================================================
 '  OKAY DENTAL CLINIC - SILENT LAUNCHER
-'  Icon: OKAY Dental (okay_dental.ico - dari Tab & Header Icon)
+'  Icon: OKAY Dental (START_DENTALCARE.ico / okay_dental.ico)
 '  Browser Default: Google Chrome
 '  Safe Startup: Menunggu MySQL & Server siap sebelum membuka browser
 '  Zero Permission Denied: Menggunakan WMI & WinHttp native Windows

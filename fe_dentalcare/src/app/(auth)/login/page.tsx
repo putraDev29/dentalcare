@@ -3,9 +3,9 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import Image from "next/image";
 import {
   ShieldCheck,
-  Sparkles,
   Mail,
   Lock,
   Eye,
@@ -75,7 +75,7 @@ function LoginForm() {
     try {
       const ok = await login(email, password);
       if (ok) {
-        toast.success("Login Super Admin berhasil! Selamat datang di OKAY Dental.");
+        toast.success("Login Super Admin berhasil! Selamat datang di OKAY DENTAL Therapist.");
         router.push(cleanRedirect);
       } else {
         toast.error("Email atau kata sandi tidak sesuai.");
@@ -95,39 +95,36 @@ function LoginForm() {
 
   return (
     <div className="w-full max-w-md space-y-6">
-      {/* Brand Header: OKAY Dental */}
+      {/* Brand Header: OKAY DENTAL Therapist */}
       <div className="flex flex-col items-center text-center">
-        <div className="relative flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-tr from-sky-500 via-rose-400 to-amber-300 text-white shadow-xl shadow-sky-500/25 ring-4 ring-white/90">
-          <Sparkles className="h-8 w-8 text-white drop-shadow-md" />
-          <span className="absolute -top-1 -right-1 flex h-4 w-4">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-4 w-4 bg-rose-500" />
-          </span>
+        <div className="relative rounded-2xl bg-slate-950 px-6 py-3.5 shadow-2xl shadow-cyan-950/30 ring-1 ring-cyan-500/30 border border-slate-800 transition-transform duration-300 hover:scale-[1.02]">
+          <div className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-cyan-500" />
+          </div>
+          <Image
+            src="/logo.png"
+            alt="OKAY DENTAL Therapist"
+            width={280}
+            height={72}
+            priority
+            className="h-12 sm:h-14 w-auto object-contain drop-shadow-md"
+          />
         </div>
 
-        <div className="mt-4 flex items-center justify-center gap-2">
-          <span className="text-3xl font-black tracking-tight text-slate-900">
-            OKAY
-          </span>
-          <span className="text-3xl font-extrabold tracking-tight text-sky-600">
-            dental
-          </span>
-          <span className="h-2.5 w-2.5 rounded-full bg-rose-500 animate-pulse" />
-        </div>
-
-        <p className="mt-1 text-xs text-slate-500 font-medium">
-          Sistem Informasi Manajemen Klinik Gigi Modern
+        <p className="mt-3 text-xs text-slate-500 font-medium tracking-wide">
+          Sistem Informasi Praktek Dokter Gigi &amp; Odontogram
         </p>
 
-        <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5 text-[11px]">
+        <div className="mt-2.5 flex flex-wrap items-center justify-center gap-1.5 text-[11px]">
           <span className="rounded-full bg-sky-100/90 px-3 py-0.5 font-bold text-sky-800 border border-sky-200/60 shadow-2xs">
             Praktek Klinik Gigi
           </span>
-          <span className="rounded-full bg-rose-100/90 px-3 py-0.5 font-bold text-rose-800 border border-rose-200/60 shadow-2xs">
+          <span className="rounded-full bg-cyan-100/90 px-3 py-0.5 font-bold text-cyan-800 border border-cyan-200/60 shadow-2xs">
             Odontogram FDI
           </span>
           <span className="rounded-full bg-amber-100/90 px-3 py-0.5 font-bold text-amber-900 border border-amber-200/60 shadow-2xs">
-            Billing & Keuangan
+            Billing &amp; Keuangan
           </span>
         </div>
       </div>
@@ -135,7 +132,7 @@ function LoginForm() {
       {/* Main Login Card */}
       <div className="overflow-hidden rounded-3xl border border-sky-100/90 bg-white/95 p-7 shadow-2xl shadow-sky-950/10 backdrop-blur-xl relative">
         {/* Top signature gradient accent line */}
-        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-sky-400 via-rose-500 to-amber-300" />
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-400 via-[#30C9DB] to-amber-200" />
 
         <div className="mb-5 text-center">
           <h2 className="text-lg font-bold text-slate-900 tracking-tight">
@@ -222,7 +219,7 @@ function LoginForm() {
           {/* Submit CTA */}
           <Button
             type="submit"
-            className="w-full h-11 mt-3 bg-gradient-to-r from-sky-600 via-sky-600 to-rose-500 hover:from-sky-700 hover:to-rose-600 text-white font-bold text-sm rounded-xl shadow-lg shadow-sky-600/25 transition-all flex items-center justify-center gap-2"
+            className="w-full h-11 mt-3 bg-gradient-to-r from-sky-600 via-cyan-600 to-cyan-500 hover:from-sky-700 hover:to-cyan-600 text-white font-bold text-sm rounded-xl shadow-lg shadow-cyan-600/25 transition-all flex items-center justify-center gap-2 cursor-pointer"
             isLoading={loading}
           >
             <span>LOGIN</span>
@@ -246,10 +243,10 @@ function LoginForm() {
       {/* Footer notes */}
       <div className="text-center space-y-1">
         <p className="text-xs font-semibold text-slate-600">
-          OKAY Dental Management System • Versi 2.0
+          OKAY DENTAL Therapist • Dental Clinic Management System
         </p>
         <p className="text-[11px] text-slate-400">
-          © 2026 OKAY Dental Clinic. Hak cipta dilindungi undang-undang.
+          © 2026 OKAY DENTAL Therapist. Hak cipta dilindungi undang-undang.
         </p>
       </div>
     </div>

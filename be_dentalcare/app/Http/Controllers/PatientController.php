@@ -12,6 +12,9 @@ class PatientController extends Controller
 {
     public function index(Request $request)
     {
+        $tControllerStart = microtime(true);
+        $bootTime = round(($tControllerStart - LARAVEL_START) * 1000, 2);
+
         $query = Patient::query();
 
         if ($request->filled('search') && $request->input('search') !== 'undefined') {
@@ -42,17 +45,7 @@ class PatientController extends Controller
 
         if ($request->boolean('h1Control') || $request->filled('nextControlDate')) {
             $targetDate = $request->input('nextControlDate') ?: now()->addDay()->toDateString();
-            $h1PatientIdsFromEnc = Encounter::whereNotNull('follow_up_plan')
-                ->where('follow_up_plan->nextControlDate', $targetDate)
-                ->pluck('patient_id')
-                ->toArray();
-
-            $h1PatientIdsFromApt = Appointment::whereDate('appointment_date', $targetDate)
-                ->pluck('patient_id')
-                ->toArray();
-
-            $allH1Ids = array_unique(array_merge($h1PatientIdsFromEnc, $h1PatientIdsFromApt));
-            $query->whereIn('id', $allH1Ids);
+            $query->whereDate('next_control_date', $targetDate);
         }
 
         $page = max(1, (int) $request->input('page', 1));
@@ -60,86 +53,44 @@ class PatientController extends Controller
         $total = $query->count();
         $totalPages = $total > 0 ? (int) ceil($total / $perPage) : 1;
 
-        $patients = $query->orderByDesc('created_at')
-            ->skip(($page - 1) * $perPage)
-            ->take($perPage)
-            ->get();
+        $tDbStart = microtime(true);
+        $patients = $total === 0 ? [] : $query->select([
+            'id',
+            'facility_id',
+            'medical_record_number',
+            'nik',
+            'name',
+            'gender',
+            'birth_place',
+            'birth_date',
+            'blood_type',
+            'marital_status',
+            'religion',
+            'occupation',
+            'phone',
+            'email',
+            'address',
+            'emergency_contact',
+            'insurance',
+            'allergies',
+            'chronic_diseases',
+            'status',
+            'next_control_date',
+            'control_doctor',
+            'control_notes',
+            'last_visit_at',
+            'registered_at',
+            'created_at',
+            'updated_at',
+        ])
+        ->orderByDesc('created_at')
+        ->skip(($page - 1) * $perPage)
+        ->take($perPage)
+        ->get();
+        $dbTime = round((microtime(true) - $tDbStart) * 1000, 2);
 
-        $patientIds = $patients->pluck('id')->toArray();
-
-        $encounters = Encounter::whereIn('patient_id', $patientIds)
-            ->whereNotNull('follow_up_plan')
-            ->orderByDesc('visit_date')
-            ->get()
-            ->groupBy('patient_id');
-
-        $appointments = Appointment::whereIn('patient_id', $patientIds)
-            ->orderBy('appointment_date')
-            ->get()
-            ->groupBy('patient_id');
-
-        $patients->each(function ($p) use ($encounters, $appointments) {
-            $encList = $encounters->get($p->id);
-            $aptList = $appointments->get($p->id);
-
-            $controlDate = null;
-            $controlDoctor = null;
-            $controlNotes = null;
-
-            // 1. Prioritize upcoming appointment (>= today, especially tomorrow)
-            $upcomingApt = $aptList ? $aptList->where('appointment_date', '>=', now()->toDateString())->sortBy('appointment_date')->first() : null;
-            if ($upcomingApt) {
-                $controlDate = $upcomingApt->appointment_date;
-                $controlDoctor = $upcomingApt->doctor_name;
-                $controlNotes = $upcomingApt->complaint ?: $upcomingApt->notes;
-            }
-
-            // 2. Or upcoming encounter follow_up_plan (>= today)
-            if (!$controlDate && $encList) {
-                $upcomingEnc = $encList->filter(function ($e) {
-                    $d = $e->nextControlDate;
-                    return !empty($d) && $d >= now()->toDateString();
-                })->sortBy(function ($e) {
-                    return $e->nextControlDate;
-                })->first();
-
-                if ($upcomingEnc) {
-                    $controlDate = $upcomingEnc->nextControlDate;
-                    $controlDoctor = $upcomingEnc->doctor_name;
-                    $controlNotes = $upcomingEnc->follow_up_plan['dentalNotes'] ?? null;
-                }
-            }
-
-            // 3. Fallback to latest encounter if no upcoming date found
-            if (!$controlDate && $encList) {
-                $latestEnc = $encList->first();
-                if ($latestEnc) {
-                    $controlDate = $latestEnc->nextControlDate;
-                    $controlDoctor = $latestEnc->doctor_name;
-                    $controlNotes = $latestEnc->follow_up_plan['dentalNotes'] ?? null;
-                }
-            }
-
-            // 4. Fallback to latest appointment
-            if (!$controlDate && $aptList) {
-                $latestApt = $aptList->sortByDesc('appointment_date')->first();
-                if ($latestApt) {
-                    $controlDate = $latestApt->appointment_date;
-                    $controlDoctor = $latestApt->doctor_name;
-                    $controlNotes = $latestApt->complaint ?: $latestApt->notes;
-                }
-            }
-
-            if (!$controlDate && !empty($p->next_control_date)) {
-                $controlDate = $p->next_control_date;
-            }
-
-            $p->setAttribute('nextControlDate', $controlDate);
-            $p->setAttribute('next_control_date', $controlDate);
-            $p->setAttribute('controlDoctor', $controlDoctor ?: 'drg. Pratama Wijaya');
-            $p->setAttribute('control_doctor', $controlDoctor ?: 'drg. Pratama Wijaya');
-            $p->setAttribute('controlNotes', $controlNotes);
-        });
+        $controllerTime = round((microtime(true) - $tControllerStart) * 1000, 2);
+        $totalTime = round((microtime(true) - LARAVEL_START) * 1000, 2);
 
         return response()->json([
             'data' => $patients,
@@ -149,7 +100,11 @@ class PatientController extends Controller
                 'total' => $total,
                 'totalPages' => $totalPages,
             ],
-        ]);
+        ])
+        ->header('X-Boot-Time', $bootTime . 'ms')
+        ->header('X-DB-Time', $dbTime . 'ms')
+        ->header('X-Controller-Time', $controllerTime . 'ms')
+        ->header('X-Response-Time', $totalTime . 'ms');
     }
 
     public function show($id)
@@ -350,10 +305,11 @@ class PatientController extends Controller
             file_put_contents($readPath, json_encode($readIds, JSON_PRETTY_PRINT));
         }
 
-        $patient->setAttribute('nextControlDate', $controlDate);
-        $patient->setAttribute('next_control_date', $controlDate);
-        $patient->setAttribute('controlDoctor', $doctorName);
-        $patient->setAttribute('controlNotes', $notes);
+        $patient->update([
+            'next_control_date' => $controlDate,
+            'control_doctor' => $doctorName,
+            'control_notes' => $notes,
+        ]);
 
         return response()->json([
             'success' => true,

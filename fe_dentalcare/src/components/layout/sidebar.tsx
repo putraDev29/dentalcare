@@ -3,9 +3,9 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ClinicLogo } from "@/components/shared/clinic-logo";
 import {
   Activity,
-  Sparkles,
   ChevronLeft,
   ChevronRight,
   X,
@@ -67,26 +67,24 @@ export function Sidebar({
       >
         {/* Brand Header */}
         <div className="flex h-16 shrink-0 items-center justify-between border-b border-sky-200/80 bg-white/80 backdrop-blur-md px-4">
-          <Link href="/dashboard" className="flex items-center gap-3 overflow-hidden" title="OKAY Dental">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-tr from-sky-500 via-rose-400 to-amber-300 text-white shadow-md shadow-sky-500/30">
-              <Sparkles className="h-5 w-5 text-white drop-shadow-xs" />
-            </div>
+          <Link href="/dashboard" className="flex items-center gap-2.5 overflow-hidden" title="OKAY DENTAL Therapist">
+            <ClinicLogo variant="badge" size="sm" className="h-10 w-10 rounded-2xl ring-2 ring-cyan-500/20" />
             {!isCollapsed && (
               <div className="transition-opacity overflow-hidden flex-1 min-w-0">
                 <div className="flex items-center gap-1.5 leading-tight">
                   <span className="text-base font-black tracking-tight text-slate-900">
                     OKAY
                   </span>
-                  <span className="text-base font-extrabold tracking-tight text-sky-600">
-                    dental
+                  <span className="text-base font-extrabold tracking-tight text-[#00bcd4]">
+                    DENTAL
                   </span>
-                  <span className="h-2 w-2 rounded-full bg-rose-400 animate-pulse" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-cyan-500 animate-pulse" />
                 </div>
-                <p className="text-[10px] text-slate-600 font-medium truncate flex items-center gap-1 mt-0.5">
-                  <span className="inline-block px-1 rounded bg-amber-200/80 text-amber-900 text-[9px] font-bold">
+                <p className="text-[11px] font-serif italic text-amber-700 font-medium tracking-wide leading-tight truncate flex items-center gap-1.5 mt-0.5">
+                  <span>Therapist</span>
+                  <span className="inline-block px-1 rounded bg-amber-200/80 text-amber-900 text-[9px] font-sans font-bold not-italic">
                     PRO
                   </span>
-                  Modern Dental Clinic
                 </p>
               </div>
             )}

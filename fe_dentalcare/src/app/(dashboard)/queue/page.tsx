@@ -37,7 +37,7 @@ import { toast } from "sonner";
 export default function QueuePage() {
   const router = useRouter();
   const { queues, updateStatus, callNext, enqueue } = useQueue();
-  const { data: patientData } = usePatients();
+  const { data: patientData } = usePatients({ perPage: 100 });
 
   const [viewMode, setViewMode] = React.useState<"card" | "table">("card");
   const [filterDept, setFilterDept] = React.useState<string>("");
@@ -50,11 +50,23 @@ export default function QueuePage() {
   const [selectedDept, setSelectedDept] = React.useState<string>("Poli Gigi Umum");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
-  const total = queues.length;
-  const waiting = queues.filter((q) => q.status === "waiting").length;
-  const inProgress = queues.filter((q) => q.status === "in_progress" || q.status === "called").length;
-  const completed = queues.filter((q) => q.status === "completed").length;
-  const skipped = queues.filter((q) => q.status === "skipped").length;
+  const todayStr = React.useMemo(() => new Date().toISOString().slice(0, 10), []);
+
+  const todayQueues = React.useMemo(() => {
+    return queues.filter((q) => {
+      const rawCreated = (q as any).createdAt || (q as any).created_at || q.checkInTime;
+      if (rawCreated && typeof rawCreated === "string" && (rawCreated.includes("-") || rawCreated.includes("T"))) {
+        return rawCreated.slice(0, 10) === todayStr;
+      }
+      return true;
+    });
+  }, [queues, todayStr]);
+
+  const total = todayQueues.length;
+  const waiting = todayQueues.filter((q) => q.status === "waiting").length;
+  const inProgress = todayQueues.filter((q) => q.status === "in_progress" || q.status === "called").length;
+  const completed = todayQueues.filter((q) => q.status === "completed").length;
+  const skipped = todayQueues.filter((q) => q.status === "skipped").length;
 
   const handleAction = async (id: string, status: QueueItem["status"], label: string, encounterId?: string, patientId?: string) => {
     try {
@@ -111,10 +123,16 @@ export default function QueuePage() {
   const [pageSize, setPageSize] = React.useState(12);
 
   const filtered = React.useMemo(() => {
-    return [...queues]
+    return [...todayQueues]
       .filter((q) => {
         if (filterDept && q.departmentName !== filterDept && q.departmentId !== filterDept) return false;
-        if (filterStatus && q.status !== filterStatus) return false;
+        if (filterStatus) {
+          if (filterStatus === "active") {
+            if (q.status !== "waiting" && q.status !== "called" && q.status !== "in_progress") return false;
+          } else if (q.status !== filterStatus) {
+            return false;
+          }
+        }
         return true;
       })
       .sort((a, b) => {
@@ -233,7 +251,8 @@ export default function QueuePage() {
             }}
             className="rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs text-slate-700 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-300"
           >
-            <option value="">Semua Status</option>
+            <option value="">Semua Status Hari Ini</option>
+            <option value="active">Antrean Aktif (Menunggu &amp; Dipanggil)</option>
             <option value="waiting">Menunggu</option>
             <option value="called">Dipanggil</option>
             <option value="in_progress">Sedang Dilayani</option>

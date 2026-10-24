@@ -168,8 +168,8 @@ export function MedicinePrescriptionModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl p-0 overflow-hidden rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-slate-200 dark:border-slate-800">
-        <DialogHeader className="p-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30">
+      <DialogContent className="max-w-4xl p-0 overflow-hidden rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[calc(100dvh-2rem)] sm:max-h-[calc(100dvh-3rem)]">
+        <DialogHeader className="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-600 text-white shadow-md shadow-teal-600/30">
@@ -187,9 +187,9 @@ export function MedicinePrescriptionModal({
           </div>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 md:grid-cols-12 min-h-[480px] max-h-[75vh]">
+        <div className="grid grid-cols-1 md:grid-cols-12 flex-1 min-h-0 overflow-y-auto md:overflow-hidden">
           {/* LEFT COLUMN: Search & Medicine List (7 Cols) */}
-          <div className="md:col-span-7 flex flex-col border-b md:border-b-0 md:border-r border-slate-100 dark:border-slate-800 p-4 space-y-3">
+          <div className="md:col-span-7 flex flex-col border-b md:border-b-0 md:border-r border-slate-100 dark:border-slate-800 p-4 space-y-3 md:overflow-y-auto">
             {/* Search Input */}
             <div className="relative">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
@@ -308,7 +308,7 @@ export function MedicinePrescriptionModal({
           </div>
 
           {/* RIGHT COLUMN: Prescription Configurator (5 Cols) */}
-          <div className="md:col-span-5 p-4 flex flex-col justify-between bg-slate-50/40 dark:bg-slate-900/60">
+          <div className="md:col-span-5 p-4 flex flex-col justify-between bg-slate-50/40 dark:bg-slate-900/60 md:overflow-y-auto">
             {selectedMedicine ? (
               <div className="space-y-4">
                 <div className="rounded-xl border border-teal-100 bg-teal-50/70 p-3 dark:border-teal-900/40 dark:bg-teal-950/40">

@@ -8,6 +8,7 @@ interface SearchInputProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange"> {
   value: string;
   onChange: (value: string) => void;
+  debounceMs?: number;
   placeholder?: string;
   className?: string;
 }
@@ -15,25 +16,54 @@ interface SearchInputProps
 export function SearchInput({
   value,
   onChange,
+  debounceMs = 300,
   placeholder = "Cari data...",
   className,
   ...props
 }: SearchInputProps) {
+  const [innerValue, setInnerValue] = React.useState(value);
+
+  // Keep inner value in sync when prop changes externally (e.g. filter reset)
+  React.useEffect(() => {
+    setInnerValue(value);
+  }, [value]);
+
+  // Debounce the call to onChange
+  React.useEffect(() => {
+    if (innerValue === value) return;
+    const timer = setTimeout(() => {
+      onChange(innerValue);
+    }, debounceMs);
+    return () => clearTimeout(timer);
+  }, [innerValue, debounceMs, onChange, value]);
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      onChange(innerValue);
+    }
+  };
+
+  const handleClear = () => {
+    setInnerValue("");
+    onChange("");
+  };
+
   return (
     <div className={cn("relative flex items-center", className)}>
       <Search className="absolute left-3 h-4 w-4 text-slate-400 pointer-events-none" />
       <input
         type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
+        value={innerValue}
+        onChange={(e) => setInnerValue(e.target.value)}
+        onKeyDown={handleKeyDown}
         placeholder={placeholder}
         className="h-9 w-full rounded-xl border border-slate-200 bg-white pl-9 pr-8 text-sm text-slate-800 transition-colors placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/20 focus-visible:border-teal-600 dark:border-slate-800 dark:bg-slate-900/90 dark:text-slate-200 dark:placeholder:text-slate-500"
         {...props}
       />
-      {value && (
+      {innerValue && (
         <button
           type="button"
-          onClick={() => onChange("")}
+          onClick={handleClear}
           className="absolute right-2.5 rounded-md p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
           aria-label="Bersihkan pencarian"
         >

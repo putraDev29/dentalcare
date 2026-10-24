@@ -324,7 +324,7 @@ export function WhatsAppReminderModal({
       description="Kirim notifikasi pengingat jadwal kontrol H-1 secara otomatis via WPPConnect Gateway atau melalui protokol WhatsApp Web."
       className="max-w-3xl"
     >
-      <div className="space-y-4 max-h-[80vh] overflow-y-auto pr-1">
+      <div className="space-y-4 pr-1">
         {/* Mode Selector Tabs */}
         <div className="flex rounded-xl bg-slate-100 p-1 dark:bg-slate-800 text-xs font-semibold">
           <button

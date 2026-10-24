@@ -10,7 +10,6 @@ import {
   Pill,
   Receipt,
   ArrowRight,
-  Sparkles,
   Landmark,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -63,11 +62,16 @@ export function ClinicalWorkflowStepper() {
   const pathname = usePathname();
 
   return (
-    <div className="rounded-2xl border border-sky-200 bg-gradient-to-r from-sky-500/10 via-rose-500/5 to-amber-300/10 p-3.5 sm:p-4 shadow-xs mb-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 pb-3 border-b border-sky-100">
+    <div className="rounded-2xl border border-cyan-200/80 bg-gradient-to-r from-cyan-500/10 via-sky-500/5 to-amber-200/10 p-3.5 sm:p-4 shadow-xs mb-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 pb-3 border-b border-cyan-100/80">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-tr from-sky-500 via-rose-400 to-amber-300 text-white shadow-xs">
-            <Sparkles className="h-4 w-4" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-slate-950 p-1 shadow-sm border border-cyan-500/30 ring-1 ring-cyan-500/20 shrink-0">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo-icon.png"
+              alt="OKAY DENTAL"
+              className="h-6 w-6 object-contain"
+            />
           </div>
           <div>
             <h3 className="text-xs font-bold uppercase tracking-wider text-sky-950">

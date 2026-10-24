@@ -104,6 +104,14 @@ class AppointmentController extends Controller
             'estimated_call_time' => $appointment->appointment_time,
         ]);
 
+        if (($appointment->visit_type ?? '') === 'control') {
+            $patient->update([
+                'next_control_date' => $appointment->appointment_date,
+                'control_doctor' => $doctor ? $doctor->name : null,
+                'control_notes' => $appointment->complaint ?: $appointment->notes,
+            ]);
+        }
+
         return response()->json($appointment, 201);
     }
 

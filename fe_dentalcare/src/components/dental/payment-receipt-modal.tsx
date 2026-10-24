@@ -172,9 +172,8 @@ export function PaymentReceiptModal({
         : "";
 
     return `🧾 *BUKTI PEMBAYARAN & NOTA KASIR*
-*DENTAL CARE CLINIC*
-_Klinik Gigi & Spesialis Konservasi / Ortodonsia_
-Jl. Kesehatan No. 45, Jakarta Pusat | Telp: (021) 555-DENTAL
+*OKAY DENTAL THERAPIST*
+Ds. Krajan II RT.08 RW.02 67276 | Telp/WA: 083856480982
 ─────────────────────────
 📄 *No. Invoice:* ${invoice.invoiceNumber}
 📅 *Tanggal:* ${formatDate(invoice.invoiceDate)}
@@ -196,7 +195,7 @@ ${insurancePart}*TOTAL BIAYA:* *Rp ${invoice.totalAmount.toLocaleString("id-ID")
 *DIBAYAR:* *Rp ${(invoice.paidAmount || invoice.totalAmount).toLocaleString("id-ID")}*
 *SISA TAGIHAN:* *Rp 0 (LUNAS)* ✅
 ─────────────────────────${notePart}
-Terima kasih telah mempercayakan perawatan kesehatan gigi Anda kepada *Dental Care Clinic*.
+Terima kasih telah mempercayakan perawatan kesehatan gigi Anda kepada *OKAY Dental Therapist*.
 Semoga lekas sembuh dan senyum sehat selalu! 🙏🦷
 
 _Simpan pesan ini sebagai bukti pembayaran dan transaksi kasir yang sah._`;
@@ -220,7 +219,7 @@ _Simpan pesan ini sebagai bukti pembayaran dan transaksi kasir yang sah._`;
       const pdf = generateInvoicePdf(invoice, {
         cashierName,
         paymentMethod: paymentMethodLabel,
-        clinicName: "OKAY DENTAL CLINIC",
+        clinicName: "OKAY DENTAL THERAPIST",
       });
       pdf.download();
     } catch (e) {}
@@ -250,11 +249,11 @@ _Simpan pesan ini sebagai bukti pembayaran dan transaksi kasir yang sah._`;
       const pdf = generateInvoicePdf(invoice, {
         cashierName,
         paymentMethod: paymentMethodLabel,
-        clinicName: "OKAY DENTAL CLINIC",
+        clinicName: "OKAY DENTAL THERAPIST",
       });
       const pdfBase64 = pdf.getBase64();
 
-      const caption = `Halo Kak *${invoice.patientName}*,\n\nTerlampir berkas *PDF Bukti Pembayaran (Invoice)* resmi dari *OKAY Dental Clinic* untuk transaksi No. *${invoice.invoiceNumber}* sebesar *${formatCurrency(invoice.totalAmount)}* (LUNAS).\n\nTerima kasih atas kepercayaannya. Semoga lekas sembuh & senyum sehat selalu! 🙏🦷`;
+      const caption = `Halo Kak *${invoice.patientName}*,\n\nTerlampir berkas *PDF Bukti Pembayaran (Invoice)* resmi dari *OKAY Dental Therapist* untuk transaksi No. *${invoice.invoiceNumber}* sebesar *${formatCurrency(invoice.totalAmount)}* (LUNAS).\n\nTerima kasih atas kepercayaannya. Semoga lekas sembuh & senyum sehat selalu! 🙏🦷`;
 
       // 2. Kirim berkas PDF via endpoint /whatsapp/send-file
       const res = await fetch(`${appConfig.apiUrl}/whatsapp/send-file`, {
@@ -303,7 +302,7 @@ _Simpan pesan ini sebagai bukti pembayaran dan transaksi kasir yang sah._`;
       const pdf = generateInvoicePdf(invoice, {
         cashierName,
         paymentMethod: paymentMethodLabel,
-        clinicName: "OKAY DENTAL CLINIC",
+        clinicName: "OKAY DENTAL THERAPIST",
       });
       pdf.download();
       toast.success("Berkas PDF Nota pembayaran berhasil diunduh!");
@@ -356,9 +355,9 @@ _Simpan pesan ini sebagai bukti pembayaran dan transaksi kasir yang sah._`;
       `}</style>
 
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-4xl p-0 overflow-hidden rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-slate-200 dark:border-slate-800">
+        <DialogContent className="max-w-4xl p-0 overflow-hidden rounded-2xl bg-white dark:bg-slate-900 shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[calc(100dvh-2rem)] sm:max-h-[calc(100dvh-3rem)]">
           {/* Modal Header */}
-          <div className="flex flex-wrap items-center justify-between border-b border-slate-100 bg-gradient-to-r from-teal-50/90 via-sky-50/60 to-white px-5 py-4 dark:border-slate-800 dark:from-teal-950/40 dark:via-sky-950/20 dark:bg-slate-900">
+          <div className="flex flex-wrap items-center justify-between border-b border-slate-100 bg-gradient-to-r from-teal-50/90 via-sky-50/60 to-white px-5 py-4 dark:border-slate-800 dark:from-teal-950/40 dark:via-sky-950/20 dark:bg-slate-900 shrink-0">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-600 text-white shadow-xs">
                 <Receipt className="h-5 w-5" />
@@ -409,7 +408,7 @@ _Simpan pesan ini sebagai bukti pembayaran dan transaksi kasir yang sah._`;
           </div>
 
           {/* Modal Body */}
-          <div className="p-5 max-h-[75vh] overflow-y-auto space-y-5">
+          <div className="p-4 sm:p-5 overflow-y-auto flex-1 min-h-0 space-y-5">
             {activeView === "receipt" ? (
               /* ================= VIEW 1: PRATINJAU NOTA FISIK / CETAK ================= */
               <div className="space-y-4">
@@ -459,17 +458,15 @@ _Simpan pesan ini sebagai bukti pembayaran dan transaksi kasir yang sah._`;
                     {/* Clinic Branding Header */}
                     <div className="text-center pb-2 border-b border-dashed border-slate-400 dark:border-slate-700 space-y-0.5">
                       <div className="flex items-center justify-center gap-1.5 font-black text-sm uppercase tracking-tight text-slate-900 dark:text-white">
-                        <Sparkles className="h-4 w-4 text-sky-600 inline shrink-0" />
-                        <span>OKAY DENTAL CLINIC</span>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src="/logo-icon-light.png" alt="" className="h-4 w-4 inline shrink-0 object-contain" />
+                        <span>OKAY DENTAL THERAPIST</span>
                       </div>
-                      <p className="text-[10px] text-slate-600 font-medium">
-                        Klinik Gigi &amp; Spesialis Konservasi
+                      <p className="text-[9.5px] text-slate-600 font-medium">
+                        Ds. Krajan II RT.08 RW.02 67276
                       </p>
                       <p className="text-[9.5px] text-slate-500">
-                        Jl. Kesehatan No. 45, Jakarta Pusat
-                      </p>
-                      <p className="text-[9.5px] text-slate-500">
-                        Telp: (021) 555-DENTAL
+                        Telp: 083856480982
                       </p>
                     </div>
 
@@ -812,7 +809,7 @@ _Simpan pesan ini sebagai bukti pembayaran dan transaksi kasir yang sah._`;
           </div>
 
           {/* Modal Footer */}
-          <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50/50 px-5 py-3 dark:border-slate-800 dark:bg-slate-900">
+          <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50/50 px-5 py-3 dark:border-slate-800 dark:bg-slate-900 shrink-0">
             <span className="text-[11px] text-slate-500">
               Dental Care Clinic Kasir &amp; Billing Module
             </span>

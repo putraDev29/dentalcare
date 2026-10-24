@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Activity } from "lucide-react";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
@@ -53,12 +54,19 @@ export default function DashboardLayout({
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-[#f0f8ff] via-[#f5faff] to-[#fef6f8] p-4">
         <div className="flex flex-col items-center gap-4 text-center max-w-sm">
-          <div className="flex h-14 px-5 items-center justify-center rounded-2xl bg-gradient-to-tr from-sky-500 via-rose-400 to-amber-300 text-white shadow-xl shadow-sky-500/25 animate-pulse font-black text-lg tracking-wider">
-            OKAY
+          <div className="flex items-center justify-center rounded-2xl bg-slate-950 px-5 py-3 shadow-xl shadow-cyan-950/20 ring-1 ring-cyan-500/30 border border-slate-800 animate-pulse">
+            <Image
+              src="/logo.png"
+              alt="OKAY DENTAL Therapist"
+              width={220}
+              height={58}
+              priority
+              className="h-11 w-auto object-contain drop-shadow"
+            />
           </div>
           <div className="space-y-1">
             <p className="text-sm font-semibold text-slate-800">
-              Mengamankan Akses OKAY dental...
+              Mengamankan Akses OKAY DENTAL Therapist...
             </p>
             <p className="text-xs text-slate-500">
               Silakan login terlebih dahulu untuk mengakses rekam medis klinik gigi.

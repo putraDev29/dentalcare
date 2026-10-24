@@ -25,8 +25,8 @@ class DashboardController extends Controller
         if ($patientsToday < 4) $patientsToday = 14;
 
         $appointmentsToday = Appointment::where('appointment_date', $today)->count() ?: Appointment::count();
-        $waitingQueues = QueueItem::where('status', 'waiting')->count() ?: 3;
-        $completedEncounters = Encounter::where('status', 'completed')->count() ?: Encounter::count();
+        $waitingQueues = QueueItem::where('status', 'waiting')->whereDate('created_at', $today)->count();
+        $completedEncounters = Encounter::where('status', 'completed')->whereDate('created_at', $today)->count() ?: Encounter::where('status', 'completed')->count();
 
         $todayRevenue = (float) FinanceTransaction::where('type', 'income')
             ->where('date', $today)
@@ -44,8 +44,10 @@ class DashboardController extends Controller
 
         $prescriptionsCount = Prescription::count() ?: 12;
 
-        // Dental Chairs status with real active queue integration
-        $activeQueues = QueueItem::whereIn('status', ['called', 'in_consultation'])->get();
+        // Dental Chairs status with real active queue integration (today only)
+        $activeQueues = QueueItem::whereIn('status', ['called', 'in_consultation', 'in_progress'])
+            ->whereDate('created_at', $today)
+            ->get();
         $firstQueue = $activeQueues->first();
 
         $dentalChairs = [

@@ -42,7 +42,7 @@ function NewAppointmentContent() {
   const preselectedPatientId = searchParams.get("patientId");
   const preselectedDoctorId = searchParams.get("doctorId");
 
-  const { data: patientsData } = usePatients();
+  const { data: patientsData } = usePatients({ perPage: 100 });
   const { doctors } = useDoctors();
 
   const [step, setStep] = React.useState<number>(1);

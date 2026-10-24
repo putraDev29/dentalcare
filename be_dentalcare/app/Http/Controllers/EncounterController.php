@@ -115,6 +115,16 @@ class EncounterController extends Controller
                 ]);
         }
 
+        // Sync next control date to patient
+        $controlDate = $encounter->follow_up_plan['nextControlDate'] ?? null;
+        if ($controlDate && $encounter->patient_id) {
+            \App\Models\Patient::where('id', $encounter->patient_id)->update([
+                'next_control_date' => $controlDate,
+                'control_doctor' => $encounter->doctor_name,
+                'control_notes' => $encounter->follow_up_plan['dentalNotes'] ?? null,
+            ]);
+        }
+
         return response()->json($encounter, 201);
     }
 
@@ -250,6 +260,16 @@ class EncounterController extends Controller
                     'encounter_id' => $encounter->id,
                     'status' => 'completed',
                 ]);
+        }
+
+        // Sync next control date to patient
+        $controlDate = $encounter->follow_up_plan['nextControlDate'] ?? null;
+        if ($controlDate && $encounter->patient_id) {
+            \App\Models\Patient::where('id', $encounter->patient_id)->update([
+                'next_control_date' => $controlDate,
+                'control_doctor' => $encounter->doctor_name,
+                'control_notes' => $encounter->follow_up_plan['dentalNotes'] ?? null,
+            ]);
         }
 
         return response()->json($encounter);

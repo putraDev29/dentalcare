@@ -4,6 +4,8 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/features/auth/auth-store";
 
+import Image from "next/image";
+
 export default function Home() {
   const router = useRouter();
   const { isAuthenticated, isHydrated, initFromStorage } = useAuthStore();
@@ -49,13 +51,20 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#f0f8ff] via-[#f5faff] to-[#fef6f8]">
-      <div className="flex flex-col items-center gap-3">
-        <div className="flex h-12 px-4 items-center justify-center rounded-2xl bg-gradient-to-tr from-sky-500 via-rose-400 to-amber-300 shadow-lg shadow-sky-500/25 animate-pulse text-white font-black text-lg tracking-wider">
-          OKAY
+      <div className="flex flex-col items-center gap-4">
+        <div className="flex items-center justify-center rounded-2xl bg-slate-950 px-5 py-3 shadow-xl shadow-cyan-950/20 ring-1 ring-cyan-500/30 border border-slate-800 animate-pulse">
+          <Image
+            src="/logo.png"
+            alt="OKAY DENTAL Therapist"
+            width={200}
+            height={52}
+            priority
+            className="h-10 w-auto object-contain drop-shadow"
+          />
         </div>
-        <div className="flex items-center gap-2 text-sm font-medium text-slate-600">
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-sky-500 border-t-transparent" />
-          <span>Memuat <strong className="font-bold text-sky-700">OKAY</strong> dental...</span>
+        <div className="flex items-center gap-2 text-xs font-semibold text-slate-600">
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-cyan-500 border-t-transparent" />
+          <span>Memuat <strong className="font-bold text-cyan-700">OKAY DENTAL</strong> Therapist...</span>
         </div>
       </div>
     </div>

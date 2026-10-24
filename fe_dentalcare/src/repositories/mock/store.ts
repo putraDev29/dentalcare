@@ -59,19 +59,19 @@ export interface MockStoreState {
 }
 
 const defaultHospitalProfile: HospitalProfile = {
-  name: "OKAY Dental (Klinik Gigi OKAY Dental)",
+  name: "OKAY DENTAL THERAPIST",
   code: "OKAY-01",
   type: "Praktek & Klinik Dokter Gigi Spesialis Modern",
   accreditation: "Paripurna Kemenkes RI",
   licenseNumber: "445/098/IZIN-KLINIK-GIGI/DINKES/2023",
   taxId: "01.345.678.9-012.000",
-  phone: "+62 21 555-4433",
+  phone: "083856480982",
   email: "kontak@okaydental.co.id",
   website: "https://okaydental.co.id",
-  address: "Jl. Senopati Raya No. 45, Kebayoran Baru",
-  city: "Jakarta Selatan",
-  province: "DKI Jakarta",
-  postalCode: "12180",
+  address: "Ds. Krajan II RT.08 RW.02 67276",
+  city: "Pati",
+  province: "Jawa Tengah",
+  postalCode: "67276",
   directorName: "drg. Jihan, S.Kep",
 };
 

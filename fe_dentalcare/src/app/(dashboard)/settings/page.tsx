@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import {
   Building2,
   Clock,
@@ -193,8 +194,8 @@ export default function SettingsPage() {
       <PageHeader
         title="Pengaturan Klinik Gigi"
         badge={
-          <Badge variant="outline" className="border-sky-300 bg-sky-50 text-sky-700 dark:border-sky-800 dark:bg-sky-950/50 dark:text-sky-300">
-            OKAY Dental v2.0
+          <Badge variant="outline" className="border-cyan-300 bg-cyan-50 text-cyan-800 dark:border-cyan-800 dark:bg-cyan-950/50 dark:text-cyan-300 font-semibold">
+            OKAY DENTAL Therapist v2.0
           </Badge>
         }
       />
@@ -230,15 +231,26 @@ export default function SettingsPage() {
           <form onSubmit={handleSaveProfile} className="space-y-6">
             <Card>
               <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle>Identitas Klinik Gigi / Fasilitas Pelayanan Dental</CardTitle>
-                    <CardDescription>
-                      Informasi resmi klinik gigi yang tercetak pada kuitansi kasir dental, e-resep dokter gigi, dan berkas rekam medis odontogram.
-                    </CardDescription>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex items-center gap-3.5">
+                    <div className="rounded-2xl bg-slate-950 p-2 shadow-md ring-1 ring-cyan-500/30 border border-slate-800 shrink-0">
+                      <Image
+                        src="/logo-icon.png"
+                        alt="OKAY DENTAL"
+                        width={40}
+                        height={40}
+                        className="h-10 w-10 object-contain"
+                      />
+                    </div>
+                    <div>
+                      <CardTitle>Identitas Klinik Gigi / Fasilitas Pelayanan Dental</CardTitle>
+                      <CardDescription>
+                        Informasi resmi klinik gigi yang tercetak pada kuitansi kasir dental, e-resep dokter gigi, dan berkas rekam medis odontogram.
+                      </CardDescription>
+                    </div>
                   </div>
-                  <Badge variant="subtle" className="hidden sm:inline-flex">
-                    Kode Faskes: {formData.code || "RSMU-01"}
+                  <Badge variant="subtle" className="hidden sm:inline-flex shrink-0">
+                    Kode Faskes: {formData.code || "OKAY-01"}
                   </Badge>
                 </div>
               </CardHeader>

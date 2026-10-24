@@ -57,50 +57,55 @@ export function Dialog({
 
   return (
     <DialogContext.Provider value={{ open, onOpenChange }}>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+      <div className="fixed inset-0 z-50 overflow-y-auto overscroll-contain">
         {/* Backdrop */}
         <div
-          className="fixed inset-0 bg-slate-950/40 backdrop-blur-xs transition-opacity animate-in fade-in"
+          className="fixed inset-0 bg-slate-950/50 backdrop-blur-xs transition-opacity animate-in fade-in"
           onClick={() => onOpenChange(false)}
+          aria-hidden="true"
         />
 
-        {hasDialogContent ? (
-          children
-        ) : (
-          <div
-            role="dialog"
-            aria-modal="true"
-            className={cn(
-              "relative z-50 w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-6 shadow-xl transition-all animate-in zoom-in-95 dark:border-slate-800 dark:bg-slate-900 max-h-[90vh] overflow-y-auto",
-              className
-            )}
-          >
-            <button
-              onClick={() => onOpenChange(false)}
-              className="absolute right-4 top-4 rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
-              aria-label="Tutup"
+        {/* Centering wrapper with scroll capability on small viewports */}
+        <div className="flex min-h-full items-center justify-center p-3 sm:p-4 md:p-6 text-center">
+          {hasDialogContent ? (
+            children
+          ) : (
+            <div
+              role="dialog"
+              aria-modal="true"
+              className={cn(
+                "relative z-50 w-full max-w-lg text-left rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-2xl transition-all animate-in zoom-in-95 dark:border-slate-800 dark:bg-slate-900 max-h-[calc(100dvh-1.5rem)] sm:max-h-[calc(100dvh-3rem)] overflow-y-auto overscroll-contain my-auto",
+                className
+              )}
             >
-              <X className="h-4 w-4" />
-            </button>
+              <button
+                type="button"
+                onClick={() => onOpenChange(false)}
+                className="absolute right-3.5 top-3.5 sm:right-4 sm:top-4 rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors z-20 cursor-pointer"
+                aria-label="Tutup"
+              >
+                <X className="h-4 w-4" />
+              </button>
 
-            {(title || description) && (
-              <div className="mb-4 space-y-1">
-                {title && (
-                  <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-                    {title}
-                  </h2>
-                )}
-                {description && (
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
-                    {description}
-                  </p>
-                )}
-              </div>
-            )}
+              {(title || description) && (
+                <div className="mb-4 space-y-1 pr-8 shrink-0">
+                  {title && (
+                    <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+                      {title}
+                    </h2>
+                  )}
+                  {description && (
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      {description}
+                    </p>
+                  )}
+                </div>
+              )}
 
-            {children}
-          </div>
-        )}
+              {children}
+            </div>
+          )}
+        </div>
       </div>
     </DialogContext.Provider>
   );
@@ -119,14 +124,15 @@ export function DialogContent({
       role="dialog"
       aria-modal="true"
       className={cn(
-        "relative z-50 w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-6 shadow-xl transition-all animate-in zoom-in-95 dark:border-slate-800 dark:bg-slate-900 max-h-[90vh] overflow-y-auto",
+        "relative z-50 w-full max-w-lg text-left rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-2xl transition-all animate-in zoom-in-95 dark:border-slate-800 dark:bg-slate-900 max-h-[calc(100dvh-1.5rem)] sm:max-h-[calc(100dvh-3rem)] overflow-y-auto overscroll-contain my-auto flex flex-col",
         className
       )}
     >
       {ctx && (
         <button
+          type="button"
           onClick={() => ctx.onOpenChange(false)}
-          className="absolute right-4 top-4 rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
+          className="absolute right-3.5 top-3.5 sm:right-4 sm:top-4 rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors z-20 cursor-pointer"
           aria-label="Tutup"
         >
           <X className="h-4 w-4" />
@@ -145,7 +151,7 @@ export function DialogHeader({
   children: React.ReactNode;
   className?: string;
 }) {
-  return <div className={cn("mb-4 space-y-1", className)}>{children}</div>;
+  return <div className={cn("mb-4 space-y-1 shrink-0", className)}>{children}</div>;
 }
 
 export function DialogTitle({
@@ -184,7 +190,7 @@ export function DialogFooter({
   className?: string;
 }) {
   return (
-    <div className={cn("mt-5 flex items-center justify-end gap-2", className)}>
+    <div className={cn("mt-5 flex items-center justify-end gap-2 shrink-0", className)}>
       {children}
     </div>
   );

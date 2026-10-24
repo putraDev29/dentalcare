@@ -63,25 +63,31 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* OKAY Dental Cheerful Welcome Card */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-sky-500 via-sky-400 to-rose-400 p-5 sm:p-6 text-white shadow-lg shadow-sky-500/20">
+      {/* OKAY DENTAL Therapist Cheerful Welcome Card */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-sky-600 via-sky-500 to-cyan-500 p-5 sm:p-6 text-white shadow-lg shadow-sky-500/20">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <div className="inline-flex items-center gap-2 rounded-full bg-white/20 backdrop-blur-md px-3 py-1 text-xs font-semibold text-white">
-              <Sparkles className="h-3.5 w-3.5 text-amber-200" />
-              <span>OKAY Dental • Praktek Dokter Gigi & Odontogram Modern</span>
+          <div className="flex items-center gap-4">
+            <div className="hidden sm:flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-slate-950 p-2 shadow-lg ring-2 ring-white/20">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo-icon.png" alt="OKAY DENTAL" className="h-10 w-10 object-contain drop-shadow" />
             </div>
-            <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center gap-2">
-              Selamat Datang di OKAY Dental! ✨
-            </h1>
-            <p className="text-xs sm:text-sm text-sky-50 max-w-xl font-medium">
-              Senyum sehat & cerah pasien prioritas kami. Kelola antrean dental chair, odontogram digital, rekam medis, dan kasir keuangan.
-            </p>
+            <div className="space-y-1">
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/20 backdrop-blur-md px-3 py-1 text-xs font-semibold text-white">
+                <span className="h-2 w-2 rounded-full bg-amber-300 animate-pulse" />
+                <span>OKAY DENTAL Therapist • Praktek Dokter Gigi &amp; Odontogram Modern</span>
+              </div>
+              <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center gap-2">
+                Selamat Datang di OKAY DENTAL Therapist! ✨
+              </h1>
+              <p className="text-xs sm:text-sm text-sky-50 max-w-xl font-medium">
+                Senyum sehat &amp; cerah pasien prioritas kami. Kelola antrean dental chair, odontogram digital, rekam medis, dan kasir keuangan.
+              </p>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <Link href="/encounters/new/">
               <Button size="sm" className="bg-white text-sky-700 hover:bg-sky-50 font-bold shadow-md shadow-black/10 border-0 cursor-pointer">
-                <Sparkles className="h-4 w-4 text-amber-500" />
+                <Stethoscope className="h-4 w-4 text-sky-600" />
                 <span>Pemeriksaan Baru</span>
               </Button>
             </Link>
@@ -565,10 +571,11 @@ export default function DashboardPage() {
           </Card>
 
           {/* Quick Dental Action Card */}
-          <div className="rounded-2xl border border-sky-200 bg-linear-to-br from-sky-500/10 via-rose-500/5 to-amber-300/10 p-4 shadow-2xs">
+          <div className="rounded-2xl border border-cyan-200/80 bg-gradient-to-br from-cyan-500/10 via-sky-500/5 to-amber-200/10 p-4 shadow-2xs">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr from-sky-500 to-sky-600 text-white shadow-sm">
-                <Sparkles className="h-5 w-5" />
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-950 p-1.5 shadow-sm border border-cyan-500/30 ring-1 ring-cyan-500/20">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/logo-icon.png" alt="OKAY DENTAL" className="h-7 w-7 object-contain" />
               </div>
               <div>
                 <h4 className="text-xs font-bold text-sky-950">

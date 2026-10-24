@@ -123,13 +123,13 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-16 sm:p-6 sm:pt-20">
+    <div className="fixed inset-0 z-50 overflow-y-auto overscroll-contain p-3 pt-10 sm:p-6 sm:pt-20">
       <div
         className="fixed inset-0 bg-slate-950/40 backdrop-blur-xs"
         onClick={() => onOpenChange(false)}
       />
 
-      <div className="relative z-50 w-full max-w-xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-900 animate-in zoom-in-95">
+      <div className="relative z-50 w-full max-w-xl mx-auto overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-900 animate-in zoom-in-95 my-auto max-h-[calc(100dvh-2.5rem)] flex flex-col">
         {/* Search Bar */}
         <div className="flex items-center border-b border-slate-100 px-4 dark:border-slate-800">
           <Search className="h-4 w-4 text-slate-400 shrink-0" />

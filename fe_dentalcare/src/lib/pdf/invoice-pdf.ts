@@ -11,11 +11,11 @@ export interface InvoicePdfOptions {
 }
 
 export function generateInvoicePdf(invoice: Invoice, options?: InvoicePdfOptions) {
-  const clinicName = options?.clinicName || "OKAY DENTAL CLINIC";
-  const clinicAddress = options?.clinicAddress || "Jl. Kesehatan No. 45, Jakarta Pusat";
-  const clinicPhone = options?.clinicPhone || "(021) 555-DENTAL";
-  const cashierName = options?.cashierName || "Kasir Utama";
-  const paymentMethod = options?.paymentMethod || "Tunai (Cash)";
+  const clinicName = options?.clinicName || "OKAY DENTAL THERAPIST";
+  const clinicAddress = options?.clinicAddress || "Ds. Krajan II RT.08 RW.02 67276";
+  const clinicPhone = options?.clinicPhone || "083856480982";
+  const cashierName = options?.cashierName || "Kasir Dental Care";
+  const paymentMethod = options?.paymentMethod || "QRIS";
 
   // Format A5 Portrait (148 x 210 mm)
   const doc = new jsPDF({
@@ -28,40 +28,41 @@ export function generateInvoicePdf(invoice: Invoice, options?: InvoicePdfOptions
   const margin = 10;
   const contentWidth = pageWidth - margin * 2; // 128 mm
 
-  // 1. Header Banner Background Accents
+  // 1. Header Banner Background Accents (Clean Sky Blue Box)
   doc.setFillColor(240, 249, 255); // sky-50
-  doc.rect(margin, 8, contentWidth, 24, "F");
+  doc.rect(margin, 8, contentWidth, 22, "F");
 
+  // Prominent Blue Accent Line under top banner
   doc.setDrawColor(2, 132, 199); // sky-600
-  doc.setLineWidth(0.8);
-  doc.line(margin, 32, pageWidth - margin, 32);
+  doc.setLineWidth(1.0);
+  doc.line(margin, 30, pageWidth - margin, 30);
 
-  // Clinic Title
+  // Clinic Title & Contact
   doc.setFont("helvetica", "bold");
   doc.setFontSize(14);
   doc.setTextColor(15, 23, 42); // slate-900
-  doc.text(clinicName, margin + 4, 16);
+  doc.text(clinicName, margin + 4, 15.5);
 
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(8);
+  doc.setFontSize(8.5);
   doc.setTextColor(71, 85, 105); // slate-600
-  doc.text("Klinik Gigi Modern & Spesialis Konservasi / Ortodonsia", margin + 4, 21);
-  doc.text(`${clinicAddress} • Telp: ${clinicPhone}`, margin + 4, 26);
+  doc.text(clinicAddress, margin + 4, 21);
+  doc.text(clinicPhone, margin + 4, 26);
 
   // LUNAS Badge on top-right
-  doc.setFillColor(220, 252, 231); // emerald-100
+  doc.setFillColor(240, 253, 244); // emerald-50
   doc.setDrawColor(34, 197, 94); // emerald-500
   doc.setLineWidth(0.4);
-  doc.roundedRect(pageWidth - margin - 28, 12, 24, 8, 2, 2, "FD");
+  doc.roundedRect(pageWidth - margin - 29, 12, 25, 8, 2, 2, "FD");
   doc.setFont("helvetica", "bold");
   doc.setFontSize(8);
-  doc.setTextColor(21, 128, 61); // emerald-700
-  doc.text("LUNAS (PAID)", pageWidth - margin - 16, 17.5, { align: "center" });
+  doc.setTextColor(22, 163, 74); // emerald-600
+  doc.text("LUNAS (PAID)", pageWidth - margin - 16.5, 17.2, { align: "center" });
 
   // 2. Document Title
-  let curY = 38;
+  let curY = 36.5;
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(11);
+  doc.setFontSize(11.5);
   doc.setTextColor(15, 23, 42);
   doc.text("BUKTI PEMBAYARAN & NOTA KASIR", margin, curY);
 
@@ -70,11 +71,11 @@ export function generateInvoicePdf(invoice: Invoice, options?: InvoicePdfOptions
   doc.setFillColor(248, 250, 252); // slate-50
   doc.setDrawColor(226, 232, 240); // slate-200
   doc.setLineWidth(0.3);
-  doc.roundedRect(margin, curY, contentWidth, 22, 1.5, 1.5, "FD");
+  doc.roundedRect(margin, curY, contentWidth, 23, 2, 2, "FD");
 
-  const col1X = margin + 3;
-  const col2X = margin + contentWidth / 2 + 2;
-  const metaY = curY + 4.5;
+  const col1X = margin + 3.5;
+  const col2X = margin + contentWidth / 2 + 3.5;
+  const metaY = curY + 5;
 
   doc.setFontSize(7.5);
   doc.setFont("helvetica", "normal");
@@ -84,39 +85,45 @@ export function generateInvoicePdf(invoice: Invoice, options?: InvoicePdfOptions
   doc.text("No. Invoice:", col1X, metaY);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(2, 132, 199);
-  doc.text(invoice.invoiceNumber, col1X + 22, metaY);
+  doc.text(invoice.invoiceNumber, col1X + 24, metaY);
 
   doc.setFont("helvetica", "normal");
   doc.setTextColor(100, 116, 139);
-  doc.text("Tanggal Transaksi:", col1X, metaY + 5);
+  doc.text("Tanggal Transaksi:", col1X, metaY + 5.5);
+  doc.setFont("helvetica", "bold");
   doc.setTextColor(15, 23, 42);
-  doc.text(formatDate(invoice.invoiceDate), col1X + 22, metaY + 5);
+  doc.text(formatDate(invoice.invoiceDate), col1X + 24, metaY + 5.5);
 
+  doc.setFont("helvetica", "normal");
   doc.setTextColor(100, 116, 139);
-  doc.text("Kasir / Petugas:", col1X, metaY + 10);
+  doc.text("Kasir / Petugas:", col1X, metaY + 11);
+  doc.setFont("helvetica", "bold");
   doc.setTextColor(15, 23, 42);
-  doc.text(cashierName, col1X + 22, metaY + 10);
+  doc.text(cashierName, col1X + 24, metaY + 11);
 
   // Right Column
+  doc.setFont("helvetica", "normal");
   doc.setTextColor(100, 116, 139);
   doc.text("Nama Pasien:", col2X, metaY);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(15, 23, 42);
-  doc.text(invoice.patientName, col2X + 22, metaY);
+  doc.text(invoice.patientName, col2X + 24, metaY);
 
   doc.setFont("helvetica", "normal");
   doc.setTextColor(100, 116, 139);
-  doc.text("No. Rekam Medis:", col2X, metaY + 5);
+  doc.text("No. Rekam Medis:", col2X, metaY + 5.5);
+  doc.setFont("helvetica", "normal");
   doc.setTextColor(15, 23, 42);
-  doc.text(invoice.patientMrn, col2X + 22, metaY + 5);
+  doc.text(invoice.patientMrn, col2X + 24, metaY + 5.5);
 
+  doc.setFont("helvetica", "normal");
   doc.setTextColor(100, 116, 139);
-  doc.text("Metode Bayar:", col2X, metaY + 10);
+  doc.text("Metode Bayar:", col2X, metaY + 11);
   doc.setTextColor(13, 148, 136); // teal-600
   doc.setFont("helvetica", "bold");
-  doc.text(paymentMethod, col2X + 22, metaY + 10);
+  doc.text(paymentMethod, col2X + 24, metaY + 11);
 
-  curY += 26;
+  curY += 27;
 
   // 3. Table Header
   const colW = {

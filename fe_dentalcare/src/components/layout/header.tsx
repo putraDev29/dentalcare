@@ -99,8 +99,8 @@ export function Header({
 
   return (
     <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-sky-200/80 bg-white/95 px-4 backdrop-blur-md sm:px-6 relative shadow-xs">
-      {/* Signature OKAY Dental Top Accent Gradient Line */}
-      <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-sky-400 via-rose-500 to-amber-300" />
+      {/* Signature OKAY DENTAL Top Accent Line */}
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-400 via-[#30C9DB] to-amber-200" />
 
       {/* Left: Mobile trigger & Facility Switcher */}
       <div className="flex items-center gap-3">
@@ -348,7 +348,7 @@ export function Header({
             onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
             className="flex items-center gap-2 rounded-xl p-1 text-left transition-colors hover:bg-sky-50 cursor-pointer"
           >
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-tr from-sky-500 via-rose-400 to-amber-300 text-white font-black text-xs shadow-xs">
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-tr from-cyan-600 via-sky-600 to-cyan-500 text-white font-black text-xs shadow-xs ring-1 ring-cyan-500/20">
               {currentUser?.name ? currentUser.name.slice(0, 2).toUpperCase() : "SA"}
             </div>
             <div className="hidden xl:block">

@@ -213,8 +213,8 @@ export function DataTable<TData, TValue>({
                 </tr>
               ))}
             </thead>
-            <tbody className="divide-y divide-slate-100 text-sm text-slate-700 dark:divide-slate-800 dark:text-slate-300">
-              {isLoading ? (
+            <tbody className={cn("divide-y divide-slate-100 text-sm text-slate-700 dark:divide-slate-800 dark:text-slate-300 transition-opacity duration-150", isLoading && data.length > 0 && "opacity-50 pointer-events-none")}>
+              {isLoading && !data.length ? (
                 <tr>
                   <td colSpan={columns.length} className="h-48 text-center text-xs text-slate-500">
                     <div className="flex flex-col items-center justify-center gap-2">

@@ -3,7 +3,8 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Activity, ArrowLeft } from "lucide-react";
+import { ClinicLogo } from "@/components/shared/clinic-logo";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -32,12 +33,15 @@ export default function ResetPasswordPage() {
     <div className="flex min-h-screen items-center justify-center bg-slate-50/70 p-4 dark:bg-slate-950">
       <div className="w-full max-w-md space-y-6">
         <div className="flex flex-col items-center text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-teal-600 text-white shadow-md">
-            <Activity className="h-6 w-6" />
-          </div>
+          <Link href="/login">
+            <ClinicLogo variant="badge" size="lg" className="rounded-3xl shadow-lg ring-2 ring-cyan-500/20" />
+          </Link>
           <h1 className="mt-4 text-xl font-bold tracking-tight text-slate-900 dark:text-white">
             Atur Ulang Kata Sandi
           </h1>
+          <p className="mt-1 text-xs text-slate-500">
+            OKAY DENTAL Therapist
+          </p>
         </div>
 
         <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xl dark:border-slate-800 dark:bg-slate-900/90">

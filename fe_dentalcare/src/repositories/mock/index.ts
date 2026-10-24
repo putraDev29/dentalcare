@@ -76,7 +76,8 @@ export class MockPatientRepository implements IPatientRepository {
     }
 
     const state = mockStore.getState();
-    let enriched = items.map((p: Patient) => {
+    const enrichPatient = (p: Patient) => {
+      if (p.nextControlDate && p.controlDoctor) return p;
       const enc = state.encounters.find((e) => e.patientId === p.id && e.nextControlDate);
       const apt = state.appointments.find((a) => a.patientId === p.id);
       const controlDate = enc?.nextControlDate || apt?.appointmentDate || p.nextControlDate;
@@ -86,23 +87,29 @@ export class MockPatientRepository implements IPatientRepository {
         nextControlDate: controlDate,
         controlDoctor,
       };
-    });
+    };
 
-    if (query.h1Control) {
-      const tomorrow = new Date();
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      const tomorrowStr = tomorrow.toISOString().split("T")[0];
-      enriched = enriched.filter((p) => p.nextControlDate === tomorrowStr);
-    } else if (query.nextControlDate) {
-      enriched = enriched.filter((p) => p.nextControlDate === query.nextControlDate);
+    let targetItems = items;
+    if (query.h1Control || query.nextControlDate) {
+      const targetDate = query.h1Control
+        ? (() => {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            return tomorrow.toISOString().split("T")[0];
+          })()
+        : query.nextControlDate;
+
+      targetItems = items
+        .map(enrichPatient)
+        .filter((p) => p.nextControlDate === targetDate);
     }
 
     const page = query.page || 1;
     const perPage = query.perPage || 10;
-    const total = enriched.length;
+    const total = targetItems.length;
     const totalPages = Math.max(1, Math.ceil(total / perPage));
     const start = (page - 1) * perPage;
-    const paginated = enriched.slice(start, start + perPage);
+    const paginated = targetItems.slice(start, start + perPage).map(enrichPatient);
 
     return {
       data: paginated,
@@ -400,13 +407,28 @@ export class MockAppointmentRepository implements IAppointmentRepository {
 }
 
 export class MockQueueRepository implements IQueueRepository {
-  async getQueues(query: QueryParams & { departmentId?: string; status?: string; serviceType?: string } = {}): Promise<QueueItem[]> {
+  async getQueues(query: QueryParams & { departmentId?: string; status?: string; serviceType?: string; allDates?: boolean } = {}): Promise<QueueItem[]> {
     let items = [...mockStore.getState().queues];
+    if (!query.allDates) {
+      const today = new Date().toISOString().slice(0, 10);
+      items = items.filter((q) => {
+        const d = (q as any).createdAt || (q as any).created_at || q.checkInTime;
+        if (!d || typeof d !== "string") return true;
+        if (d.includes("-") || d.includes("T")) {
+          return d.slice(0, 10) === today;
+        }
+        return true;
+      });
+    }
     if (query.departmentId) {
       items = items.filter((q) => q.departmentId === query.departmentId);
     }
     if (query.status) {
-      items = items.filter((q) => q.status === query.status);
+      if (query.status === "active") {
+        items = items.filter((q) => q.status === "waiting" || q.status === "called" || q.status === "in_progress");
+      } else {
+        items = items.filter((q) => q.status === query.status);
+      }
     }
     if (query.serviceType) {
       items = items.filter((q) => q.serviceType === query.serviceType);
