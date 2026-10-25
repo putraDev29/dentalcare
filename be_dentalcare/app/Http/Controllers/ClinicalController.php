@@ -21,6 +21,10 @@ class ClinicalController extends Controller
     // ==========================================
     public function diagnoses(Request $request)
     {
+        if (DentalDiagnosis::count() === 0) {
+            $this->autoSeedDiagnoses();
+        }
+
         $query = DentalDiagnosis::query();
 
         if ($request->filled('category')) {
@@ -37,6 +41,41 @@ class ClinicalController extends Controller
         }
 
         return response()->json($query->orderBy('code')->get());
+    }
+
+    private function autoSeedDiagnoses(): void
+    {
+        $filePath = database_path('data/diagnoses.json');
+        if (!file_exists($filePath)) {
+            $filePath = base_path('../fe_dentalcare/src/data/diagnoses.json');
+        }
+        if (file_exists($filePath)) {
+            $items = json_decode(file_get_contents($filePath), true) ?: [];
+            foreach ($items as $d) {
+                $existing = DentalDiagnosis::where('code', $d['code'])->first();
+                if ($existing) {
+                    $existing->update([
+                        'name' => $d['name'],
+                        'category' => $d['category'] ?? 'Umum',
+                        'description' => $d['description'] ?? $d['name'],
+                        'is_active' => true,
+                    ]);
+                } else {
+                    $id = $d['id'];
+                    if (DentalDiagnosis::where('id', $id)->exists()) {
+                        $id = 'DIA-' . strtoupper(Str::random(5));
+                    }
+                    DentalDiagnosis::create([
+                        'id' => $id,
+                        'code' => $d['code'],
+                        'name' => $d['name'],
+                        'category' => $d['category'] ?? 'Umum',
+                        'description' => $d['description'] ?? $d['name'],
+                        'is_active' => true,
+                    ]);
+                }
+            }
+        }
     }
 
     public function storeDiagnosis(Request $request)
@@ -99,6 +138,10 @@ class ClinicalController extends Controller
     // ==========================================
     public function procedures(Request $request)
     {
+        if (DentalProcedure::count() === 0) {
+            $this->autoSeedProcedures();
+        }
+
         $query = DentalProcedure::query();
 
         if ($request->filled('category')) {
@@ -115,6 +158,43 @@ class ClinicalController extends Controller
         }
 
         return response()->json($query->orderBy('name')->get());
+    }
+
+    private function autoSeedProcedures(): void
+    {
+        $filePath = database_path('data/procedures.json');
+        if (!file_exists($filePath)) {
+            $filePath = base_path('../fe_dentalcare/src/data/procedures.json');
+        }
+        if (file_exists($filePath)) {
+            $items = json_decode(file_get_contents($filePath), true) ?: [];
+            foreach ($items as $p) {
+                $existing = DentalProcedure::where('code', $p['code'])->first();
+                if ($existing) {
+                    $existing->update([
+                        'name' => $p['name'],
+                        'category' => $p['category'] ?? 'Umum',
+                        'cost' => $p['price'] ?? 0,
+                        'description' => $p['name'],
+                        'is_active' => true,
+                    ]);
+                } else {
+                    $id = $p['id'];
+                    if (DentalProcedure::where('id', $id)->exists()) {
+                        $id = 'PROC-' . strtoupper(Str::random(5));
+                    }
+                    DentalProcedure::create([
+                        'id' => $id,
+                        'code' => $p['code'],
+                        'name' => $p['name'],
+                        'category' => $p['category'] ?? 'Umum',
+                        'cost' => $p['price'] ?? 0,
+                        'description' => $p['name'],
+                        'is_active' => true,
+                    ]);
+                }
+            }
+        }
     }
 
     public function storeProcedure(Request $request)

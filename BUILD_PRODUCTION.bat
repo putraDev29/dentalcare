@@ -42,6 +42,10 @@ if not exist ".env" (
 echo       - Memeriksa migrasi database...
 call php artisan migrate --force
 
+echo       - Memastikan Master Data ICD-10 dan Dental terpasang...
+call php artisan db:seed --class=DentalDiagnosisSeeder --force
+call php artisan db:seed --force
+
 echo.
 :: -----------------------------------------------------------------
 :: 2. WHATSAPP GATEWAY

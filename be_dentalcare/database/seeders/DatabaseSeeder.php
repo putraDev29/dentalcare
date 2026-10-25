@@ -37,42 +37,45 @@ class DatabaseSeeder extends Seeder
         // Path to JSON data in frontend
         $dataPath = base_path('../fe_dentalcare/src/data');
 
-        // 3. Seed Departments
+        // 3. Seed Master Dental Diagnoses & Procedures (ICD-10 Dental & Tarif)
+        $this->seedDentalMasterData($dataPath);
+
+        // 4. Seed Departments
         $this->seedDepartments($dataPath);
 
-        // 4. Seed Doctors
+        // 5. Seed Doctors
         $this->seedDoctors($dataPath);
 
-        // 5. Seed Patients
+        // 6. Seed Patients
         $this->seedPatients($dataPath);
 
-        // 6. Seed Appointments
+        // 7. Seed Appointments
         $this->seedAppointments($dataPath);
 
-        // 7. Seed Queues
+        // 8. Seed Queues
         $this->seedQueues($dataPath);
 
-        // 8. Seed Encounters & Odontogram
+        // 9. Seed Encounters & Odontogram
         $this->seedEncounters($dataPath);
 
-        // 9. Seed Medicines & Initial Mutations
+        // 10. Seed Medicines & Initial Mutations
         $this->seedMedicines($dataPath);
 
-        // 10. Seed Prescriptions
+        // 11. Seed Prescriptions
         $this->seedPrescriptions($dataPath);
 
-        // 11. Seed Invoices & Financial Cash Flow
+        // 12. Seed Invoices & Financial Cash Flow
         $this->seedInvoicesAndFinances($dataPath);
-
-        // 12. Seed Master Dental Diagnoses & Procedures
-        $this->seedDentalMasterData($dataPath);
 
         $this->command->info("Dental Care Database Seeded Successfully!");
     }
 
     private function loadJson(string $dataPath, string $filename): array
     {
-        $file = $dataPath . '/' . $filename;
+        $file = database_path('data/' . $filename);
+        if (!file_exists($file)) {
+            $file = $dataPath . '/' . $filename;
+        }
         if (file_exists($file)) {
             $content = file_get_contents($file);
             return json_decode($content, true) ?: [];
@@ -339,8 +342,9 @@ class DatabaseSeeder extends Seeder
         $items = $this->loadJson($dataPath, 'medicines.json');
         foreach ($items as $index => $item) {
             $med = Medicine::updateOrCreate(
-                ['id' => $item['id']],
+                ['code' => $item['code']],
                 [
+                    'id' => $item['id'],
                     'code' => $item['code'],
                     'generic_name' => $item['genericName'],
                     'brand_name' => $item['brandName'],
@@ -499,31 +503,56 @@ class DatabaseSeeder extends Seeder
     {
         $diagnoses = $this->loadJson($dataPath, 'diagnoses.json');
         foreach ($diagnoses as $d) {
-            \App\Models\DentalDiagnosis::updateOrCreate(
-                ['code' => $d['code']],
-                [
-                    'id' => $d['id'],
+            $existing = \App\Models\DentalDiagnosis::where('code', $d['code'])->first();
+            if ($existing) {
+                $existing->update([
                     'name' => $d['name'],
                     'category' => $d['category'] ?? 'Umum',
                     'description' => $d['description'] ?? $d['name'],
                     'is_active' => true,
-                ]
-            );
+                ]);
+            } else {
+                $id = $d['id'];
+                if (\App\Models\DentalDiagnosis::where('id', $id)->exists()) {
+                    $id = 'DIA-' . strtoupper(Str::random(5));
+                }
+                \App\Models\DentalDiagnosis::create([
+                    'id' => $id,
+                    'code' => $d['code'],
+                    'name' => $d['name'],
+                    'category' => $d['category'] ?? 'Umum',
+                    'description' => $d['description'] ?? $d['name'],
+                    'is_active' => true,
+                ]);
+            }
         }
 
         $procedures = $this->loadJson($dataPath, 'procedures.json');
         foreach ($procedures as $p) {
-            \App\Models\DentalProcedure::updateOrCreate(
-                ['code' => $p['code']],
-                [
-                    'id' => $p['id'],
+            $existing = \App\Models\DentalProcedure::where('code', $p['code'])->first();
+            if ($existing) {
+                $existing->update([
                     'name' => $p['name'],
                     'category' => $p['category'] ?? 'Umum',
                     'cost' => $p['price'] ?? 0,
                     'description' => $p['name'],
                     'is_active' => true,
-                ]
-            );
+                ]);
+            } else {
+                $id = $p['id'];
+                if (\App\Models\DentalProcedure::where('id', $id)->exists()) {
+                    $id = 'PROC-' . strtoupper(Str::random(5));
+                }
+                \App\Models\DentalProcedure::create([
+                    'id' => $id,
+                    'code' => $p['code'],
+                    'name' => $p['name'],
+                    'category' => $p['category'] ?? 'Umum',
+                    'cost' => $p['price'] ?? 0,
+                    'description' => $p['name'],
+                    'is_active' => true,
+                ]);
+            }
         }
     }
 }

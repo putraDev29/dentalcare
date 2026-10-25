@@ -9,9 +9,12 @@ class DentalDiagnosisSeeder extends Seeder
 {
     public function run(): void
     {
-        $filePath = base_path('../fe_dentalcare/src/data/diagnoses.json');
+        $filePath = database_path('data/diagnoses.json');
         if (!file_exists($filePath)) {
-            $this->command->error("File diagnoses.json tidak ditemukan di: {$filePath}");
+            $filePath = base_path('../fe_dentalcare/src/data/diagnoses.json');
+        }
+        if (!file_exists($filePath)) {
+            $this->command->error("File diagnoses.json tidak ditemukan di database/data maupun di fe_dentalcare/src/data");
             return;
         }
 
@@ -20,16 +23,28 @@ class DentalDiagnosisSeeder extends Seeder
 
         $count = 0;
         foreach ($items as $d) {
-            DentalDiagnosis::updateOrCreate(
-                ['code' => $d['code']],
-                [
-                    'id' => $d['id'],
+            $existing = DentalDiagnosis::where('code', $d['code'])->first();
+            if ($existing) {
+                $existing->update([
                     'name' => $d['name'],
                     'category' => $d['category'] ?? 'Umum',
                     'description' => $d['description'] ?? $d['name'],
                     'is_active' => true,
-                ]
-            );
+                ]);
+            } else {
+                $id = $d['id'];
+                if (DentalDiagnosis::where('id', $id)->exists()) {
+                    $id = 'DIA-' . strtoupper(\Illuminate\Support\Str::random(5));
+                }
+                DentalDiagnosis::create([
+                    'id' => $id,
+                    'code' => $d['code'],
+                    'name' => $d['name'],
+                    'category' => $d['category'] ?? 'Umum',
+                    'description' => $d['description'] ?? $d['name'],
+                    'is_active' => true,
+                ]);
+            }
             $count++;
         }
 

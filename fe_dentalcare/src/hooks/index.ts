@@ -48,6 +48,8 @@ import {
   DentalDepartmentMaster,
   DentalInsuranceMaster,
 } from "@/types";
+import diagnosesSeed from "@/data/diagnoses.json";
+import proceduresSeed from "@/data/procedures.json";
 
 export function usePatients(initialQuery?: PatientQuery) {
   const [data, setData] = useState<PaginatedResult<Patient> | null>(null);
@@ -904,8 +906,8 @@ export function useClinicalReferences() {
 }
 
 export function useDentalMaster() {
-  const [diagnoses, setDiagnoses] = useState<DentalDiagnosisMaster[]>([]);
-  const [procedures, setProcedures] = useState<DentalProcedureMaster[]>([]);
+  const [diagnoses, setDiagnoses] = useState<DentalDiagnosisMaster[]>(diagnosesSeed as any);
+  const [procedures, setProcedures] = useState<DentalProcedureMaster[]>(proceduresSeed as any);
   const [departments, setDepartments] = useState<DentalDepartmentMaster[]>([]);
   const [insurances, setInsurances] = useState<DentalInsuranceMaster[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -919,12 +921,14 @@ export function useDentalMaster() {
         DentalMasterService.getDepartments(),
         DentalMasterService.getInsurances(),
       ]);
-      setDiagnoses(dx || []);
-      setProcedures(proc || []);
+      setDiagnoses(dx && dx.length > 0 ? dx : (diagnosesSeed as any));
+      setProcedures(proc && proc.length > 0 ? proc : (proceduresSeed as any));
       setDepartments(dept || []);
       setInsurances(ins || []);
     } catch (err) {
       console.error("Gagal memuat master data dental:", err);
+      setDiagnoses(diagnosesSeed as any);
+      setProcedures(proceduresSeed as any);
     } finally {
       setLoading(false);
     }

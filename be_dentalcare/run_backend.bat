@@ -26,6 +26,9 @@ if not exist "node_modules" (
     call npm install
 )
 
+:: Pastikan tabel database siap
+call php artisan migrate --force --no-interaction >nul 2>&1
+
 echo Menjalankan Backend Laravel di port 8000...
 php artisan serve --host=127.0.0.1 --port=8000
 pause

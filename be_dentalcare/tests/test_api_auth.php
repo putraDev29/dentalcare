@@ -33,24 +33,24 @@ if ($token) {
 }
 
 $dash = new DashboardController();
-$dashRes = $dash->stats();
+$dashRes = $dash->stats(Request::create('/api/dashboard/stats', 'GET'));
 echo "3. DASHBOARD STATS: " . $dashRes->getStatusCode() . "\n";
 echo "   Payload: " . substr($dashRes->getContent(), 0, 150) . "...\n\n";
 
 $clin = new ClinicalController();
-$dxRes = $clin->diagnoses();
+$dxRes = $clin->diagnoses(Request::create('/api/clinical/diagnoses', 'GET'));
 echo "4. CLINICAL DIAGNOSES: " . $dxRes->getStatusCode() . "\n";
 echo "   Count: " . count(json_decode($dxRes->getContent(), true)) . " diagnoses\n\n";
 
-$procRes = $clin->procedures();
+$procRes = $clin->procedures(Request::create('/api/clinical/procedures', 'GET'));
 echo "5. CLINICAL PROCEDURES: " . $procRes->getStatusCode() . "\n";
 echo "   Count: " . count(json_decode($procRes->getContent(), true)) . " procedures\n\n";
 
-$staffRes = $clin->staff();
+$staffRes = $clin->staff(Request::create('/api/clinical/staff', 'GET'));
 echo "6. STAFF: " . $staffRes->getStatusCode() . "\n";
 echo "   Count: " . count(json_decode($staffRes->getContent(), true)) . " staff members\n\n";
 
-$insRes = $clin->insurance();
+$insRes = $clin->insurance(Request::create('/api/clinical/insurance', 'GET'));
 echo "7. INSURANCE: " . $insRes->getStatusCode() . "\n";
 echo "   Count: " . count(json_decode($insRes->getContent(), true)) . " insurers\n\n";
 
