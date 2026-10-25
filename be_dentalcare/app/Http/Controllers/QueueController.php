@@ -125,4 +125,17 @@ class QueueController extends Controller
 
         return response()->json($next);
     }
+
+    public function destroy($id)
+    {
+        $queue = QueueItem::findOrFail($id);
+
+        if ($queue->appointment_id) {
+            Appointment::where('id', $queue->appointment_id)->update(['status' => 'cancelled']);
+        }
+
+        $queue->delete();
+
+        return response()->json(['message' => 'Antrean berhasil dihapus']);
+    }
 }

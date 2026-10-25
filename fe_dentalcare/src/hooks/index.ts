@@ -275,7 +275,12 @@ export function useQueue(departmentId?: string, serviceType?: string) {
     return res;
   };
 
-  return { queues, loading, error, refetch: fetchQueues, updateStatus, callNext, enqueue };
+  const deleteQueue = async (id: string) => {
+    await QueueService.deleteQueue(id);
+    await fetchQueues();
+  };
+
+  return { queues, loading, error, refetch: fetchQueues, updateStatus, callNext, enqueue, deleteQueue };
 }
 
 export function useEncounters(patientId?: string, doctorId?: string) {

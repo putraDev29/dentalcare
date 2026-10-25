@@ -71,6 +71,7 @@ Route::get('/queues', [QueueController::class, 'index']);
 Route::post('/queues', [QueueController::class, 'store']);
 Route::patch('/queues/{id}/status', [QueueController::class, 'updateStatus']);
 Route::post('/queues/call-next', [QueueController::class, 'callNext']);
+Route::delete('/queues/{id}', [QueueController::class, 'destroy']);
 
 // Encounters (Rekam Medis & Odontogram)
 Route::get('/encounters', [EncounterController::class, 'index']);

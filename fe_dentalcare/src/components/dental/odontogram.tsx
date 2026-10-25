@@ -13,7 +13,7 @@ import { Dialog } from "@/components/ui/dialog";
 import { Select } from "@/components/ui/select";
 import { formatCurrency, formatRupiahInput } from "@/lib/formatting";
 import { cn } from "@/lib/utils";
-import { Check, Sparkles, AlertCircle, Info, Stethoscope, Banknote, Tag } from "lucide-react";
+import { Check, Sparkles, AlertCircle, Info, Stethoscope, Banknote, Tag, Search, X } from "lucide-react";
 
 // Tooth naming dictionary in Indonesian
 export const TOOTH_NAMES: Record<number, string> = {
@@ -109,6 +109,11 @@ export const DENTAL_PROCEDURE_PRESETS: {
   cost: number;
   condition: ToothCondition;
 }[] = [
+  { name: "Open bur", code: "23.70", cost: 150000, condition: "root_canal" },
+  { name: "Konsultasi", code: "89.07", cost: 100000, condition: "sound" },
+  { name: "Cetak alginat", code: "99.91", cost: 150000, condition: "sound" },
+  { name: "Incisi abses", code: "24.00", cost: 350000, condition: "caries" },
+  { name: "Insersi gigi tiruan", code: "23.45", cost: 650000, condition: "missing" },
   { name: "Pembersihan Karang Gigi (Scaling Rahang Atas & Bawah)", code: "96.54", cost: 350000, condition: "calculus" },
   { name: "Penambalan Permanen Komposit Sinar (Light Curing)", code: "23.2", cost: 450000, condition: "filled_composite" },
   { name: "Penambalan Permanen Glass Ionomer (GIC)", code: "23.2G", cost: 300000, condition: "filled_composite" },
@@ -1176,6 +1181,15 @@ function ToothEditorDialog({
   const [notes, setNotes] = React.useState<string>(
     initialRecord?.notes || ""
   );
+  const [procedureSearch, setProcedureSearch] = React.useState<string>("");
+
+  const filteredPresets = React.useMemo(() => {
+    if (!procedureSearch.trim()) return DENTAL_PROCEDURE_PRESETS;
+    const q = procedureSearch.toLowerCase().trim();
+    return DENTAL_PROCEDURE_PRESETS.filter(
+      (p) => p.name.toLowerCase().includes(q) || p.code.toLowerCase().includes(q)
+    );
+  }, [procedureSearch]);
 
   const toothName = TOOTH_NAMES[toothNumber] || `Gigi #${toothNumber}`;
 
@@ -1230,7 +1244,7 @@ function ToothEditorDialog({
   };
 
   return (
-    <Dialog open={true} onOpenChange={onClose} className="max-w-xl">
+    <Dialog open={true} onOpenChange={onClose} className="max-w-4xl sm:max-w-4xl w-full">
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Modal Header with Live Anatomical Preview */}
         <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
@@ -1270,7 +1284,7 @@ function ToothEditorDialog({
           <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
             Kondisi Patologi / Status Gigi
           </label>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
             {TOOTH_CONDITIONS.map((c) => {
               const active = condition === c.value;
               return (
@@ -1457,35 +1471,66 @@ function ToothEditorDialog({
         </div>
 
         {/* Quick Procedure Presets */}
-        <div className="space-y-1.5 pt-1">
-          <div className="flex items-center justify-between">
-            <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-              Pilihan Cepat Tindakan & Tarif Standar
-            </label>
-            <span className="text-[10px] text-slate-400">Pilih untuk isi otomatis</span>
+        <div className="space-y-2 pt-1">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-1.5">
+            <div>
+              <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                Pilihan Cepat Tindakan & Tarif Standar
+              </label>
+              <p className="text-[10px] text-slate-400">Pilih tindakan untuk mengisi nama & tarif secara otomatis</p>
+            </div>
+
+            {/* Search Tindakan Input */}
+            <div className="relative w-full sm:w-72">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+              <input
+                type="text"
+                value={procedureSearch}
+                onChange={(e) => setProcedureSearch(e.target.value)}
+                placeholder="Cari tindakan (e.g. Open bur, Alginat)..."
+                className="w-full h-8 pl-8 pr-7 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500 shadow-2xs"
+              />
+              {procedureSearch && (
+                <button
+                  type="button"
+                  onClick={() => setProcedureSearch("")}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5"
+                  title="Hapus pencarian"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-32 overflow-y-auto pr-1">
-            {DENTAL_PROCEDURE_PRESETS.map((preset) => (
-              <button
-                type="button"
-                key={preset.name}
-                onClick={() => handleSelectPreset(preset)}
-                className={cn(
-                  "flex items-center justify-between p-2 rounded-xl text-left border text-xs transition-all cursor-pointer",
-                  procedure === preset.name
-                    ? "border-teal-500 bg-teal-50 dark:bg-teal-950/40 text-teal-900 dark:text-teal-200 font-semibold shadow-2xs"
-                    : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 hover:bg-slate-50"
-                )}
-              >
-                <div className="truncate mr-2">
-                  <p className="truncate font-medium">{preset.name}</p>
-                  <p className="text-[10px] text-slate-400 font-mono">Kode: {preset.code}</p>
-                </div>
-                <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 shrink-0">
-                  {formatCurrency(preset.cost)}
-                </span>
-              </button>
-            ))}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 max-h-52 overflow-y-auto pr-1">
+            {filteredPresets.length > 0 ? (
+              filteredPresets.map((preset) => (
+                <button
+                  type="button"
+                  key={preset.name}
+                  onClick={() => handleSelectPreset(preset)}
+                  className={cn(
+                    "flex items-center justify-between p-2.5 rounded-xl text-left border text-xs transition-all cursor-pointer hover:border-teal-400 hover:bg-slate-50 dark:hover:bg-slate-800",
+                    procedure === preset.name
+                      ? "border-teal-500 bg-teal-50 dark:bg-teal-950/40 text-teal-900 dark:text-teal-200 font-semibold shadow-2xs ring-1 ring-teal-500"
+                      : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700"
+                  )}
+                >
+                  <div className="truncate mr-2">
+                    <p className="truncate font-semibold">{preset.name}</p>
+                    <p className="text-[10px] text-slate-400 font-mono">Kode: {preset.code}</p>
+                  </div>
+                  <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 shrink-0">
+                    {formatCurrency(preset.cost)}
+                  </span>
+                </button>
+              ))
+            ) : (
+              <div className="col-span-full py-6 text-center text-xs text-slate-400">
+                Tidak ada tindakan yang cocok dengan kata kunci &quot;<span className="text-slate-600 dark:text-slate-200 font-semibold">{procedureSearch}</span>&quot;
+              </div>
+            )}
           </div>
         </div>
 

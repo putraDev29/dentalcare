@@ -57,6 +57,7 @@ export interface IQueueRepository {
   updateQueueStatus(id: string, status: QueueItem["status"]): Promise<QueueItem>;
   callNextQueue(departmentId?: string): Promise<QueueItem | null>;
   enqueue(data: { patientId: string; patientName?: string; doctorId?: string; departmentId?: string; appointmentId?: string }): Promise<QueueItem>;
+  deleteQueue(id: string): Promise<void>;
 }
 
 export interface IEncounterRepository {

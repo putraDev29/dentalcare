@@ -118,6 +118,10 @@ export class QueueService {
   static async enqueue(data: { patientId: string; patientName?: string; doctorId?: string; departmentId?: string; appointmentId?: string }) {
     return queueRepository.enqueue(data);
   }
+
+  static async deleteQueue(id: string) {
+    return queueRepository.deleteQueue(id);
+  }
 }
 
 export class EncounterService {

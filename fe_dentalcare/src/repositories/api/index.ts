@@ -155,6 +155,9 @@ export class ApiQueueRepository implements IQueueRepository {
   async enqueue(data: { patientId: string; patientName?: string; doctorId?: string; departmentId?: string; appointmentId?: string }): Promise<QueueItem> {
     return apiClient.post<QueueItem>(API_ENDPOINTS.queues, data);
   }
+  async deleteQueue(id: string): Promise<void> {
+    return apiClient.delete<void>(`${API_ENDPOINTS.queues}/${id}`);
+  }
 }
 
 export class ApiEncounterRepository implements IEncounterRepository {

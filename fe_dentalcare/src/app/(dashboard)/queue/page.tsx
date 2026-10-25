@@ -21,12 +21,14 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
+  Trash2,
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { StatCard } from "@/components/shared/stat-card";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Dialog } from "@/components/ui/dialog";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { useQueue, usePatients } from "@/hooks";
 import { QueueItem } from "@/types";
 import { formatTime } from "@/lib/formatting";
@@ -36,7 +38,7 @@ import { toast } from "sonner";
 
 export default function QueuePage() {
   const router = useRouter();
-  const { queues, updateStatus, callNext, enqueue } = useQueue();
+  const { queues, updateStatus, callNext, enqueue, deleteQueue } = useQueue();
   const { data: patientData } = usePatients({ perPage: 100 });
 
   const [viewMode, setViewMode] = React.useState<"card" | "table">("card");
@@ -49,6 +51,10 @@ export default function QueuePage() {
   const [selectedPatientId, setSelectedPatientId] = React.useState<string>("");
   const [selectedDept, setSelectedDept] = React.useState<string>("Poli Gigi Umum");
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+
+  // Delete Queue Confirmation State
+  const [queueToDelete, setQueueToDelete] = React.useState<QueueItem | null>(null);
+  const [isDeleting, setIsDeleting] = React.useState(false);
 
   const todayStr = React.useMemo(() => new Date().toISOString().slice(0, 10), []);
 
@@ -78,6 +84,20 @@ export default function QueuePage() {
       }
     } catch {
       toast.error("Gagal memperbarui antrean.");
+    }
+  };
+
+  const handleDeleteQueue = async () => {
+    if (!queueToDelete) return;
+    setIsDeleting(true);
+    try {
+      await deleteQueue(queueToDelete.id);
+      toast.success(`Antrean ${queueToDelete.queueNumber} (${queueToDelete.patientName}) berhasil dihapus.`);
+      setQueueToDelete(null);
+    } catch {
+      toast.error("Gagal menghapus antrean.");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -346,8 +366,17 @@ export default function QueuePage() {
                     <span className="text-[11px] text-slate-500 truncate">Poli Gigi</span>
                   </div>
                 </div>
-                <div className="shrink-0">
+                <div className="shrink-0 flex items-center gap-1.5">
                   <StatusBadge type="queue" status={q.status} />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 w-7 p-0 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg"
+                    title="Hapus Antrean"
+                    onClick={() => setQueueToDelete(q)}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
                 </div>
               </div>
 
@@ -430,7 +459,19 @@ export default function QueuePage() {
                   </>
                 )}
 
-                {q.status !== "completed" && q.status !== "cancelled" && (
+                {q.status === "skipped" && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 text-xs gap-1 border-sky-300 text-sky-700 hover:bg-sky-50 font-bold"
+                    onClick={() => handleAction(q.id, "called", "Panggil Pasien Kembali", q.encounterId, q.patientId || (q as any).patient_id)}
+                  >
+                    <Volume2 className="h-3.5 w-3.5" />
+                    <span>Panggil Lagi</span>
+                  </Button>
+                )}
+
+                {q.status !== "completed" && q.status !== "cancelled" && q.status !== "skipped" && (
                   <Button
                     variant="ghost"
                     size="sm"
@@ -440,6 +481,17 @@ export default function QueuePage() {
                     Lewati
                   </Button>
                 )}
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs border-rose-200 text-rose-600 hover:bg-rose-50 hover:border-rose-300 font-semibold gap-1 px-2.5 ml-auto"
+                  title="Hapus Antrean dari Daftar"
+                  onClick={() => setQueueToDelete(q)}
+                >
+                  <Trash2 className="h-3.5 w-3.5 text-rose-500" />
+                  <span>Hapus</span>
+                </Button>
               </div>
             </div>
           ))}
@@ -476,33 +528,63 @@ export default function QueuePage() {
                   <td className="px-4 py-3">
                     <StatusBadge type="queue" status={q.status} />
                   </td>
-                  <td className="px-4 py-3 text-right space-x-1">
-                    {q.status === "waiting" && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="h-6 px-2 text-[11px]"
-                        onClick={() => handleAction(q.id, "called", "Panggil")}
-                      >
-                        Panggil
-                      </Button>
-                    )}
-                    {q.status === "in_progress" && (
-                      <div className="inline-flex items-center gap-1">
-                        <Link href={`/encounters/new/?patientId=${q.patientId || (q as any).patient_id || ""}&queueId=${q.id}`}>
-                          <Button size="sm" variant="outline" className="h-6 px-2 text-[11px] font-bold text-sky-700 border-sky-300 hover:bg-sky-50">
-                            Buka SOAP
+                  <td className="px-4 py-3 text-right">
+                    <div className="inline-flex items-center justify-end gap-1">
+                      {q.status === "waiting" && (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-6 px-2 text-[11px] border-sky-300 text-sky-700 hover:bg-sky-50 font-semibold"
+                            onClick={() => handleAction(q.id, "called", "Panggil")}
+                          >
+                            Panggil
                           </Button>
-                        </Link>
+                          <Button
+                            size="sm"
+                            className="h-6 px-2 text-[11px] bg-sky-600 hover:bg-sky-700 text-white font-semibold"
+                            onClick={() => handleAction(q.id, "in_progress", "Mulai", q.encounterId, q.patientId || (q as any).patient_id)}
+                          >
+                            Mulai
+                          </Button>
+                        </>
+                      )}
+                      {q.status === "called" && (
                         <Button
                           size="sm"
-                          className="h-6 px-2 text-[11px] bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
-                          onClick={() => handleAction(q.id, "completed", "Selesai", q.encounterId, q.patientId || (q as any).patient_id)}
+                          className="h-6 px-2 text-[11px] bg-sky-600 hover:bg-sky-700 text-white font-semibold"
+                          onClick={() => handleAction(q.id, "in_progress", "Masuk", q.encounterId, q.patientId || (q as any).patient_id)}
                         >
-                          Selesai
+                          Masuk
                         </Button>
-                      </div>
-                    )}
+                      )}
+                      {q.status === "in_progress" && (
+                        <>
+                          <Link href={`/encounters/new/?patientId=${q.patientId || (q as any).patient_id || ""}&queueId=${q.id}`}>
+                            <Button size="sm" variant="outline" className="h-6 px-2 text-[11px] font-bold text-sky-700 border-sky-300 hover:bg-sky-50">
+                              Buka SOAP
+                            </Button>
+                          </Link>
+                          <Button
+                            size="sm"
+                            className="h-6 px-2 text-[11px] bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
+                            onClick={() => handleAction(q.id, "completed", "Selesai", q.encounterId, q.patientId || (q as any).patient_id)}
+                          >
+                            Selesai
+                          </Button>
+                        </>
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 px-2 text-[11px] text-rose-500 hover:text-rose-700 hover:bg-rose-50 font-medium gap-1"
+                        title="Hapus Antrean"
+                        onClick={() => setQueueToDelete(q)}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                        <span>Hapus</span>
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -672,6 +754,19 @@ export default function QueuePage() {
           </div>
         </form>
       </Dialog>
+
+      {/* Modal Dialog: Konfirmasi Hapus Antrean */}
+      <ConfirmDialog
+        open={!!queueToDelete}
+        onOpenChange={(open) => !open && setQueueToDelete(null)}
+        title="Hapus Antrean Pasien?"
+        description={`Apakah Anda yakin ingin menghapus antrean nomor ${queueToDelete?.queueNumber} atas nama pasien ${queueToDelete?.patientName}? Tindakan ini akan menghapus antrean secara permanen.`}
+        confirmText="Hapus Antrean"
+        cancelText="Batal"
+        variant="danger"
+        isLoading={isDeleting}
+        onConfirm={handleDeleteQueue}
+      />
     </div>
   );
 }

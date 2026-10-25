@@ -44,5 +44,6 @@
   { "id": "PROC-043", "code": "24.21", "name": "Kontrol Rutin Kawat Gigi (Ganti Kawat Niti, Power O / Chain)", "category": "Ortodonti (Behel)", "price": 200000 },
   { "id": "PROC-044", "code": "24.22", "name": "Pemasangan Retainer Pasca Behel (Clear Essix / Hawley)", "category": "Ortodonti (Behel)", "price": 800000 },
   { "id": "PROC-045", "code": "96.55", "name": "Bleaching / Pemutihan Gigi In-Office (LED Light Whitening)", "category": "Estetika Dental", "price": 2200000 },
-  { "id": "PROC-046", "code": "96.55B", "name": "Home Bleaching Kit Lengkap + Custom Tray Cetakan Gigi", "category": "Estetika Dental", "price": 1400000 }
+  { "id": "PROC-046", "code": "96.55B", "name": "Home Bleaching Kit Lengkap + Custom Tray Cetakan Gigi", "category": "Estetika Dental", "price": 1400000 },
+  { "id": "PROC-047", "code": "23.70B", "name": "Open Bur / Trepanasi Gigi Darurat (Relief Nyeri Pulpa)", "category": "Endodontik (PSA)", "price": 150000 }
 ]

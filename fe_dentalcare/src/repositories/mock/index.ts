@@ -496,6 +496,12 @@ export class MockQueueRepository implements IQueueRepository {
     });
     return newItem;
   }
+
+  async deleteQueue(id: string): Promise<void> {
+    mockStore.updateState((s) => {
+      s.queues = s.queues.filter((q) => q.id !== id);
+    });
+  }
 }
 
 export class MockEncounterRepository implements IEncounterRepository {
