@@ -102,7 +102,17 @@ export interface IInpatientRepository {
 export interface IBillingRepository {
   getInvoices(query?: QueryParams & { status?: string; patientId?: string }): Promise<Invoice[]>;
   getInvoiceById(id: string): Promise<Invoice | null>;
-  recordPayment(invoiceId: string, paymentMethod: string, amount: number, cashierName: string): Promise<Invoice>;
+  createInvoice(data: any): Promise<Invoice>;
+  recordPayment(
+    invoiceId: string,
+    paymentMethod: string,
+    amount: number,
+    cashierName: string,
+    paymentType?: string,
+    notes?: string,
+    tenderedAmount?: number,
+    changeAmount?: number
+  ): Promise<Invoice>;
 }
 
 export interface IInventoryRepository {

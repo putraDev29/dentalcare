@@ -1,48 +1,426 @@
 [
-  { "id": "PROC-001", "code": "89.07", "name": "Konsultasi Dokter Gigi & Pemeriksaan Rongga Mulut", "category": "Pemeriksaan & Diagnostik", "price": 100000 },
-  { "id": "PROC-002", "code": "87.12", "name": "Rontgen Dental Foto Periapikal Digital", "category": "Radiologi Gigi", "price": 125000 },
-  { "id": "PROC-003", "code": "87.11", "name": "Rontgen Panoramik Gigi 2D Digital", "category": "Radiologi Gigi", "price": 250000 },
-  { "id": "PROC-004", "code": "96.51", "name": "Aplikasi Topikal Fluoride Varnish Pencegah Karies Gigi", "category": "Preventif & Anak", "price": 175000 },
-  { "id": "PROC-005", "code": "16.01", "name": "Fissure Sealant Penutupan Celah Gigi (per gigi)", "category": "Preventif & Anak", "price": 200000 },
-  { "id": "PROC-006", "code": "96.52", "name": "Desensitisasi Leher Gigi Sensitif (Topical Agent)", "category": "Preventif & Anak", "price": 150000 },
-  { "id": "PROC-007", "code": "96.54", "name": "Pembersihan Karang Gigi (Scaling & Polishing) Rahang Atas & Bawah", "category": "Periodonsia", "price": 350000 },
-  { "id": "PROC-008", "code": "96.54A", "name": "Deep Scaling & Root Planing (SRP) per Kuadran", "category": "Periodonsia", "price": 250000 },
-  { "id": "PROC-009", "code": "96.54B", "name": "Kuretase Gingiva / Deep Pocket Curettage", "category": "Periodonsia", "price": 200000 },
-  { "id": "PROC-010", "code": "24.31", "name": "Gingivektomi / Gingivoplasti (Koreksi Gusi Berlebih)", "category": "Periodonsia", "price": 600000 },
-  { "id": "PROC-011", "code": "24.70", "name": "Fiber Ribbon Splinting Gigi Goyang (per regio)", "category": "Periodonsia", "price": 650000 },
-  { "id": "PROC-012", "code": "23.21", "name": "Penambalan Komposit Sinar Light-Curing Posterior Kelas I / II", "category": "Restorasi & Konservasi", "price": 450000 },
-  { "id": "PROC-013", "code": "23.20", "name": "Penambalan Komposit Sinar Estetik Anterior Kelas III / IV / V", "category": "Restorasi & Konservasi", "price": 550000 },
-  { "id": "PROC-014", "code": "23.22", "name": "Penambalan Glass Ionomer Cement (GIC) Kuat Fisiologis", "category": "Restorasi & Konservasi", "price": 300000 },
-  { "id": "PROC-015", "code": "23.23", "name": "Penambalan Sementara / Tumpatan Cavit Pasca Medikamen", "category": "Restorasi & Konservasi", "price": 100000 },
-  { "id": "PROC-016", "code": "23.24", "name": "Direct Composite Veneer Estetik (per elemen)", "category": "Restorasi & Konservasi", "price": 950000 },
-  { "id": "PROC-017", "code": "23.42", "name": "Inlay / Onlay Keramik Zirconia (CAD/CAM)", "category": "Restorasi & Konservasi", "price": 1750000 },
-  { "id": "PROC-018", "code": "23.70", "name": "PSA - Ekstirpasi Pulpa & Pembersihan Saluran Akar (Kunjungan 1)", "category": "Endodontik (PSA)", "price": 500000 },
-  { "id": "PROC-019", "code": "23.71", "name": "PSA - Medikamen Dressing Saluran Akar (Kunjungan 2)", "category": "Endodontik (PSA)", "price": 250000 },
-  { "id": "PROC-020", "code": "23.73", "name": "PSA - Pengisian & Obturasi Saluran Akar Gutta-Percha", "category": "Endodontik (PSA)", "price": 600000 },
-  { "id": "PROC-021", "code": "23.43", "name": "Pemasangan Fiber Post (Pasak Gigi) & Core Build-Up Komposit", "category": "Endodontik (PSA)", "price": 750000 },
-  { "id": "PROC-022", "code": "23.01", "name": "Pencabutan Gigi Susu Anak (Anestesi Topikal Spray / Infiltrasi)", "category": "Bedah Mulut", "price": 150000 },
-  { "id": "PROC-023", "code": "23.09", "name": "Pencabutan Gigi Tetap Dewasa Sederhana (Tanpa Penyulit)", "category": "Bedah Mulut", "price": 350000 },
-  { "id": "PROC-024", "code": "23.11", "name": "Pencabutan Gigi Tetap dengan Penyulit (Separasi Tulang / Akar Bengkok)", "category": "Bedah Mulut", "price": 550000 },
-  { "id": "PROC-025", "code": "23.12", "name": "Pencabutan Sisa Akar Gigi (Radiks Retained)", "category": "Bedah Mulut", "price": 400000 },
-  { "id": "PROC-026", "code": "23.19", "name": "Odontektomi / Bedah Gigi Bungsu Impaksi Kelas I / II", "category": "Bedah Mulut", "price": 1750000 },
-  { "id": "PROC-027", "code": "23.19B", "name": "Odontektomi Bedah Gigi Bungsu Impaksi Horisontal Kompleks Kelas III", "category": "Bedah Mulut", "price": 2500000 },
-  { "id": "PROC-028", "code": "24.00", "name": "Insisi & Drainase Abses Intraoral Akut", "category": "Bedah Mulut", "price": 350000 },
-  { "id": "PROC-029", "code": "24.11", "name": "Penanganan Alveolitis / Dry Socket (Debridement + Alvogyl)", "category": "Bedah Mulut", "price": 200000 },
-  { "id": "PROC-030", "code": "24.32", "name": "Alveolektomi / Penghalusan Tulang Alveolar Tajam", "category": "Bedah Mulut", "price": 600000 },
-  { "id": "PROC-031", "code": "24.35", "name": "Operkulektomi (Eksisi Gusi Penutup Gigi Bungsu Erupsi)", "category": "Bedah Mulut", "price": 450000 },
-  { "id": "PROC-032", "code": "86.59", "name": "Penjahitan Luka Bedah Gigi (Suturing) / Angkat Jahitan", "category": "Bedah Mulut", "price": 150000 },
-  { "id": "PROC-033", "code": "23.41", "name": "Mahkota Tiruan / Dental Crown Zirconia Estetik", "category": "Prostodonsia (Gigi Tiruan)", "price": 2500000 },
-  { "id": "PROC-034", "code": "23.41B", "name": "Mahkota Tiruan PFM (Porcelain Fused to Metal)", "category": "Prostodonsia (Gigi Tiruan)", "price": 1800000 },
-  { "id": "PROC-035", "code": "23.44", "name": "Jembatan Gigi Tiruan (Dental Bridge 3 Unit Zirconia)", "category": "Prostodonsia (Gigi Tiruan)", "price": 6500000 },
-  { "id": "PROC-036", "code": "23.45", "name": "Gigi Tiruan Sebagian Lepasan Akrilik (Gigi Pertama)", "category": "Prostodonsia (Gigi Tiruan)", "price": 650000 },
-  { "id": "PROC-037", "code": "23.45B", "name": "Tambahan Elemen Gigi Tiruan Lepasan (per elemen)", "category": "Prostodonsia (Gigi Tiruan)", "price": 150000 },
-  { "id": "PROC-038", "code": "23.46", "name": "Gigi Tiruan Fleksibel (Valplast) Tanpa Logam Kawat", "category": "Prostodonsia (Gigi Tiruan)", "price": 1500000 },
-  { "id": "PROC-039", "code": "23.47", "name": "Gigi Tiruan Lengkap Penuh (Full Denture Rahang Atas & Bawah)", "category": "Prostodonsia (Gigi Tiruan)", "price": 4500000 },
-  { "id": "PROC-040", "code": "99.91", "name": "Cetak Rahang Studi & Model Kerja Alginat", "category": "Prostodonsia (Gigi Tiruan)", "price": 150000 },
-  { "id": "PROC-041", "code": "24.20", "name": "Pemasangan Kawat Gigi / Behel Metal MBT (Rahang Atas & Bawah)", "category": "Ortodonti (Behel)", "price": 6000000 },
-  { "id": "PROC-042", "code": "24.20B", "name": "Pemasangan Kawat Gigi Ceramic / Sapphire Transparan Estetik", "category": "Ortodonti (Behel)", "price": 8500000 },
-  { "id": "PROC-043", "code": "24.21", "name": "Kontrol Rutin Kawat Gigi (Ganti Kawat Niti, Power O / Chain)", "category": "Ortodonti (Behel)", "price": 200000 },
-  { "id": "PROC-044", "code": "24.22", "name": "Pemasangan Retainer Pasca Behel (Clear Essix / Hawley)", "category": "Ortodonti (Behel)", "price": 800000 },
-  { "id": "PROC-045", "code": "96.55", "name": "Bleaching / Pemutihan Gigi In-Office (LED Light Whitening)", "category": "Estetika Dental", "price": 2200000 },
-  { "id": "PROC-046", "code": "96.55B", "name": "Home Bleaching Kit Lengkap + Custom Tray Cetakan Gigi", "category": "Estetika Dental", "price": 1400000 }
+  {
+    "id": "PROC-001",
+    "code": "23.70",
+    "name": "Open bur",
+    "category": "Endodontik (PSA)",
+    "price": 150000,
+    "cost": 150000,
+    "condition": "root_canal"
+  },
+  {
+    "id": "PROC-002",
+    "code": "89.07",
+    "name": "Konsultasi",
+    "category": "Pemeriksaan & Diagnostik",
+    "price": 100000,
+    "cost": 100000,
+    "condition": "sound"
+  },
+  {
+    "id": "PROC-003",
+    "code": "99.91",
+    "name": "Cetak alginat",
+    "category": "Prostodonsia (Gigi Tiruan)",
+    "price": 150000,
+    "cost": 150000,
+    "condition": "sound"
+  },
+  {
+    "id": "PROC-004",
+    "code": "24.00",
+    "name": "Incisi abses",
+    "category": "Bedah Mulut",
+    "price": 350000,
+    "cost": 350000,
+    "condition": "caries"
+  },
+  {
+    "id": "PROC-005",
+    "code": "23.45",
+    "name": "Insersi gigi tiruan",
+    "category": "Prostodonsia (Gigi Tiruan)",
+    "price": 650000,
+    "cost": 650000,
+    "condition": "missing"
+  },
+  {
+    "id": "PROC-006",
+    "code": "96.54",
+    "name": "Pembersihan Karang Gigi (Scaling)",
+    "category": "Periodonsia",
+    "price": 350000,
+    "cost": 350000,
+    "condition": "calculus"
+  },
+  {
+    "id": "PROC-007",
+    "code": "23.2",
+    "name": "Penambalan Permanen Komposit Sinar",
+    "category": "Restorasi & Konservasi",
+    "price": 450000,
+    "cost": 450000,
+    "condition": "filled_composite"
+  },
+  {
+    "id": "PROC-008",
+    "code": "23.2G",
+    "name": "Penambalan Permanen Glass Ionomer (GIC)",
+    "category": "Restorasi & Konservasi",
+    "price": 300000,
+    "cost": 300000,
+    "condition": "filled_composite"
+  },
+  {
+    "id": "PROC-009",
+    "code": "23.2T",
+    "name": "Penambalan Sementara (Fletcher / Cavit)",
+    "category": "Restorasi & Konservasi",
+    "price": 150000,
+    "cost": 150000,
+    "condition": "filled_temporary"
+  },
+  {
+    "id": "PROC-010",
+    "code": "23.09",
+    "name": "Pencabutan Gigi Tetap Dewasa",
+    "category": "Bedah Mulut",
+    "price": 350000,
+    "cost": 350000,
+    "condition": "extracted"
+  },
+  {
+    "id": "PROC-011",
+    "code": "23.01",
+    "name": "Pencabutan Gigi Susu Anak (Topikal)",
+    "category": "Bedah Mulut",
+    "price": 175000,
+    "cost": 175000,
+    "condition": "extracted"
+  },
+  {
+    "id": "PROC-012",
+    "code": "23.19",
+    "name": "Odontektomi / Bedah Gigi Bungsu",
+    "category": "Bedah Mulut",
+    "price": 1850000,
+    "cost": 1850000,
+    "condition": "extracted"
+  },
+  {
+    "id": "PROC-013",
+    "code": "23.7",
+    "name": "Perawatan Saluran Akar (PSA Kunjungan 1)",
+    "category": "Endodontik (PSA)",
+    "price": 650000,
+    "cost": 650000,
+    "condition": "root_canal"
+  },
+  {
+    "id": "PROC-014",
+    "code": "23.41",
+    "name": "Mahkota Jaket Porselen Zirconia",
+    "category": "Prostodonsia (Gigi Tiruan)",
+    "price": 2800000,
+    "cost": 2800000,
+    "condition": "crown"
+  },
+  {
+    "id": "PROC-015",
+    "code": "96.55",
+    "name": "Bleaching / Pemutihan Gigi In-Office",
+    "category": "Estetika Dental",
+    "price": 2500000,
+    "cost": 2500000,
+    "condition": "sound"
+  },
+  {
+    "id": "PROC-016",
+    "code": "87.12",
+    "name": "Rontgen Dental Periapikal",
+    "category": "Radiologi Gigi",
+    "price": 150000,
+    "cost": 150000,
+    "condition": "sound"
+  },
+  {
+    "id": "PROC-017",
+    "code": "87.11",
+    "name": "Rontgen Panoramik Gigi 2D Digital",
+    "category": "Radiologi Gigi",
+    "price": 250000,
+    "cost": 250000
+  },
+  {
+    "id": "PROC-018",
+    "code": "96.51",
+    "name": "Aplikasi Topikal Fluoride Varnish Pencegah Karies Gigi",
+    "category": "Preventif & Anak",
+    "price": 175000,
+    "cost": 175000
+  },
+  {
+    "id": "PROC-019",
+    "code": "16.01",
+    "name": "Fissure Sealant Penutupan Celah Gigi (per gigi)",
+    "category": "Preventif & Anak",
+    "price": 200000,
+    "cost": 200000
+  },
+  {
+    "id": "PROC-020",
+    "code": "96.52",
+    "name": "Desensitisasi Leher Gigi Sensitif (Topical Agent)",
+    "category": "Preventif & Anak",
+    "price": 150000,
+    "cost": 150000
+  },
+  {
+    "id": "PROC-021",
+    "code": "96.54A",
+    "name": "Deep Scaling & Root Planing (SRP) per Kuadran",
+    "category": "Periodonsia",
+    "price": 250000,
+    "cost": 250000
+  },
+  {
+    "id": "PROC-022",
+    "code": "96.54B",
+    "name": "Kuretase Gingiva / Deep Pocket Curettage",
+    "category": "Periodonsia",
+    "price": 200000,
+    "cost": 200000
+  },
+  {
+    "id": "PROC-023",
+    "code": "24.31",
+    "name": "Gingivektomi / Gingivoplasti (Koreksi Gusi Berlebih)",
+    "category": "Periodonsia",
+    "price": 600000,
+    "cost": 600000
+  },
+  {
+    "id": "PROC-024",
+    "code": "24.70",
+    "name": "Fiber Ribbon Splinting Gigi Goyang (per regio)",
+    "category": "Periodonsia",
+    "price": 650000,
+    "cost": 650000
+  },
+  {
+    "id": "PROC-025",
+    "code": "23.21",
+    "name": "Penambalan Komposit Sinar Light-Curing Posterior Kelas I / II",
+    "category": "Restorasi & Konservasi",
+    "price": 450000,
+    "cost": 450000
+  },
+  {
+    "id": "PROC-026",
+    "code": "23.20",
+    "name": "Penambalan Komposit Sinar Estetik Anterior Kelas III / IV / V",
+    "category": "Restorasi & Konservasi",
+    "price": 550000,
+    "cost": 550000
+  },
+  {
+    "id": "PROC-027",
+    "code": "23.22",
+    "name": "Penambalan Glass Ionomer Cement (GIC) Kuat Fisiologis",
+    "category": "Restorasi & Konservasi",
+    "price": 300000,
+    "cost": 300000
+  },
+  {
+    "id": "PROC-028",
+    "code": "23.23",
+    "name": "Penambalan Sementara / Tumpatan Cavit Pasca Medikamen",
+    "category": "Restorasi & Konservasi",
+    "price": 100000,
+    "cost": 100000
+  },
+  {
+    "id": "PROC-029",
+    "code": "23.24",
+    "name": "Direct Composite Veneer Estetik (per elemen)",
+    "category": "Restorasi & Konservasi",
+    "price": 950000,
+    "cost": 950000
+  },
+  {
+    "id": "PROC-030",
+    "code": "23.42",
+    "name": "Inlay / Onlay Keramik Zirconia (CAD/CAM)",
+    "category": "Restorasi & Konservasi",
+    "price": 1750000,
+    "cost": 1750000
+  },
+  {
+    "id": "PROC-031",
+    "code": "23.71",
+    "name": "PSA - Medikamen Dressing Saluran Akar (Kunjungan 2)",
+    "category": "Endodontik (PSA)",
+    "price": 250000,
+    "cost": 250000
+  },
+  {
+    "id": "PROC-032",
+    "code": "23.73",
+    "name": "PSA - Pengisian & Obturasi Saluran Akar Gutta-Percha",
+    "category": "Endodontik (PSA)",
+    "price": 600000,
+    "cost": 600000
+  },
+  {
+    "id": "PROC-033",
+    "code": "23.43",
+    "name": "Pemasangan Fiber Post (Pasak Gigi) & Core Build-Up Komposit",
+    "category": "Endodontik (PSA)",
+    "price": 750000,
+    "cost": 750000
+  },
+  {
+    "id": "PROC-034",
+    "code": "23.11",
+    "name": "Pencabutan Gigi Tetap dengan Penyulit (Separasi Tulang / Akar Bengkok)",
+    "category": "Bedah Mulut",
+    "price": 550000,
+    "cost": 550000
+  },
+  {
+    "id": "PROC-035",
+    "code": "23.12",
+    "name": "Pencabutan Sisa Akar Gigi (Radiks Retained)",
+    "category": "Bedah Mulut",
+    "price": 400000,
+    "cost": 400000
+  },
+  {
+    "id": "PROC-036",
+    "code": "23.19B",
+    "name": "Odontektomi Bedah Gigi Bungsu Impaksi Horisontal Kompleks Kelas III",
+    "category": "Bedah Mulut",
+    "price": 2500000,
+    "cost": 2500000
+  },
+  {
+    "id": "PROC-037",
+    "code": "24.11",
+    "name": "Penanganan Alveolitis / Dry Socket (Debridement + Alvogyl)",
+    "category": "Bedah Mulut",
+    "price": 200000,
+    "cost": 200000
+  },
+  {
+    "id": "PROC-038",
+    "code": "24.32",
+    "name": "Alveolektomi / Penghalusan Tulang Alveolar Tajam",
+    "category": "Bedah Mulut",
+    "price": 600000,
+    "cost": 600000
+  },
+  {
+    "id": "PROC-039",
+    "code": "24.35",
+    "name": "Operkulektomi (Eksisi Gusi Penutup Gigi Bungsu Erupsi)",
+    "category": "Bedah Mulut",
+    "price": 450000,
+    "cost": 450000
+  },
+  {
+    "id": "PROC-040",
+    "code": "86.59",
+    "name": "Penjahitan Luka Bedah Gigi (Suturing) / Angkat Jahitan",
+    "category": "Bedah Mulut",
+    "price": 150000,
+    "cost": 150000
+  },
+  {
+    "id": "PROC-041",
+    "code": "23.41B",
+    "name": "Mahkota Tiruan PFM (Porcelain Fused to Metal)",
+    "category": "Prostodonsia (Gigi Tiruan)",
+    "price": 1800000,
+    "cost": 1800000
+  },
+  {
+    "id": "PROC-042",
+    "code": "23.44",
+    "name": "Jembatan Gigi Tiruan (Dental Bridge 3 Unit Zirconia)",
+    "category": "Prostodonsia (Gigi Tiruan)",
+    "price": 6500000,
+    "cost": 6500000
+  },
+  {
+    "id": "PROC-043",
+    "code": "23.45B",
+    "name": "Tambahan Elemen Gigi Tiruan Lepasan (per elemen)",
+    "category": "Prostodonsia (Gigi Tiruan)",
+    "price": 150000,
+    "cost": 150000
+  },
+  {
+    "id": "PROC-044",
+    "code": "23.46",
+    "name": "Gigi Tiruan Fleksibel (Valplast) Tanpa Logam Kawat",
+    "category": "Prostodonsia (Gigi Tiruan)",
+    "price": 1500000,
+    "cost": 1500000
+  },
+  {
+    "id": "PROC-045",
+    "code": "23.47",
+    "name": "Gigi Tiruan Lengkap Penuh (Full Denture Rahang Atas & Bawah)",
+    "category": "Prostodonsia (Gigi Tiruan)",
+    "price": 4500000,
+    "cost": 4500000
+  },
+  {
+    "id": "PROC-046",
+    "code": "24.20",
+    "name": "Pemasangan Kawat Gigi / Behel Metal MBT (Rahang Atas & Bawah)",
+    "category": "Ortodonti (Behel)",
+    "price": 6000000,
+    "cost": 6000000
+  },
+  {
+    "id": "PROC-047",
+    "code": "24.20B",
+    "name": "Pemasangan Kawat Gigi Ceramic / Sapphire Transparan Estetik",
+    "category": "Ortodonti (Behel)",
+    "price": 8500000,
+    "cost": 8500000
+  },
+  {
+    "id": "PROC-048",
+    "code": "24.21",
+    "name": "Kontrol Rutin Kawat Gigi (Ganti Kawat Niti, Power O / Chain)",
+    "category": "Ortodonti (Behel)",
+    "price": 200000,
+    "cost": 200000
+  },
+  {
+    "id": "PROC-049",
+    "code": "24.22",
+    "name": "Pemasangan Retainer Pasca Behel (Clear Essix / Hawley)",
+    "category": "Ortodonti (Behel)",
+    "price": 800000,
+    "cost": 800000
+  },
+  {
+    "id": "PROC-050",
+    "code": "96.55B",
+    "name": "Home Bleaching Kit Lengkap + Custom Tray Cetakan Gigi",
+    "category": "Estetika Dental",
+    "price": 1400000,
+    "cost": 1400000
+  },
+  {
+    "id": "PROC-051",
+    "code": "23.70B",
+    "name": "Open Bur / Trepanasi Gigi Darurat (Relief Nyeri Pulpa)",
+    "category": "Endodontik (PSA)",
+    "price": 150000,
+    "cost": 150000
+  }
 ]

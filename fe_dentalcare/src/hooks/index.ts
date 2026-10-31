@@ -493,13 +493,37 @@ export function useBilling() {
     fetchInvoices();
   }, [fetchInvoices]);
 
-  const recordPayment = async (invoiceId: string, paymentMethod: string, amount: number, cashierName: string) => {
-    const res = await BillingService.recordPayment(invoiceId, paymentMethod, amount, cashierName);
+  const recordPayment = async (
+    invoiceId: string,
+    paymentMethod: string,
+    amount: number,
+    cashierName: string,
+    paymentType?: string,
+    notes?: string,
+    tenderedAmount?: number,
+    changeAmount?: number
+  ) => {
+    const res = await BillingService.recordPayment(
+      invoiceId,
+      paymentMethod,
+      amount,
+      cashierName,
+      paymentType,
+      notes,
+      tenderedAmount,
+      changeAmount
+    );
     await fetchInvoices();
     return res;
   };
 
-  return { invoices, loading, refetch: fetchInvoices, recordPayment };
+  const createInvoice = async (data: any) => {
+    const res = await BillingService.createInvoice(data);
+    await fetchInvoices();
+    return res;
+  };
+
+  return { invoices, loading, refetch: fetchInvoices, recordPayment, createInvoice };
 }
 
 export function useInventory() {

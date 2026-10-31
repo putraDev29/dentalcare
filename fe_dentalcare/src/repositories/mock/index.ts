@@ -1017,11 +1017,58 @@ export class MockBillingRepository implements IBillingRepository {
     return mockStore.getState().invoices.find((i) => i.id === id) || null;
   }
 
+  async createInvoice(data: any): Promise<Invoice> {
+    const id = `INV-${Date.now()}`;
+    const invoiceNumber = `INV-${new Date().toISOString().slice(0, 7).replace("-", "")}-${String(Math.floor(Math.random() * 9000) + 1000)}`;
+    const total = Number(data.totalAmount) || 0;
+    const paid = Number(data.patientPaidAmount) || 0;
+    const balance = Math.max(0, total - paid);
+    const newInv: Invoice = {
+      id,
+      invoiceNumber,
+      facilityId: "FAC-001",
+      patientId: data.patientId,
+      patientName: data.patientName,
+      patientMrn: data.patientMrn || "-",
+      patientPhone: data.patientPhone,
+      invoiceDate: new Date().toISOString().split("T")[0],
+      dueDate: new Date().toISOString().split("T")[0],
+      items: data.items || [],
+      subtotal: Number(data.subtotal) || total,
+      discount: Number(data.discount) || 0,
+      tax: Number(data.tax) || 0,
+      totalAmount: total,
+      insuranceCoverage: Number(data.coveredByInsurance) || 0,
+      patientResponsibility: total,
+      paidAmount: paid,
+      dpAmount: paid > 0 && balance > 0 ? paid : 0,
+      balanceAmount: balance,
+      status: balance <= 0 ? "paid" : (paid > 0 ? "partial" : "pending"),
+      transactions: paid > 0 ? [{
+        id: `PAY-${Date.now()}`,
+        transactionNumber: `TRX-${Date.now()}`,
+        paymentMethod: data.paymentMethod || "cash",
+        amount: paid,
+        type: balance > 0 ? "dp" : "full",
+        cashierName: data.cashierName || "Kasir Dental Care",
+        paidAt: new Date().toISOString(),
+      }] : [],
+    };
+    mockStore.updateState((state) => {
+      state.invoices.unshift(newInv);
+    });
+    return newInv;
+  }
+
   async recordPayment(
     invoiceId: string,
     paymentMethod: string,
     amount: number,
-    cashierName: string
+    cashierName: string,
+    paymentType?: string,
+    notes?: string,
+    tenderedAmount?: number,
+    changeAmount?: number
   ): Promise<Invoice> {
     let result: Invoice | null = null;
     mockStore.updateState((state) => {
@@ -1031,19 +1078,35 @@ export class MockBillingRepository implements IBillingRepository {
         const nextTrxNum = (inv.transactions?.length || 0) + 1;
         const trxId = `TRX-${Date.now()}`;
         if (!inv.transactions) inv.transactions = [];
+        const prevPaid = Number(inv.paidAmount) || 0;
+        const isSettlement = prevPaid > 0;
+        const currentType = paymentType || (inv.balanceAmount - amount <= 0 ? (isSettlement ? "settlement" : "full") : "dp");
+        const tenderedVal = tenderedAmount !== undefined ? tenderedAmount : amount;
+        const changeVal = changeAmount !== undefined ? changeAmount : Math.max(0, tenderedVal - amount);
+
         inv.transactions.push({
           id: trxId,
           transactionNumber: `TRX-2026-${String(nextTrxNum).padStart(4, "0")}`,
           paymentMethod: paymentMethod as any,
           amount,
+          tenderedAmount: tenderedVal,
+          changeAmount: changeVal,
+          type: currentType,
+          notes: notes || (currentType === "dp" ? "Pembayaran Uang Muka (DP)" : (currentType === "settlement" ? "Pelunasan Tagihan (Sisa DP)" : undefined)),
           paidAt: new Date().toISOString(),
-          cashierName: cashierName || "Kasir OKAY Dental",
+          cashierName: cashierName || "Kasir Dental Care",
         });
-        inv.paidAmount = (Number(inv.paidAmount) || 0) + amount;
+        inv.paidAmount = prevPaid + amount;
+        inv.tenderedAmount = tenderedVal;
+        inv.changeAmount = changeVal;
         inv.balanceAmount = Math.max(0, (Number(inv.totalAmount) || 0) - (Number(inv.insuranceCoverage) || 0) - inv.paidAmount);
         inv.status = inv.balanceAmount <= 0 ? "paid" : "partial";
+        if (currentType === "dp" || !inv.dpAmount) {
+          inv.dpAmount = (inv.dpAmount || 0) + (currentType === "dp" ? amount : 0);
+        }
         result = inv;
 
+        const descType = currentType === "dp" ? "Pembayaran Uang Muka (DP)" : (isSettlement ? "Pelunasan Tagihan (Sisa DP)" : "Pembayaran Kasir");
         // Otomatis catat Kas Masuk (income) dari pembayaran kasir pasien ke store persisten
         state.financeTransactions = state.financeTransactions || [];
         state.financeTransactions.unshift({
@@ -1053,11 +1116,11 @@ export class MockBillingRepository implements IBillingRepository {
           category: "patient_payment",
           amount,
           paymentMethod: paymentMethod || "cash",
-          description: `Pembayaran Kasir Pasien: ${inv.patientName} (${inv.invoiceNumber})`,
+          description: `${descType} Pasien: ${inv.patientName} (${inv.invoiceNumber})`,
           referenceId: inv.id,
           referenceType: "invoice",
           date: new Date().toISOString().split("T")[0],
-          operatorName: cashierName || "Kasir OKAY Dental",
+          operatorName: cashierName || "Kasir Dental Care",
           notes: `Pembayaran kasir ${inv.invoiceNumber} | Metode: ${paymentMethod}`,
           createdAt: new Date().toISOString(),
         });

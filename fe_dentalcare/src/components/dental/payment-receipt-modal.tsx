@@ -124,7 +124,7 @@ export function PaymentReceiptModal({
     : null;
 
   const paymentMethodLabel = (() => {
-    const method = latestTransaction?.paymentMethod || "qris";
+    const method = latestTransaction?.paymentMethod || "cash";
     switch (method) {
       case "qris":
         return "QRIS";
@@ -155,6 +155,13 @@ export function PaymentReceiptModal({
 
   // Build the formatted WhatsApp message
   const buildWhatsAppMessage = () => {
+    const isPendingDp = (invoice.balanceAmount || 0) > 0;
+    const hasDpHistory =
+      (invoice.transactions && invoice.transactions.length > 1) ||
+      (invoice.dpAmount && invoice.dpAmount > 0);
+    const dpVal =
+      invoice.dpAmount || (invoice.transactions && invoice.transactions[0]?.amount) || 0;
+
     const itemsList = invoice.items
       .map(
         (it, idx) =>
@@ -171,7 +178,35 @@ export function PaymentReceiptModal({
         ? `Tanggungan Asuransi: -Rp ${invoice.insuranceCoverage.toLocaleString("id-ID")}\n`
         : "";
 
-    return `🧾 *BUKTI PEMBAYARAN & NOTA KASIR*
+    const tenderedVal = latestTransaction?.tenderedAmount || invoice.tenderedAmount;
+    const changeVal = latestTransaction?.changeAmount ?? invoice.changeAmount;
+    const changeText =
+      tenderedVal && tenderedVal > 0
+        ? `\n*UANG DITERIMA:* Rp ${tenderedVal.toLocaleString("id-ID")} (${paymentMethodLabel})\n*KEMBALIAN:* Rp ${(changeVal || 0).toLocaleString("id-ID")}`
+        : "";
+
+    let titleHeader = "🧾 *BUKTI PEMBAYARAN & NOTA KASIR*";
+    let paymentSummaryPart = "";
+
+    if (isPendingDp) {
+      titleHeader = "🧾 *BUKTI PENERIMAAN UANG MUKA (DP)*";
+      paymentSummaryPart = `*TOTAL TAGIHAN:* *Rp ${invoice.totalAmount.toLocaleString("id-ID")}*
+*UANG MUKA (DP) DITERIMA:* *Rp ${(invoice.paidAmount || 0).toLocaleString("id-ID")}*
+*SISA PELUNASAN:* *Rp ${invoice.balanceAmount.toLocaleString("id-ID")}* ⚠️
+_(Sisa tagihan wajib dilunasi saat tindakan/jadwal berikutnya)_${changeText}`;
+    } else if (hasDpHistory && dpVal > 0) {
+      titleHeader = "🧾 *KUITANSI PELUNASAN RESMI*";
+      paymentSummaryPart = `*TOTAL TAGIHAN:* *Rp ${invoice.totalAmount.toLocaleString("id-ID")}*
+Uang Muka (DP) Sebelumnya: Rp ${dpVal.toLocaleString("id-ID")}
+*PELUNASAN SISA:* *Rp ${(invoice.totalAmount - dpVal).toLocaleString("id-ID")}*
+*SISA TAGIHAN:* *Rp 0 (LUNAS)* ✅${changeText}`;
+    } else {
+      paymentSummaryPart = `*TOTAL BIAYA:* *Rp ${invoice.totalAmount.toLocaleString("id-ID")}*
+*DIBAYAR:* *Rp ${(invoice.paidAmount || invoice.totalAmount).toLocaleString("id-ID")}*
+*SISA TAGIHAN:* *Rp 0 (LUNAS)* ✅${changeText}`;
+    }
+
+    return `${titleHeader}
 *OKAY DENTAL THERAPIST*
 Ds. Krajan II RT.08 RW.02 67276 | Telp/WA: 083856480982
 ─────────────────────────
@@ -191,9 +226,7 @@ ${itemsList}
 
 ─────────────────────────
 Subtotal Layanan: Rp ${invoice.subtotal.toLocaleString("id-ID")}
-${insurancePart}*TOTAL BIAYA:* *Rp ${invoice.totalAmount.toLocaleString("id-ID")}*
-*DIBAYAR:* *Rp ${(invoice.paidAmount || invoice.totalAmount).toLocaleString("id-ID")}*
-*SISA TAGIHAN:* *Rp 0 (LUNAS)* ✅
+${insurancePart}${paymentSummaryPart}
 ─────────────────────────${notePart}
 Terima kasih telah mempercayakan perawatan kesehatan gigi Anda kepada *OKAY Dental Therapist*.
 Semoga lekas sembuh dan senyum sehat selalu! 🙏🦷
@@ -473,10 +506,22 @@ _Simpan pesan ini sebagai bukti pembayaran dan transaksi kasir yang sah._`;
                     {/* Receipt Status & Metadata */}
                     <div className="space-y-1 text-[10.5px] py-1 border-b border-dashed border-slate-400 dark:border-slate-700">
                       <div className="flex justify-between items-center font-bold">
-                        <span>BUKTI TRANSAKSI KASIR</span>
-                        <span className="text-[10px] font-black border border-emerald-600 text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded dark:bg-emerald-950 dark:text-emerald-300">
-                          LUNAS
+                        <span>
+                          {invoice.balanceAmount > 0
+                            ? "BUKTI PENERIMAAN UANG MUKA (DP)"
+                            : (invoice.transactions && invoice.transactions.length > 1) || (invoice.dpAmount && invoice.dpAmount > 0)
+                            ? "KUITANSI PELUNASAN RESMI"
+                            : "BUKTI TRANSAKSI KASIR"}
                         </span>
+                        {invoice.balanceAmount > 0 ? (
+                          <span className="text-[10px] font-black border border-sky-600 text-sky-700 bg-sky-50 px-1.5 py-0.5 rounded dark:bg-sky-950 dark:text-sky-300">
+                            DP TERBAYAR
+                          </span>
+                        ) : (
+                          <span className="text-[10px] font-black border border-emerald-600 text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded dark:bg-emerald-950 dark:text-emerald-300">
+                            LUNAS
+                          </span>
+                        )}
                       </div>
                       <div className="flex justify-between text-slate-600 dark:text-slate-400">
                         <span>No. Nota:</span>
@@ -558,21 +603,73 @@ _Simpan pesan ini sebagai bukti pembayaran dan transaksi kasir yang sah._`;
                         </div>
                       )}
                       <div className="flex justify-between font-black text-xs pt-1 border-t border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white">
-                        <span>TOTAL BAYAR:</span>
+                        <span>TOTAL TAGIHAN:</span>
                         <span className="font-mono text-sky-700 dark:text-sky-400">
                           {formatCurrency(invoice.totalAmount)}
                         </span>
                       </div>
-                      <div className="flex justify-between text-slate-700 dark:text-slate-300">
-                        <span>Jumlah Bayar:</span>
-                        <span className="font-mono font-bold">
-                          {formatCurrency(invoice.paidAmount || invoice.totalAmount)}
-                        </span>
-                      </div>
-                      <div className="flex justify-between text-slate-600 dark:text-slate-400">
-                        <span>Kembali / Sisa:</span>
-                        <span className="font-mono font-bold text-emerald-600">Rp 0 (LUNAS)</span>
-                      </div>
+                      {invoice.balanceAmount > 0 ? (
+                        <>
+                          <div className="flex justify-between text-sky-700 dark:text-sky-400 font-bold">
+                            <span>Uang Muka (DP) Diterima:</span>
+                            <span className="font-mono">
+                              {formatCurrency(invoice.paidAmount)}
+                            </span>
+                          </div>
+                          <div className="flex justify-between text-rose-600 font-bold">
+                            <span>Sisa Pelunasan:</span>
+                            <span className="font-mono">{formatCurrency(invoice.balanceAmount)} (BELUM LUNAS)</span>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          {((invoice.transactions && invoice.transactions.length > 1) || (invoice.dpAmount && invoice.dpAmount > 0)) && (
+                            <>
+                              <div className="flex justify-between text-slate-600 dark:text-slate-400">
+                                <span>DP Sebelumnya:</span>
+                                <span className="font-mono">
+                                  {formatCurrency(invoice.dpAmount || (invoice.transactions && invoice.transactions[0]?.amount) || 0)}
+                                </span>
+                              </div>
+                              <div className="flex justify-between text-emerald-600 font-semibold">
+                                <span>Pelunasan Sisa:</span>
+                                <span className="font-mono">
+                                  {formatCurrency(invoice.totalAmount - (invoice.dpAmount || (invoice.transactions && invoice.transactions[0]?.amount) || 0))}
+                                </span>
+                              </div>
+                            </>
+                          )}
+                          <div className="flex justify-between text-slate-700 dark:text-slate-300">
+                            <span>Total Diterima:</span>
+                            <span className="font-mono font-bold">
+                              {formatCurrency(invoice.paidAmount || invoice.totalAmount)}
+                            </span>
+                          </div>
+                          <div className="flex justify-between text-emerald-600 font-bold">
+                            <span>Sisa Tagihan:</span>
+                            <span className="font-mono">Rp 0 (LUNAS)</span>
+                          </div>
+                        </>
+                      )}
+
+                      {/* Cash Tendered & Change Row */}
+                      {(() => {
+                        const tVal = latestTransaction?.tenderedAmount || invoice.tenderedAmount;
+                        const cVal = latestTransaction?.changeAmount ?? invoice.changeAmount;
+                        if (!tVal || tVal <= 0) return null;
+                        return (
+                          <div className="pt-1 mt-1 border-t border-dashed border-slate-300 dark:border-slate-700 space-y-0.5">
+                            <div className="flex justify-between text-slate-700 dark:text-slate-300 font-medium">
+                              <span>Uang Diterima:</span>
+                              <span className="font-mono font-bold">{formatCurrency(tVal)}</span>
+                            </div>
+                            <div className="flex justify-between text-emerald-700 dark:text-emerald-400 font-bold">
+                              <span>Kembalian:</span>
+                              <span className="font-mono">{formatCurrency(cVal || 0)}</span>
+                            </div>
+                          </div>
+                        );
+                      })()}
                     </div>
 
                     {/* Footer / Thank you */}

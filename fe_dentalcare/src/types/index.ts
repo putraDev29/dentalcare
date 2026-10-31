@@ -695,7 +695,7 @@ export interface EmergencyCase {
 // 11. BILLING & PAYMENTS
 // ==========================================
 
-export type InvoiceStatus = "draft" | "pending" | "partial" | "paid" | "cancelled" | "refunded";
+export type InvoiceStatus = "draft" | "pending" | "partial" | "partially_paid" | "paid" | "cancelled" | "refunded";
 export type PaymentMethod = "cash" | "debit_card" | "credit_card" | "bank_transfer" | "qris" | "bpjs" | "insurance" | "corporate";
 
 export interface InvoiceItem {
@@ -709,12 +709,16 @@ export interface InvoiceItem {
 
 export interface PaymentTransaction {
   id: string;
-  transactionNumber: string;
-  paymentMethod: PaymentMethod;
+  transactionNumber?: string;
+  paymentMethod: PaymentMethod | string;
   amount: number;
+  tenderedAmount?: number;
+  changeAmount?: number;
   paidAt: string;
   referenceNumber?: string;
   cashierName: string;
+  type?: "dp" | "settlement" | "full" | string;
+  notes?: string;
 }
 
 export interface Invoice {
@@ -738,6 +742,9 @@ export interface Invoice {
   insuranceCoverage: number;
   patientResponsibility: number;
   paidAmount: number;
+  dpAmount?: number;
+  tenderedAmount?: number;
+  changeAmount?: number;
   balanceAmount: number;
   status: InvoiceStatus;
   transactions: PaymentTransaction[];

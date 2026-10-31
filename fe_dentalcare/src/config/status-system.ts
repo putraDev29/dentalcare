@@ -122,9 +122,19 @@ export const invoiceStatusMap: Record<string, StatusConfig> = {
     badgeClass: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300",
   },
   partial: {
-    label: "Sebagian",
+    label: "Sebagian (DP)",
     variant: "info",
     badgeClass: "bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/40 dark:text-sky-300",
+  },
+  partially_paid: {
+    label: "Sebagian (DP)",
+    variant: "info",
+    badgeClass: "bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/40 dark:text-sky-300",
+  },
+  dp_paid: {
+    label: "DP Terbayar",
+    variant: "info",
+    badgeClass: "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300",
   },
   paid: {
     label: "Lunas",

@@ -307,6 +307,11 @@ export class ApiBillingRepository implements IBillingRepository {
     const covered = Number(inv.coveredByInsurance ?? inv.insuranceCoverage) || 0;
     const paid = Number(inv.patientPaidAmount ?? inv.paidAmount) || 0;
     const balance = inv.balanceAmount ?? inv.outstandingAmount ?? Math.max(0, total - covered - paid);
+    const txs = inv.transactions || inv.payments || [];
+    const dpFromTx = Array.isArray(txs)
+      ? txs.reduce((acc: number, p: any) => (p.type === "dp" ? acc + (Number(p.amount) || 0) : acc), 0)
+      : 0;
+    const dp = Number(inv.dpAmount) || (dpFromTx > 0 ? dpFromTx : (paid > 0 && balance > 0 ? paid : 0));
 
     return {
       ...inv,
@@ -325,9 +330,12 @@ export class ApiBillingRepository implements IBillingRepository {
       insuranceCoverage: covered,
       patientResponsibility: Math.max(0, total - covered),
       paidAmount: paid,
+      dpAmount: dp,
+      tenderedAmount: Number(inv.tenderedAmount) || paid,
+      changeAmount: Number(inv.changeAmount) || 0,
       balanceAmount: balance,
       status: inv.status || (balance <= 0 ? "paid" : "pending"),
-      transactions: inv.transactions || inv.payments || [],
+      transactions: txs,
       invoiceDate: inv.invoiceDate || (inv.createdAt ? inv.createdAt.split("T")[0] : new Date().toISOString().split("T")[0]),
       dueDate: inv.dueDate || (inv.createdAt ? inv.createdAt.split("T")[0] : new Date().toISOString().split("T")[0]),
       items: inv.items || [],
@@ -344,12 +352,30 @@ export class ApiBillingRepository implements IBillingRepository {
     return raw ? this.mapInvoice(raw) : null;
   }
 
-  async recordPayment(invoiceId: string, paymentMethod: string, amount: number, cashierName: string): Promise<Invoice> {
+  async createInvoice(data: any): Promise<Invoice> {
+    const raw = await apiClient.post<any>(API_ENDPOINTS.billing.invoices, data);
+    return this.mapInvoice(raw);
+  }
+
+  async recordPayment(
+    invoiceId: string,
+    paymentMethod: string,
+    amount: number,
+    cashierName: string,
+    paymentType?: string,
+    notes?: string,
+    tenderedAmount?: number,
+    changeAmount?: number
+  ): Promise<Invoice> {
     const raw = await apiClient.post<any>(API_ENDPOINTS.billing.payments, {
       invoiceId,
       paymentMethod,
       amount,
       cashierName,
+      paymentType,
+      notes,
+      tenderedAmount,
+      changeAmount,
     });
     return this.mapInvoice(raw);
   }

@@ -15,7 +15,7 @@ export function generateInvoicePdf(invoice: Invoice, options?: InvoicePdfOptions
   const clinicAddress = options?.clinicAddress || "Ds. Krajan II RT.08 RW.02 67276";
   const clinicPhone = options?.clinicPhone || "083856480982";
   const cashierName = options?.cashierName || "Kasir Dental Care";
-  const paymentMethod = options?.paymentMethod || "QRIS";
+  const paymentMethod = options?.paymentMethod || "Tunai (Cash)";
 
   // Format A5 Portrait (148 x 210 mm)
   const doc = new jsPDF({
@@ -49,22 +49,39 @@ export function generateInvoicePdf(invoice: Invoice, options?: InvoicePdfOptions
   doc.text(clinicAddress, margin + 4, 21);
   doc.text(clinicPhone, margin + 4, 26);
 
-  // LUNAS Badge on top-right
-  doc.setFillColor(240, 253, 244); // emerald-50
-  doc.setDrawColor(34, 197, 94); // emerald-500
-  doc.setLineWidth(0.4);
-  doc.roundedRect(pageWidth - margin - 29, 12, 25, 8, 2, 2, "FD");
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(8);
-  doc.setTextColor(22, 163, 74); // emerald-600
-  doc.text("LUNAS (PAID)", pageWidth - margin - 16.5, 17.2, { align: "center" });
+  // Status Badge on top-right (LUNAS vs UANG MUKA DP)
+  const isPendingDp = invoice.balanceAmount > 0;
+  if (isPendingDp) {
+    doc.setFillColor(240, 249, 255); // sky-50
+    doc.setDrawColor(2, 132, 199); // sky-600
+    doc.setLineWidth(0.4);
+    doc.roundedRect(pageWidth - margin - 35, 12, 31, 8, 2, 2, "FD");
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(7.5);
+    doc.setTextColor(2, 132, 199); // sky-600
+    doc.text("DP TERBAYAR", pageWidth - margin - 19.5, 17.2, { align: "center" });
+  } else {
+    doc.setFillColor(240, 253, 244); // emerald-50
+    doc.setDrawColor(34, 197, 94); // emerald-500
+    doc.setLineWidth(0.4);
+    doc.roundedRect(pageWidth - margin - 29, 12, 25, 8, 2, 2, "FD");
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setTextColor(22, 163, 74); // emerald-600
+    doc.text("LUNAS (PAID)", pageWidth - margin - 16.5, 17.2, { align: "center" });
+  }
 
   // 2. Document Title
   let curY = 36.5;
   doc.setFont("helvetica", "bold");
   doc.setFontSize(11.5);
   doc.setTextColor(15, 23, 42);
-  doc.text("BUKTI PEMBAYARAN & NOTA KASIR", margin, curY);
+  const docTitle = isPendingDp
+    ? "BUKTI PENERIMAAN UANG MUKA (DP)"
+    : ((invoice.transactions && invoice.transactions.length > 1) || (invoice.dpAmount && invoice.dpAmount > 0)
+        ? "KUITANSI PELUNASAN RESMI"
+        : "BUKTI PEMBAYARAN & NOTA KASIR");
+  doc.text(docTitle, margin, curY);
 
   curY += 5;
   // Metadata 2-Column Box
@@ -229,8 +246,33 @@ export function generateInvoicePdf(invoice: Invoice, options?: InvoicePdfOptions
   doc.line(summaryX, curY - 1, margin + contentWidth, curY - 1);
 
   addSummaryRow("TOTAL TAGIHAN:", formatCurrency(invoice.totalAmount), true, [2, 132, 199]);
-  addSummaryRow(`Dibayar (${paymentMethod}):`, formatCurrency(invoice.paidAmount || invoice.totalAmount), true, [16, 185, 129]);
-  addSummaryRow("Sisa Tagihan:", "Rp 0 (LUNAS)", false, [71, 85, 105]);
+
+  const hasDpHistory = (invoice.transactions && invoice.transactions.length > 1) || (invoice.dpAmount && invoice.dpAmount > 0);
+  const dpAmount = invoice.dpAmount || (invoice.transactions && invoice.transactions[0]?.amount) || 0;
+
+  if (isPendingDp) {
+    addSummaryRow(`Uang Muka / DP (${paymentMethod}):`, formatCurrency(invoice.paidAmount), true, [14, 165, 233]);
+    addSummaryRow("SISA PELUNASAN:", `${formatCurrency(invoice.balanceAmount)} (BELUM LUNAS)`, true, [225, 29, 72]);
+  } else if (hasDpHistory && dpAmount > 0) {
+    addSummaryRow("Uang Muka (DP) Sebelumnya:", formatCurrency(dpAmount), false, [71, 85, 105]);
+    addSummaryRow(`Pelunasan Sisa (${paymentMethod}):`, formatCurrency(invoice.totalAmount - dpAmount), true, [16, 185, 129]);
+    addSummaryRow("Sisa Tagihan:", "Rp 0 (LUNAS)", true, [16, 185, 129]);
+  } else {
+    addSummaryRow(`Dibayar (${paymentMethod}):`, formatCurrency(invoice.paidAmount || invoice.totalAmount), true, [16, 185, 129]);
+    addSummaryRow("Sisa Tagihan:", "Rp 0 (LUNAS)", false, [71, 85, 105]);
+  }
+
+  // Tendered amount & Change calculation
+  const lastTrx = invoice.transactions && invoice.transactions.length > 0
+    ? invoice.transactions[invoice.transactions.length - 1]
+    : null;
+  const tenderedVal = lastTrx?.tenderedAmount || invoice.tenderedAmount;
+  const changeVal = lastTrx?.changeAmount ?? invoice.changeAmount;
+
+  if (tenderedVal && tenderedVal > 0) {
+    addSummaryRow(`Uang Diterima (${paymentMethod}):`, formatCurrency(tenderedVal), false, [51, 65, 85]);
+    addSummaryRow("Kembalian:", formatCurrency(changeVal || 0), true, [16, 185, 129]);
+  }
 
   // 6. Guarantee & Thank You Footer
   curY = Math.max(curY + 4, 180);

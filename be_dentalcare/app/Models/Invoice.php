@@ -22,6 +22,9 @@ class Invoice extends BaseModel
     protected $appends = [
         'balanceAmount',
         'paidAmount',
+        'dpAmount',
+        'tenderedAmount',
+        'changeAmount',
         'insuranceCoverage',
         'patientResponsibility',
         'transactions',
@@ -43,6 +46,45 @@ class Invoice extends BaseModel
     public function getPaidAmountAttribute(): float
     {
         return (float) ($this->attributes['patient_paid_amount'] ?? 0);
+    }
+
+    public function getTenderedAmountAttribute(): float
+    {
+        $payments = $this->transactions;
+        if (!empty($payments)) {
+            $latest = end($payments);
+            if (isset($latest['tenderedAmount'])) {
+                return (float) $latest['tenderedAmount'];
+            }
+        }
+        return (float) ($this->attributes['patient_paid_amount'] ?? 0);
+    }
+
+    public function getChangeAmountAttribute(): float
+    {
+        $payments = $this->transactions;
+        if (!empty($payments)) {
+            $latest = end($payments);
+            if (isset($latest['changeAmount'])) {
+                return (float) $latest['changeAmount'];
+            }
+        }
+        return 0;
+    }
+
+    public function getDpAmountAttribute(): float
+    {
+        $payments = $this->transactions;
+        $dp = 0;
+        foreach ($payments as $p) {
+            if (($p['type'] ?? '') === 'dp') {
+                $dp += (float) ($p['amount'] ?? 0);
+            }
+        }
+        if ($dp === 0 && (float) ($this->attributes['patient_paid_amount'] ?? 0) > 0 && (float) ($this->attributes['outstanding_amount'] ?? 0) > 0) {
+            $dp = (float) ($this->attributes['patient_paid_amount'] ?? 0);
+        }
+        return $dp;
     }
 
     public function getInsuranceCoverageAttribute(): float

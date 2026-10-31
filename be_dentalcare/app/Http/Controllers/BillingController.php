@@ -69,17 +69,29 @@ class BillingController extends Controller
 
         $payments = [];
         if ($paid > 0) {
+            $isDp = ($outstanding > 0);
+            $paymentType = $request->input('paymentType', $isDp ? 'dp' : 'full');
             $paymentId = 'PAY-' . strtoupper(Str::random(6));
             $paymentMethod = $request->input('paymentMethod', 'cash');
             $cashier = $request->input('cashierName', 'Kasir Dental Care');
+            $customNotes = $request->input('notes', $isDp ? 'Pembayaran Uang Muka (DP)' : null);
+            $tendered = (float) $request->input('tenderedAmount', $paid);
+            $change = max(0, (float) $request->input('changeAmount', $tendered - $paid));
+
             $payments[] = [
                 'id' => $paymentId,
+                'transactionNumber' => 'TRX-' . strtoupper(Str::random(8)),
                 'amount' => $paid,
+                'tenderedAmount' => $tendered,
+                'changeAmount' => $change,
                 'paymentMethod' => $paymentMethod,
                 'cashierName' => $cashier,
+                'type' => $paymentType,
+                'notes' => $customNotes,
                 'paidAt' => now()->toIso8601String(),
             ];
 
+            $descType = ($paymentType === 'dp') ? 'Pembayaran Uang Muka (DP)' : 'Pembayaran Kasir';
             // Automatically create Finance Transaction as Income
             FinanceTransaction::create([
                 'id' => 'FIN-' . strtoupper(Str::random(6)),
@@ -88,12 +100,12 @@ class BillingController extends Controller
                 'category' => 'patient_payment',
                 'amount' => $paid,
                 'payment_method' => $paymentMethod,
-                'description' => "Pembayaran Kasir Pasien: {$validated['patientName']} ({$invoiceNumber})",
+                'description' => "{$descType} Pasien: {$validated['patientName']} ({$invoiceNumber})",
                 'reference_id' => $id,
                 'reference_type' => 'invoice',
                 'date' => date('Y-m-d'),
                 'operator_name' => $cashier,
-                'notes' => "ID Pembayaran: {$paymentId} | Metode: {$paymentMethod}",
+                'notes' => "ID Pembayaran: {$paymentId} | Tipe: {$paymentType} | Metode: {$paymentMethod} | Diterima: Rp " . number_format($tendered, 0, ',', '.') . " | Kembalian: Rp " . number_format($change, 0, ',', '.') . ($customNotes ? " | Catatan: {$customNotes}" : ""),
             ]);
         }
 
@@ -130,6 +142,10 @@ class BillingController extends Controller
             'paymentMethod' => 'required|string',
             'amount' => 'required|numeric|min:1',
             'cashierName' => 'nullable|string',
+            'paymentType' => 'nullable|string',
+            'notes' => 'nullable|string',
+            'tenderedAmount' => 'nullable|numeric|min:0',
+            'changeAmount' => 'nullable|numeric|min:0',
         ]);
 
         $invoice = Invoice::where('id', $validated['invoiceId'])
@@ -146,12 +162,25 @@ class BillingController extends Controller
         $outstanding = max(0, $total - $covered - $newPaid);
         $newStatus = $outstanding <= 0 ? 'paid' : 'partially_paid';
 
+        $paymentType = $request->input('paymentType');
+        if (empty($paymentType)) {
+            $paymentType = ($outstanding <= 0) ? ($currentPaid > 0 ? 'settlement' : 'full') : 'dp';
+        }
+        $customNotes = $request->input('notes');
+        $tendered = (float) $request->input('tenderedAmount', $amount);
+        $change = max(0, (float) $request->input('changeAmount', $tendered - $amount));
+
         $payments = $invoice->payments ?: [];
         $paymentRecord = [
             'id' => 'PAY-' . strtoupper(Str::random(6)),
+            'transactionNumber' => 'TRX-' . strtoupper(Str::random(8)),
             'amount' => $amount,
+            'tenderedAmount' => $tendered,
+            'changeAmount' => $change,
             'paymentMethod' => $method,
             'cashierName' => $cashier,
+            'type' => $paymentType,
+            'notes' => $customNotes,
             'paidAt' => now()->toIso8601String(),
         ];
         $payments[] = $paymentRecord;
@@ -164,6 +193,10 @@ class BillingController extends Controller
             'paid_at' => $newStatus === 'paid' ? now() : $invoice->paid_at,
         ]);
 
+        $descType = ($paymentType === 'dp')
+            ? 'Pembayaran Uang Muka (DP)'
+            : (($currentPaid > 0 && $outstanding <= 0) ? 'Pelunasan Tagihan (Sisa DP)' : 'Pembayaran Kasir');
+
         // Automatically sync to Finance Transactions as Income (Kas Masuk)
         FinanceTransaction::create([
             'id' => 'FIN-' . strtoupper(Str::random(6)),
@@ -172,12 +205,12 @@ class BillingController extends Controller
             'category' => 'patient_payment',
             'amount' => $amount,
             'payment_method' => $method,
-            'description' => "Pembayaran Kasir Pasien: {$invoice->patient_name} ({$invoice->invoice_number})",
+            'description' => "{$descType} Pasien: {$invoice->patient_name} ({$invoice->invoice_number})",
             'reference_id' => $invoice->id,
             'reference_type' => 'invoice',
             'date' => date('Y-m-d'),
             'operator_name' => $cashier,
-            'notes' => "ID Pembayaran: {$paymentRecord['id']} | Metode: {$method}",
+            'notes' => "ID Pembayaran: {$paymentRecord['id']} | Tipe: {$paymentType} | Metode: {$method} | Diterima: Rp " . number_format($tendered, 0, ',', '.') . " | Kembalian: Rp " . number_format($change, 0, ',', '.') . ($customNotes ? " | Catatan: {$customNotes}" : ""),
         ]);
 
         $invoice->load('patient');

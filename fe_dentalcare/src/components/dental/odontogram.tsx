@@ -6,7 +6,10 @@ import {
   ToothRecord,
   OdontogramData,
   DentalSurface,
+  DentalProcedureMaster,
 } from "@/types";
+import { DentalMasterService } from "@/services";
+import proceduresSeed from "@/data/procedures.json";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
@@ -133,6 +136,7 @@ interface OdontogramProps {
   readOnly?: boolean;
   className?: string;
   onSelectProcedure?: (procedure: { toothNumber: number; name: string; code: string; cost: number }) => void;
+  procedures?: DentalProcedureMaster[];
 }
 
 // ==========================================
@@ -679,7 +683,30 @@ export function Odontogram({
   readOnly = false,
   className,
   onSelectProcedure,
+  procedures: initialProcedures,
 }: OdontogramProps) {
+  const [masterProcedures, setMasterProcedures] = React.useState<DentalProcedureMaster[]>(
+    initialProcedures && initialProcedures.length > 0 ? initialProcedures : (proceduresSeed as any)
+  );
+
+  const reloadProcedures = React.useCallback(async () => {
+    try {
+      const res = await DentalMasterService.getProcedures();
+      if (res && res.length > 0) {
+        setMasterProcedures(res);
+      }
+    } catch {
+      // fallback
+    }
+  }, []);
+
+  React.useEffect(() => {
+    if (initialProcedures && initialProcedures.length > 0) {
+      setMasterProcedures(initialProcedures);
+    } else {
+      reloadProcedures();
+    }
+  }, [initialProcedures, reloadProcedures]);
   const [viewMode, setViewMode] = React.useState<"anatomical" | "geometric">("anatomical");
   const [showPedodontic, setShowPedodontic] = React.useState(false);
   const [showLegend, setShowLegend] = React.useState(false);
@@ -732,7 +759,7 @@ export function Odontogram({
           ? `Tindakan Gigi #${record.toothNumber}`
           : "");
       if (procName || (record.procedureCost !== undefined && record.procedureCost > 0)) {
-        const preset = DENTAL_PROCEDURE_PRESETS.find((p) => p.name === record.procedure);
+        const preset = masterProcedures.find((p: any) => p.name === record.procedure);
         onSelectProcedure({
           toothNumber: record.toothNumber,
           name: procName || `Perawatan Gigi #${record.toothNumber}`,
@@ -1142,6 +1169,7 @@ export function Odontogram({
           initialRecord={activeTeeth[selectedTooth]}
           onClose={() => setSelectedTooth(null)}
           onSave={handleSaveTooth}
+          procedures={masterProcedures}
         />
       )}
     </div>
@@ -1154,12 +1182,38 @@ function ToothEditorDialog({
   initialRecord,
   onClose,
   onSave,
+  procedures = [],
 }: {
   toothNumber: number;
   initialRecord?: ToothRecord;
   onClose: () => void;
   onSave: (record: ToothRecord) => void;
+  procedures?: DentalProcedureMaster[];
 }) {
+  const [dialogProcedures, setDialogProcedures] = React.useState<DentalProcedureMaster[]>(
+    procedures && procedures.length > 0 ? procedures : (proceduresSeed as any)
+  );
+
+  React.useEffect(() => {
+    let isMounted = true;
+    DentalMasterService.getProcedures()
+      .then((res) => {
+        if (isMounted && res && Array.isArray(res) && res.length > 0) {
+          setDialogProcedures(res);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  React.useEffect(() => {
+    if (procedures && procedures.length > 0) {
+      setDialogProcedures(procedures);
+    }
+  }, [procedures]);
+
   const [condition, setCondition] = React.useState<ToothCondition>(
     initialRecord?.condition || "sound"
   );
@@ -1183,13 +1237,21 @@ function ToothEditorDialog({
   );
   const [procedureSearch, setProcedureSearch] = React.useState<string>("");
 
+  const availableProcedures = React.useMemo(() => {
+    if (dialogProcedures && dialogProcedures.length > 0) return dialogProcedures;
+    return (proceduresSeed as any);
+  }, [dialogProcedures]);
+
   const filteredPresets = React.useMemo(() => {
-    if (!procedureSearch.trim()) return DENTAL_PROCEDURE_PRESETS;
+    if (!procedureSearch.trim()) return availableProcedures;
     const q = procedureSearch.toLowerCase().trim();
-    return DENTAL_PROCEDURE_PRESETS.filter(
-      (p) => p.name.toLowerCase().includes(q) || p.code.toLowerCase().includes(q)
+    return availableProcedures.filter(
+      (p: any) =>
+        (p.name && p.name.toLowerCase().includes(q)) ||
+        (p.code && p.code.toLowerCase().includes(q)) ||
+        (p.category && p.category.toLowerCase().includes(q))
     );
-  }, [procedureSearch]);
+  }, [availableProcedures, procedureSearch]);
 
   const toothName = TOOTH_NAMES[toothNumber] || `Gigi #${toothNumber}`;
 
@@ -1199,11 +1261,38 @@ function ToothEditorDialog({
     );
   };
 
-  const handleSelectPreset = (preset: typeof DENTAL_PROCEDURE_PRESETS[0]) => {
+  const handleSelectPreset = (preset: { name: string; code: string; cost?: number; price?: number; condition?: ToothCondition; category?: string }) => {
     setProcedure(preset.name);
-    setCost(preset.cost);
-    setCostInput(formatRupiahInput(preset.cost));
-    setCondition(preset.condition);
+    const priceVal = Number(preset.cost ?? (preset as any).price ?? 0);
+    setCost(priceVal);
+    setCostInput(formatRupiahInput(priceVal));
+
+    // Determine appropriate tooth condition automatically based on procedure name / category / condition
+    const lowerName = preset.name.toLowerCase();
+    const lowerCat = (preset.category || "").toLowerCase();
+
+    let autoCond: ToothCondition | null = preset.condition || null;
+    if (!autoCond) {
+      if (lowerName.includes("open bur") || lowerName.includes("trepanasi") || lowerName.includes("saluran akar") || lowerName.includes("psa") || lowerName.includes("pulpa") || lowerName.includes("endodontik") || lowerCat.includes("endodontik")) {
+        autoCond = "root_canal";
+      } else if (lowerName.includes("tambal") || lowerName.includes("komposit") || lowerName.includes("gic") || lowerName.includes("restorasi") || lowerCat.includes("restorasi")) {
+        autoCond = (lowerName.includes("sementara") || lowerName.includes("cavit") || lowerName.includes("fletcher")) ? "filled_temporary" : "filled_composite";
+      } else if (lowerName.includes("cabut") || lowerName.includes("odontektomi") || lowerName.includes("ekstraksi") || lowerName.includes("bedah gigi") || lowerCat.includes("bedah mulut")) {
+        autoCond = "extracted";
+      } else if (lowerName.includes("scaling") || lowerName.includes("karang gigi") || lowerName.includes("kuretase") || lowerCat.includes("periodonsia")) {
+        autoCond = "calculus";
+      } else if (lowerName.includes("gigi tiruan") || lowerName.includes("insersi") || lowerCat.includes("prostodonsia")) {
+        autoCond = "missing";
+      } else if (lowerName.includes("mahkota") || lowerName.includes("crown") || lowerName.includes("bridge") || lowerName.includes("inlay") || lowerName.includes("onlay") || lowerName.includes("veneer")) {
+        autoCond = "crown";
+      } else if (lowerName.includes("abses") || lowerName.includes("incisi") || lowerName.includes("karies")) {
+        autoCond = "caries";
+      }
+    }
+
+    if (autoCond) {
+      setCondition(autoCond);
+    }
   };
 
   const handleSelectAmountChip = (amount: number) => {
@@ -1503,29 +1592,33 @@ function ToothEditorDialog({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 max-h-52 overflow-y-auto pr-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 max-h-64 sm:max-h-72 overflow-y-auto pr-1">
             {filteredPresets.length > 0 ? (
-              filteredPresets.map((preset) => (
-                <button
-                  type="button"
-                  key={preset.name}
-                  onClick={() => handleSelectPreset(preset)}
-                  className={cn(
-                    "flex items-center justify-between p-2.5 rounded-xl text-left border text-xs transition-all cursor-pointer hover:border-teal-400 hover:bg-slate-50 dark:hover:bg-slate-800",
-                    procedure === preset.name
-                      ? "border-teal-500 bg-teal-50 dark:bg-teal-950/40 text-teal-900 dark:text-teal-200 font-semibold shadow-2xs ring-1 ring-teal-500"
-                      : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700"
-                  )}
-                >
-                  <div className="truncate mr-2">
-                    <p className="truncate font-semibold">{preset.name}</p>
-                    <p className="text-[10px] text-slate-400 font-mono">Kode: {preset.code}</p>
-                  </div>
-                  <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 shrink-0">
-                    {formatCurrency(preset.cost)}
-                  </span>
-                </button>
-              ))
+              filteredPresets.map((preset: any) => {
+                const costVal = Number(preset.cost ?? preset.price ?? 0);
+                const isSelected = procedure === preset.name;
+                return (
+                  <button
+                    type="button"
+                    key={preset.id || preset.code || preset.name}
+                    onClick={() => handleSelectPreset(preset)}
+                    className={cn(
+                      "flex items-center justify-between p-2.5 rounded-xl text-left border text-xs transition-all cursor-pointer hover:border-teal-400 hover:bg-slate-50 dark:hover:bg-slate-800",
+                      isSelected
+                        ? "border-teal-500 bg-teal-50 dark:bg-teal-950/40 text-teal-900 dark:text-teal-200 font-semibold shadow-2xs ring-1 ring-teal-500"
+                        : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200"
+                    )}
+                  >
+                    <div className="truncate mr-2">
+                      <p className="truncate font-semibold text-slate-800 dark:text-slate-100">{preset.name}</p>
+                      <p className="text-[10px] text-slate-400 font-mono">Kode: {preset.code}</p>
+                    </div>
+                    <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 shrink-0">
+                      {formatCurrency(costVal)}
+                    </span>
+                  </button>
+                );
+              })
             ) : (
               <div className="col-span-full py-6 text-center text-xs text-slate-400">
                 Tidak ada tindakan yang cocok dengan kata kunci &quot;<span className="text-slate-600 dark:text-slate-200 font-semibold">{procedureSearch}</span>&quot;

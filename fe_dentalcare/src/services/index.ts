@@ -253,8 +253,30 @@ export class BillingService {
     return billingRepository.getInvoiceById(id);
   }
 
-  static async recordPayment(invoiceId: string, paymentMethod: string, amount: number, cashierName: string) {
-    return billingRepository.recordPayment(invoiceId, paymentMethod, amount, cashierName);
+  static async createInvoice(data: any) {
+    return billingRepository.createInvoice(data);
+  }
+
+  static async recordPayment(
+    invoiceId: string,
+    paymentMethod: string,
+    amount: number,
+    cashierName: string,
+    paymentType?: string,
+    notes?: string,
+    tenderedAmount?: number,
+    changeAmount?: number
+  ) {
+    return billingRepository.recordPayment(
+      invoiceId,
+      paymentMethod,
+      amount,
+      cashierName,
+      paymentType,
+      notes,
+      tenderedAmount,
+      changeAmount
+    );
   }
 }
 

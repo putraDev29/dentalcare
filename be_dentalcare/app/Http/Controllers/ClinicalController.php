@@ -157,7 +157,7 @@ class ClinicalController extends Controller
             });
         }
 
-        return response()->json($query->orderBy('name')->get());
+        return response()->json($query->orderBy('id')->get());
     }
 
     private function autoSeedProcedures(): void
@@ -203,20 +203,29 @@ class ClinicalController extends Controller
             'code' => 'required|string|max:50',
             'name' => 'required|string|max:255',
             'category' => 'nullable|string|max:100',
-            'cost' => 'required|numeric|min:0',
+            'cost' => 'sometimes|numeric|min:0',
+            'price' => 'sometimes|numeric|min:0',
             'description' => 'nullable|string',
             'isActive' => 'nullable|boolean',
+            'is_active' => 'nullable|boolean',
         ]);
 
-        $id = 'PROC-' . strtoupper(Str::random(5));
+        $cost = $request->input('cost', $request->input('price', 0));
+        $isActive = $request->input('isActive', $request->input('is_active', true));
+
+        $id = $request->input('id');
+        if (empty($id) || DentalProcedure::where('id', $id)->exists()) {
+            $id = 'PROC-' . strtoupper(Str::random(5));
+        }
+
         $procedure = DentalProcedure::create([
             'id' => $id,
             'code' => $validated['code'],
             'name' => $validated['name'],
             'category' => $validated['category'] ?? 'Umum',
-            'cost' => $validated['cost'],
+            'cost' => $cost,
             'description' => $validated['description'] ?? null,
-            'is_active' => $validated['isActive'] ?? true,
+            'is_active' => $isActive,
         ]);
 
         return response()->json($procedure, 201);
@@ -230,18 +239,28 @@ class ClinicalController extends Controller
             'code' => 'sometimes|required|string|max:50',
             'name' => 'sometimes|required|string|max:255',
             'category' => 'nullable|string|max:100',
-            'cost' => 'sometimes|required|numeric|min:0',
+            'cost' => 'nullable|numeric|min:0',
+            'price' => 'nullable|numeric|min:0',
             'description' => 'nullable|string',
             'isActive' => 'nullable|boolean',
+            'is_active' => 'nullable|boolean',
         ]);
 
         $data = [];
         if (isset($validated['code'])) $data['code'] = $validated['code'];
         if (isset($validated['name'])) $data['name'] = $validated['name'];
         if (array_key_exists('category', $validated)) $data['category'] = $validated['category'];
-        if (isset($validated['cost'])) $data['cost'] = $validated['cost'];
+        if ($request->has('cost')) {
+            $data['cost'] = $request->input('cost');
+        } elseif ($request->has('price')) {
+            $data['cost'] = $request->input('price');
+        }
         if (array_key_exists('description', $validated)) $data['description'] = $validated['description'];
-        if (array_key_exists('isActive', $validated)) $data['is_active'] = $validated['isActive'];
+        if ($request->has('isActive')) {
+            $data['is_active'] = $request->boolean('isActive');
+        } elseif ($request->has('is_active')) {
+            $data['is_active'] = $request->boolean('is_active');
+        }
 
         $procedure->update($data);
 
@@ -275,7 +294,7 @@ class ClinicalController extends Controller
             });
         }
 
-        return response()->json($query->orderBy('name')->get());
+        return response()->json($query->orderBy('id')->get());
     }
 
     public function storeInsurance(Request $request)

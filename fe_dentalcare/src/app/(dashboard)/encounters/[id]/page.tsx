@@ -45,7 +45,7 @@ import { PatientExaminationHistoryModal } from "@/components/dental/patient-exam
 
 import { toast } from "sonner";
 import diagnosesSeed from "@/data/diagnoses.json";
-import { Patient, Encounter, EncounterDiagnosis, EncounterProcedure, PrescriptionItem, OdontogramData, Medicine, Invoice } from "@/types";
+import { Patient, Encounter, EncounterDiagnosis, EncounterProcedure, PrescriptionItem, OdontogramData, Medicine, Invoice, DentalProcedureMaster } from "@/types";
 
 export default function DentalEncounterWorkspacePage() {
   const params = useParams();
@@ -150,6 +150,17 @@ export default function DentalEncounterWorkspacePage() {
   const [height, setHeight] = React.useState<number>(172);
 
   const bmiCalc = calculateBmi(weight, height);
+
+  // Master Procedures for Odontogram & Encounter
+  const [masterProcedures, setMasterProcedures] = React.useState<DentalProcedureMaster[]>([]);
+
+  React.useEffect(() => {
+    DentalMasterService.getProcedures()
+      .then((data) => {
+        if (data && data.length > 0) setMasterProcedures(data);
+      })
+      .catch((err) => console.error("Gagal memuat master data tindakan:", err));
+  }, []);
 
   // 3. Odontogram State
   const [odontogramData, setOdontogramData] = React.useState<OdontogramData>({
@@ -1188,6 +1199,7 @@ export default function DentalEncounterWorkspacePage() {
               value={odontogramData}
               onChange={setOdontogramData}
               onSelectProcedure={handleOdontogramProcedureSelect}
+              procedures={masterProcedures}
             />
 
             {/* Procedures Summary Box */}
